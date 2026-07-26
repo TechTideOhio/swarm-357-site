@@ -2,37 +2,41 @@
 // description: Canonical Tailwind class strings for chrome and content UI tiers
 // reference: app/globals.css, lib/motion.tsx, components/header.tsx, components/footer.tsx
 
+// Every token below declares its transition exactly once: either through a
+// named utility from globals.css (interactive-base, interactive-press,
+// interactive-card, cta-morph) or through Tailwind transition-* utilities.
+// Mixing the two cancels one of them. See DESIGN.md, "One transition source".
+
 /** Press feedback for buttons and icon controls. */
-export const interactive_press =
-  "interactive-press active:scale-[0.96] transition-transform duration-200 ease-out";
+export const interactive_press = "interactive-press active:scale-[0.96]";
 
 /** Card lift and shadow on hover. */
 export const interactive_card =
-  "interactive-base transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-lg active:translate-y-0 active:shadow-2xl/20";
+  "interactive-card hover:-translate-y-1 hover:shadow-lg active:translate-y-0 active:shadow-2xl/20";
 
 /** Tier A - primary CTA (accent pill morph). */
 export const chrome_primary_cta =
-  "bg-accent rounded-[3.5px] px-5 py-3 text-sm font-medium tracking-tight text-black transition-all duration-500 ease-out hover:rounded-[50px] hover:brightness-105 focus-ring active:scale-[0.96] interactive-press disabled:opacity-50 disabled:pointer-events-none disabled:active:scale-100 disabled:hover:rounded-[3.5px]";
+  "bg-accent cta-morph rounded-[3.5px] px-5 py-3 text-sm font-medium tracking-tight text-black hover:rounded-[50px] hover:brightness-105 focus-ring active:scale-[0.96] disabled:opacity-50 disabled:pointer-events-none disabled:active:scale-100 disabled:hover:rounded-[3.5px]";
 
 /** Tier A - secondary CTA (muted pill morph). */
 export const chrome_secondary_cta =
-  "bg-muted text-foreground rounded-[3.5px] px-5 py-3 text-sm font-medium tracking-tight transition-all duration-500 ease-out hover:rounded-[50px] hover:brightness-95 focus-ring active:scale-[0.96] interactive-press disabled:opacity-50 disabled:pointer-events-none disabled:active:scale-100 disabled:hover:rounded-[3.5px]";
+  "bg-muted text-foreground cta-morph rounded-[3.5px] px-5 py-3 text-sm font-medium tracking-tight hover:rounded-[50px] hover:brightness-95 focus-ring active:scale-[0.96] disabled:opacity-50 disabled:pointer-events-none disabled:active:scale-100 disabled:hover:rounded-[3.5px]";
 
 /** Tier A - arrow CTA shell (white or accent background added per context). */
 export const chrome_arrow_cta =
-  "group interactive-base inline-flex items-center gap-3 rounded-[3.5px] py-3 pr-3 pl-4 font-medium tracking-tight transition-all duration-500 ease-out hover:rounded-[50px] focus-ring active:scale-[0.96] interactive-press";
+  "group cta-morph inline-flex items-center gap-3 rounded-[3.5px] py-3 pr-3 pl-4 font-medium tracking-tight hover:rounded-[50px] focus-ring active:scale-[0.96]";
 
 /** Tier A - arrow CTA chevron badge. */
 export const chrome_arrow_cta_badge =
-  "flex min-h-11 min-w-11 items-center justify-center rounded-full transition-all duration-300 ease-out group-hover:scale-110 group-active:scale-105";
+  "flex min-h-11 min-w-11 items-center justify-center rounded-full transition-transform duration-300 ease-out group-hover:scale-110 group-active:scale-105";
 
 /** Tier A - quiet text link with hover surface. */
 export const chrome_quiet_link =
-  "text-muted-foreground interactive-base rounded-[3.5px] px-3 py-1.5 text-sm transition-colors duration-300 ease-out hover:bg-foreground/5 hover:text-foreground focus-ring active:opacity-80 dark:hover:bg-foreground/10";
+  "text-muted-foreground interactive-base rounded-[3.5px] px-3 py-1.5 text-sm hover:bg-foreground/5 hover:text-foreground focus-ring active:opacity-80 dark:hover:bg-foreground/10";
 
 /** Tier A - circular icon button (44px minimum touch target). */
 export const chrome_icon_circle =
-  "flex min-h-11 min-w-11 items-center justify-center rounded-full transition-all duration-300 hover:scale-110 active:scale-105 focus-ring interactive-press";
+  "flex min-h-11 min-w-11 items-center justify-center rounded-full interactive-base hover:scale-110 active:scale-[0.96] focus-ring";
 
 /** Tier A - card / panel shell on landing sections. */
 export const chrome_card_shell =
@@ -58,7 +62,7 @@ export const chrome_form_control =
 
 /** Minimum 44px touch target for icon buttons and compact controls. */
 export const touch_target =
-  "inline-flex min-h-11 min-w-11 items-center justify-center focus-ring interactive-press active:scale-[0.96]";
+  "inline-flex min-h-11 min-w-11 items-center justify-center focus-ring interactive-base active:scale-[0.96]";
 
 /** Tier B - full-screen mobile dialog / sheet shell. */
 export const content_dialog_sheet_sm =
@@ -66,7 +70,7 @@ export const content_dialog_sheet_sm =
 
 /** Tier B - docs sidebar / nav link base. */
 export const content_nav_link =
-  "interactive-base block rounded-md border-l-2 border-transparent py-2 pl-[calc(0.75rem-2px)] pr-3 text-sm transition-colors focus-ring active:border-accent active:bg-muted";
+  "interactive-base block rounded-md border-l-2 border-transparent py-2 pl-[calc(0.75rem-2px)] pr-3 text-sm focus-ring active:border-accent active:bg-muted";
 
 /** Tier B - docs sidebar / nav link active state. */
 export const content_nav_link_active = "bg-accent font-medium text-black";
@@ -77,11 +81,11 @@ export const content_nav_link_inactive =
 
 /** Tier B - inline prose link. */
 export const content_inline_link =
-  "nav-link-underline text-foreground underline underline-offset-4 transition-opacity hover:opacity-70 focus-ring active:opacity-80";
+  "nav-link-underline text-foreground underline underline-offset-4 transition-opacity duration-200 ease-out hover:opacity-70 focus-ring active:opacity-80";
 
 /** Tier B - content card (docs home, pager). */
 export const content_card =
-  "border-border interactive-card rounded-xl border p-4 hover:border-accent/30";
+  "border-border interactive-card rounded-xl border p-4 hover:border-accent/30 focus-ring";
 
 /** Tier B - content form control (search trigger, inputs). */
 export const content_form_control =
@@ -93,4 +97,4 @@ export const content_dialog_panel =
 
 /** Tier B - breadcrumb link. */
 export const content_breadcrumb_link =
-  "nav-link-underline transition-opacity hover:opacity-70 focus-ring active:opacity-80";
+  "nav-link-underline transition-opacity duration-200 ease-out hover:opacity-70 focus-ring active:opacity-80";

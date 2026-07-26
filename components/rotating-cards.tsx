@@ -262,6 +262,8 @@ const RotatingCards: React.FC<RotatingCardsProps> = ({
     [onCardClick],
   );
 
+  const is_interactive = Boolean(onCardClick);
+
   const containerWidth = radius * 2 + cardWidth;
   const containerHeight = radius * 2 + cardHeight;
 
@@ -318,8 +320,9 @@ const RotatingCards: React.FC<RotatingCardsProps> = ({
             <motion.div
               key={`${card.id}-${cards.length}`}
               className={cn(
-                "absolute cursor-pointer overflow-hidden rounded-2xl border border-neutral-200/10 shadow-2xl/20",
+                "absolute overflow-hidden rounded-2xl border border-neutral-200/10 shadow-2xl/20",
                 "bg-background text-foreground",
+                is_interactive && "focus-ring cursor-pointer",
                 cardClassName,
               )}
               style={{
@@ -351,7 +354,21 @@ const RotatingCards: React.FC<RotatingCardsProps> = ({
               }}
               onMouseEnter={() => pauseOnHover && setIsHovered(true)}
               onMouseLeave={() => pauseOnHover && setIsHovered(false)}
-              onClick={() => handleCardClick(card, index)}
+              {...(is_interactive
+                ? {
+                    role: "button",
+                    tabIndex: 0,
+                    onClick: () => handleCardClick(card, index),
+                    onKeyDown: (event: React.KeyboardEvent<HTMLDivElement>) => {
+                      if (event.key !== "Enter" && event.key !== " ") return;
+                      event.preventDefault();
+                      handleCardClick(card, index);
+                    },
+                    onFocus: () => pauseOnHover && setIsHovered(true),
+                    onBlur: () => pauseOnHover && setIsHovered(false),
+                    whileTap: { scale: 0.96 },
+                  }
+                : {})}
               {...(pauseOnHover
                 ? {
                     whileHover: {

@@ -56,7 +56,7 @@ export function DocsMobileToolbar({
           ref={menu_button_ref}
           type="button"
           onClick={() => set_drawer_open(true)}
-          className={`${touch_target} text-foreground hover:bg-muted focus-ring gap-2 rounded-lg px-3 transition-colors active:opacity-80`}
+          className={`${touch_target} text-foreground hover:bg-muted focus-ring gap-2 rounded-lg px-3 active:opacity-80`}
           aria-expanded={drawer_open}
           aria-controls="docs-mobile-drawer"
           aria-label="Open documentation sections"
@@ -104,7 +104,7 @@ export function DocsMobileToolbar({
                 <button
                   type="button"
                   onClick={() => set_drawer_open(false)}
-                  className={`${touch_target} text-muted-foreground hover:text-foreground focus-ring rounded-full transition-colors active:opacity-80`}
+                  className={`${touch_target} text-muted-foreground hover:text-foreground focus-ring rounded-full active:opacity-80`}
                   aria-label="Close documentation sections"
                 >
                   <X className="h-5 w-5" aria-hidden="true" />

@@ -149,7 +149,7 @@ Every interactive element answers four states the same way.
 |-------|----------|
 | Rest | Token colors, `rounded-[3.5px]` for controls |
 | Hover | Color or brightness shift, cards lift by `-translate-y-1`, buttons morph toward a pill |
-| Press | `active:scale-[0.96]` on buttons, `active:opacity-80` on links |
+| Press | `active:scale-[0.96]` on every button and icon control, `active:opacity-80` on links. Presses always move inward |
 | Focus | `.focus-ring` renders a 2px `--ring` outline at 2px offset on `:focus-visible` only |
 | Disabled | `disabled:opacity-50`, pointer events off, press and morph suppressed |
 
@@ -157,18 +157,20 @@ Named utilities in [`app/globals.css`](app/globals.css):
 
 | Utility | Behavior |
 |---------|----------|
-| `.interactive-base` | 200ms transition across color, transform, and shadow |
+| `.interactive-base` | 200ms transition across color, background, border, opacity, transform, and shadow |
 | `.interactive-press` | 200ms transform-only transition |
 | `.interactive-card` | 300ms transition across transform, shadow, border, and background |
-| `.glow-accent` | Accent halo for the single most important call to action on a page |
-| `.glow-accent-subtle` | Accent ring for a highlighted card, such as the featured pricing tier |
+| `.cta-morph` | Pill call to action. Radius at 500ms, color, brightness, opacity and press at 200ms, shadow at 300ms |
+| `.glow-accent` | Accent halo for the single most important call to action on a page. Carries box-shadow values only |
+| `.glow-accent-subtle` | Accent ring for a highlighted card, such as the featured pricing tier. Carries box-shadow values only |
 | `.nav-link-underline` | Ring-colored underline that scales in from the center on hover and focus |
 | `.focus-ring` | The only sanctioned focus treatment |
 
-Two rules that are easy to get wrong:
+Three rules that are easy to get wrong:
 
-1. **One glow per page.** `.glow-accent` marks a single primary action. If a second element glows, neither reads as primary.
-2. **The pill morph is slow on purpose.** Calls to action animate radius over `duration-500` while color and press respond at 200ms. Do not shorten the morph to match the press.
+1. **One transition source per element.** An element declares its transition either through a named utility above or through Tailwind `transition-*` utilities, never both. These utilities live in `@layer utilities` and are emitted after Tailwind's own, so a second declaration silently cancels the first and the element stops animating the properties it visibly changes. If a control needs more than transform, reach for `.interactive-base` rather than adding `transition-colors` next to `.interactive-press`.
+2. **One glow per page.** `.glow-accent` marks a single primary action. If a second element glows, neither reads as primary. The glow utilities deliberately carry no transition of their own, so the host element owns the timing.
+3. **The pill morph is slow on purpose.** Calls to action animate radius over 500ms while color and press respond at 200ms. `.cta-morph` expresses both in a single declaration. Do not shorten the morph to match the press.
 
 ## Motion
 

@@ -38,7 +38,7 @@ function ToastViewport(): ReactNode {
             transition={
               prefers_reduced_motion ? { duration: 0.01 } : toastSpringTransition
             }
-            className={`bg-card border-border text-foreground pointer-events-auto flex w-full max-w-sm items-start gap-3 rounded-xl border p-4 shadow-2xl/20 ${
+            className={`bg-background border-border text-foreground pointer-events-auto flex w-full max-w-sm items-start gap-3 rounded-xl border p-4 shadow-2xl/20 ${
               toast.variant === "error" ? "border-foreground/20" : ""
             }`}
           >
@@ -46,7 +46,7 @@ function ToastViewport(): ReactNode {
             <button
               type="button"
               onClick={() => dismissToast(toast.id)}
-              className={`${touch_target} text-muted-foreground hover:text-foreground shrink-0 rounded-full transition-colors active:opacity-80`}
+              className={`${touch_target} text-muted-foreground hover:text-foreground shrink-0 rounded-full active:opacity-80`}
               aria-label="Dismiss notification"
             >
               <X className="h-4 w-4" aria-hidden="true" />

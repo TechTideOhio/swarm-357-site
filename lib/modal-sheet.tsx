@@ -119,7 +119,7 @@ export function ModalSheet({
               <button
                 type="button"
                 onClick={onClose}
-                className={`${touch_target} text-muted-foreground hover:text-foreground rounded-full transition-colors active:opacity-80`}
+                className={`${touch_target} text-muted-foreground hover:text-foreground rounded-full active:opacity-80`}
                 aria-label="Close dialog"
               >
                 <X className="h-5 w-5" aria-hidden="true" />
