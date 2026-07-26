@@ -8,50 +8,44 @@ import { motion } from "motion/react";
 interface Testimonial {
   title: string;
   description: string;
-  name: string;
-  role: string;
+  scenario: string;
   image: string;
 }
 
 const testimonials: Testimonial[] = [
   {
-    title: "Replaced Our Entire Outreach Stack",
+    title: "Sales outreach",
     description:
-      "We pointed the Sales layer at our CRM exports and got cold emails, follow-ups, and battlecards out of a single swarm run. Budget caps kept costs predictable from day one.",
-    name: "Jordan Lee",
-    role: "Revenue Ops, Series B SaaS",
+      "Point the Sales layer at CRM exports and draft cold emails, follow-ups, and battlecards in a single swarm run. Budget caps keep costs predictable.",
+    scenario: "Use-case scenario",
     image: "/art/testimonials/outreach.png",
   },
   {
-    title: "Memory That Actually Persists",
+    title: "Durable memory",
     description:
-      "The .mv2 memory store means agents recall last week's research without re-running prompts. We migrated from flat files with one CLI command and never looked back.",
-    name: "Priya Venkatesh",
-    role: "AI Engineering Lead",
+      "Optional Memvid .mv2 (Beta bridge) lets agents recall prior research without re-running prompts. Flat-file topics remain the Stable default.",
+    scenario: "Use-case scenario",
     image: "/art/testimonials/memory.png",
   },
   {
-    title: "Security Review Was Painless",
+    title: "Security review",
     description:
-      "Our infosec team reviewed BashSecurityGate, the budget caps, and Memvid verify in a single afternoon. First open-source agent tool they cleared without a follow-up.",
-    name: "Thomas Gruber",
-    role: "CISO, Fintech Startup",
+      "BashSecurityGate, HITL for Bash, budget caps, and Memvid verify give reviewers concrete controls — not a blank-slate agent sandbox.",
+    scenario: "Use-case scenario",
     image: "/art/testimonials/security.png",
   },
   {
-    title: "CLAUDE.md Is the Killer Feature",
+    title: "CLAUDE.md onboarding",
     description:
-      "Load one file and Claude Code understands the whole swarm: layers, CLI, memory, bridge. Onboarding new engineers takes an hour instead of a week.",
-    name: "Maya Okonkwo",
-    role: "Platform Engineer",
+      "Load one file and Claude Code understands the swarm: layers, CLI, memory, bridge, and STATUS maturity. Faster engineer onboarding.",
+    scenario: "Use-case scenario",
     image: "/art/testimonials/claude-md.png",
   },
   {
-    title: "UltraPlan Saved Our Offsite",
+    title: "UltraPlan planning",
     description:
-      "We fed our quarterly goals into swarm plan and got a phased rollout with budget estimates in fifteen minutes. The exec team used it as the actual slide deck.",
-    name: "Carlos Mendez",
-    role: "VP Engineering",
+      "Feed quarterly goals into swarm plan for a phased rollout with budget estimates — useful as a planning artifact, not a substitute for human sign-off.",
+    scenario: "Use-case scenario",
     image: "/art/testimonials/ultraplan.png",
   },
 ];
@@ -182,12 +176,9 @@ export function Testimonials() {
                     <p className="text-muted-foreground mb-6 text-base leading-relaxed md:text-lg">
                       {item.description}
                     </p>
-                    <div>
-                      <p className="font-medium tracking-tight text-foreground">
-                        {item.name}
-                      </p>
-                      <p className="text-muted-foreground text-sm">{item.role}</p>
-                    </div>
+                    <p className="text-muted-foreground text-sm tracking-tight">
+                      {item.scenario}
+                    </p>
                   </div>
                 </div>
               </article>

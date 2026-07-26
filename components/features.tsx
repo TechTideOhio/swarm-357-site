@@ -23,7 +23,7 @@ const features: Feature[] = [
     number: "02",
     title: "Durable .mv2 memory",
     description:
-      "Replace flat-file context with portable Memvid capsules. WAL-based crash safety, full-text and vector search, integrity verification -- no database server required.",
+      "Flat-file topics ship Stable by default. Optional Memvid bridge (Beta) adds portable .mv2 capsules with WAL crash safety, search, and verify — no database server required.",
   },
   {
     number: "03",
