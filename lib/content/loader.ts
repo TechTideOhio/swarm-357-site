@@ -87,6 +87,24 @@ export function load_all_docs(): DocPage[] {
   return pages;
 }
 
+/**
+ * Slugs become route hrefs, so they are restricted to the shape a filename is
+ * allowed to have rather than trusted because they came off disk.
+ */
+const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
+/** Covers become `src` attributes, so only a bundled image path is accepted. */
+const COVER_PATTERN = /^\/art\/blog\/[a-z0-9-]+\.(?:jpg|jpeg|png|webp)$/;
+
+function safe_slug(value: string): string | null {
+  return SLUG_PATTERN.test(value) ? value : null;
+}
+
+function safe_cover(value: unknown): string | undefined {
+  if (typeof value !== "string") return undefined;
+  return COVER_PATTERN.test(value) ? value : undefined;
+}
+
 function parse_faq(value: unknown): BlogFaqEntry[] | undefined {
   if (!Array.isArray(value)) return undefined;
 
@@ -101,7 +119,10 @@ function parse_faq(value: unknown): BlogFaqEntry[] | undefined {
   return entries.length > 0 ? entries : undefined;
 }
 
-export function load_blog_by_slug(slug: string): BlogPost | null {
+export function load_blog_by_slug(raw_slug: string): BlogPost | null {
+  const slug = safe_slug(raw_slug);
+  if (!slug) return null;
+
   const file_path = path.join(BLOG_DIR, `${slug}.mdx`);
   if (!fs.existsSync(file_path)) return null;
 
@@ -112,7 +133,7 @@ export function load_blog_by_slug(slug: string): BlogPost | null {
     date: String(data.date ?? ""),
     slug,
     updated: data.updated ? String(data.updated) : undefined,
-    cover: data.cover ? String(data.cover) : undefined,
+    cover: safe_cover(data.cover),
     coverAlt: data.coverAlt ? String(data.coverAlt) : undefined,
     author: data.author ? String(data.author) : undefined,
     keyword: data.keyword ? String(data.keyword) : undefined,

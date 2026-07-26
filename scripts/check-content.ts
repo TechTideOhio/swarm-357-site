@@ -377,8 +377,12 @@ function check_blog_frontmatter() {
 
     const cover = read_field("cover");
     if (cover) {
-      if (!cover.startsWith("/")) {
-        errors.push(`${rel}: cover "${cover}" must be an absolute path under /public`);
+      // Mirrors COVER_PATTERN in lib/content/loader.ts, which drops anything
+      // outside this shape rather than rendering an unvalidated src attribute.
+      if (!/^\/art\/blog\/[a-z0-9-]+\.(?:jpg|jpeg|png|webp)$/.test(cover)) {
+        errors.push(
+          `${rel}: cover "${cover}" must match /art/blog/<lowercase-slug>.<jpg|jpeg|png|webp>`
+        );
       } else if (!fs.existsSync(path.join(ROOT, "public", cover.replace(/^\//, "")))) {
         errors.push(`${rel}: cover "${cover}" does not exist in public/`);
       }

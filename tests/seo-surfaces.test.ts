@@ -7,7 +7,7 @@ import { describe, expect, test } from "bun:test";
 import sitemap from "../app/sitemap";
 import { GET as feed_get } from "../app/feed.xml/route";
 import { GET as llms_get } from "../app/llms.txt/route";
-import { load_all_blog_posts } from "../lib/content/loader";
+import { load_all_blog_posts, load_blog_by_slug } from "../lib/content/loader";
 import { SITE_URL } from "../lib/site-url";
 
 const posts = load_all_blog_posts();
@@ -43,6 +43,20 @@ describe("blog corpus", () => {
   test("posts are ordered newest first", () => {
     const dates = posts.map((post) => post.frontmatter.date);
     expect([...dates].sort().reverse()).toEqual(dates);
+  });
+});
+
+describe("loader input validation", () => {
+  test("rejects a slug that is not a plain lowercase filename", () => {
+    for (const slug of ["../secrets", "Upper", "has space", "javascript:alert(1)", ""]) {
+      expect(load_blog_by_slug(slug)).toBeNull();
+    }
+  });
+
+  test("every href is a relative blog route", () => {
+    for (const post of posts) {
+      expect(post.href).toBe(`/blog/${post.slug}`);
+    }
   });
 });
 
