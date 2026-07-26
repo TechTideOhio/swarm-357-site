@@ -3,6 +3,7 @@
 // reference: lib/content/nav.ts
 
 import Link from "next/link";
+import { content_breadcrumb_link } from "@/lib/ui-classes";
 import type { ReactNode } from "react";
 
 export function DocsBreadcrumbs({
@@ -21,7 +22,7 @@ export function DocsBreadcrumbs({
               {is_last ? (
                 <span className="text-foreground">{crumb.title}</span>
               ) : (
-                <Link href={crumb.href} className="hover:text-foreground transition-colors">
+                <Link href={crumb.href} className={content_breadcrumb_link}>
                   {crumb.title}
                 </Link>
               )}

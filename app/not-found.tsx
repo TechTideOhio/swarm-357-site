@@ -1,9 +1,10 @@
 // file: app/not-found.tsx
 // description: Global 404 not found page
-// reference: app/layout.tsx, components/page-shell.tsx
+// reference: app/layout.tsx, components/page-shell.tsx, lib/ui-classes.ts
 
 import Link from "next/link";
 import { PageShell } from "@/components/page-shell";
+import { chrome_primary_cta, chrome_secondary_cta } from "@/lib/ui-classes";
 import type { ReactNode } from "react";
 
 export default function NotFound(): ReactNode {
@@ -13,10 +14,10 @@ export default function NotFound(): ReactNode {
         The page you requested does not exist or was moved.
       </p>
       <div className="flex justify-center gap-4">
-        <Link href="/" className="bg-foreground text-background rounded-md px-5 py-3 text-sm font-medium">
+        <Link href="/" className={`${chrome_primary_cta} glow-accent`}>
           Home
         </Link>
-        <Link href="/docs" className="border-border rounded-md border px-5 py-3 text-sm font-medium">
+        <Link href="/docs" className={`${chrome_secondary_cta} border-border border`}>
           Documentation
         </Link>
       </div>

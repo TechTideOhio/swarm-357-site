@@ -6,7 +6,13 @@
 
 import { InteractiveArtPanel } from "@/components/interactive-art-panel";
 import { featuresConfig } from "@/lib/config";
-import { easeOut } from "@/lib/motion";
+import { fadeInUpView } from "@/lib/motion";
+import {
+  chrome_arrow_cta,
+  chrome_arrow_cta_badge,
+  interactive_card,
+  chrome_card_shell,
+} from "@/lib/ui-classes";
 import { ChevronRightIcon } from "lucide-react";
 import { motion } from "motion/react";
 import Link from "next/link";
@@ -25,7 +31,7 @@ const features: Feature[] = [
     number: "01",
     title: "Layered orchestration",
     description:
-      "Six business layers -- Sales, Support, Marketing, SEO, Research, Operations -- plus Management meta-agents. Pre-defined roles, not blank-slate prompts.",
+      "Six business layers (Sales, Support, Marketing, SEO, Research, Operations) plus Management meta-agents. Pre-defined roles, not blank-slate prompts.",
     image: "/art/hero/layer-health.png",
     image_label: "Layer health",
   },
@@ -56,15 +62,9 @@ function FeatureCard({
 }): ReactNode {
   return (
     <motion.div
-      className="group bg-muted grid grid-cols-1 gap-2 overflow-hidden rounded-2xl border border-neutral-200/10 p-2 shadow-2xl/20 transition-colors duration-300 ease-out hover:bg-muted/80 md:grid-cols-2"
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.5 }}
-      transition={{
-        duration: 0.8,
-        delay: index * 0.1,
-        ease: easeOut,
-      }}
+      className={`${chrome_card_shell} ${interactive_card} group grid grid-cols-1 gap-2 overflow-hidden p-2 hover:border-accent/30 md:grid-cols-2`}
+      {...fadeInUpView}
+      transition={{ ...fadeInUpView.transition, delay: index * 0.1 }}
     >
       <div className="px-4 py-16 md:py-28">
         <span className="text-muted-foreground bg-foreground/5 mb-4 block w-fit rounded-[3.5px] px-2 py-1 text-sm font-medium tracking-tight transition-colors duration-300 ease-out group-hover:bg-foreground/10">
@@ -91,13 +91,7 @@ export function Features(): ReactNode {
   return (
     <section className="bg-background px-6 py-16 md:py-32">
       <div className="mx-auto flex max-w-6xl flex-col gap-12 lg:flex-row lg:items-start lg:gap-16">
-        <motion.div
-          className="lg:sticky lg:top-60 lg:w-96 lg:shrink-0"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.5 }}
-          transition={{ duration: 0.8, ease: easeOut }}
-        >
+        <motion.div className="lg:sticky lg:top-60 lg:w-96 lg:shrink-0" {...fadeInUpView}>
           <h2 className="mb-4 text-2xl font-medium tracking-tight md:mb-6 md:text-3xl lg:text-4xl">
             {featuresConfig.title}
           </h2>
@@ -106,10 +100,10 @@ export function Features(): ReactNode {
           </p>
           <Link
             href="/docs"
-            className="group bg-accent inline-flex w-full items-center justify-center gap-3 rounded-[3.5px] py-3 pr-3 pl-4 font-medium tracking-tight text-black transition-all duration-500 ease-out hover:rounded-[50px] sm:w-auto"
+            className={`${chrome_arrow_cta} bg-accent w-full text-black sm:w-auto`}
           >
             <span>Read the docs</span>
-            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-black transition-all duration-300 ease-out group-hover:scale-110">
+            <span className={`${chrome_arrow_cta_badge} bg-white text-black`}>
               <ChevronRightIcon className="relative left-px h-4 w-4" />
             </span>
           </Link>

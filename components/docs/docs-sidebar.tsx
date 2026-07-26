@@ -7,6 +7,11 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { docs_nav } from "@/lib/content/nav";
+import {
+  content_nav_link,
+  content_nav_link_active,
+  content_nav_link_inactive,
+} from "@/lib/ui-classes";
 import type { ReactNode } from "react";
 
 export function DocsSidebar(): ReactNode {
@@ -26,10 +31,8 @@ export function DocsSidebar(): ReactNode {
                 <li key={item.slug}>
                   <Link
                     href={item.href}
-                    className={`block rounded-md px-3 py-2 text-sm transition-colors ${
-                      active
-                        ? "bg-accent font-medium text-black"
-                        : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                    className={`${content_nav_link} ${
+                      active ? content_nav_link_active : content_nav_link_inactive
                     }`}
                   >
                     {item.title}

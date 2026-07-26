@@ -4,6 +4,7 @@
 
 import Link from "next/link";
 import type { MDXComponents } from "mdx/types";
+import { content_inline_link } from "@/lib/ui-classes";
 import type { ReactNode } from "react";
 import { Callout } from "./callout";
 
@@ -65,8 +66,7 @@ function Td({ children, ...props }: React.TdHTMLAttributes<HTMLTableCellElement>
 
 function A({ href, children }: React.AnchorHTMLAttributes<HTMLAnchorElement>) {
   const is_external = href?.startsWith("http");
-  const className =
-    "text-foreground underline underline-offset-4 transition-opacity hover:opacity-70";
+  const className = content_inline_link;
   if (is_external) {
     return (
       <a
@@ -127,5 +127,5 @@ export const mdx_components: MDXComponents = {
 };
 
 export function MdxContent({ children }: { children: ReactNode }) {
-  return <div className="docs-prose max-w-none">{children}</div>;
+  return <div className="max-w-none">{children}</div>;
 }

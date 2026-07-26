@@ -2,10 +2,15 @@
 
 import { faqConfig } from "@/lib/config";
 import { landing_faqs } from "@/lib/faq-data";
-import { easeOut } from "@/lib/motion";
+import { easeOut, fadeInUpView } from "@/lib/motion";
+import {
+  chrome_arrow_cta,
+  chrome_arrow_cta_badge,
+  chrome_card_shell,
+} from "@/lib/ui-classes";
 import { ChevronDown, ChevronRightIcon } from "lucide-react";
-import { AnimatePresence, motion, useInView } from "motion/react";
-import { useRef, useState, type ReactNode } from "react";
+import { AnimatePresence, motion } from "motion/react";
+import { useState, type ReactNode } from "react";
 
 const faqs = landing_faqs;
 
@@ -23,17 +28,15 @@ function FAQItem({
   return (
     <motion.div
       className="border-foreground/10 border-b last:border-b-0"
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.5 }}
-      transition={{ duration: 0.8, delay: index * 0.05, ease: easeOut }}
+      {...fadeInUpView}
+      transition={{ ...fadeInUpView.transition, delay: index * 0.05 }}
     >
       <button
         type="button"
         onClick={onToggle}
         aria-expanded={isOpen}
         aria-controls={`faq-panel-${index}`}
-        className="group focus-ring flex w-full items-center justify-between py-6 text-left"
+        className="group focus-ring hover:bg-foreground/5 active:bg-foreground/10 flex w-full items-center justify-between py-6 text-left transition-colors duration-200"
       >
         <span className="text-foreground text-lg font-medium pr-8 md:text-xl">
           {faq.question}
@@ -68,8 +71,6 @@ function FAQItem({
 
 export function FAQ(): ReactNode {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const headerRef = useRef<HTMLDivElement>(null);
-  const isHeaderInView = useInView(headerRef, { once: true, amount: 0.5 });
 
   const handleToggle = (index: number) => {
     setOpenIndex(openIndex === index ? null : index);
@@ -78,24 +79,15 @@ export function FAQ(): ReactNode {
   return (
     <section className="bg-foreground px-6 py-16 md:py-32 rounded-4xl">
       <div className="mx-auto max-w-3xl">
-        <motion.div
-          ref={headerRef}
-          className="mb-12 text-center md:mb-16"
-          initial={{ opacity: 0, y: 30 }}
-          animate={isHeaderInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-          transition={{ duration: 0.8, ease: easeOut }}
-        >
+        <motion.div className="mb-12 text-center md:mb-16" {...fadeInUpView}>
           <h2 className="text-background text-3xl font-medium tracking-tight md:text-4xl lg:text-5xl">
             {faqConfig.title}
           </h2>
         </motion.div>
 
         <motion.div
-          className="bg-background rounded-2xl border border-neutral-200/10 px-6 py-2 shadow-2xl/20 md:px-10"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.5 }}
-          transition={{ duration: 0.8, ease: easeOut }}
+          className={`${chrome_card_shell} bg-background px-6 py-2 md:px-10`}
+          {...fadeInUpView}
         >
           {faqs.map((faq, index) => (
             <FAQItem
@@ -110,20 +102,18 @@ export function FAQ(): ReactNode {
 
         <motion.div
           className="mt-12 text-center"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.5 }}
-          transition={{ duration: 0.8, delay: 0.2, ease: easeOut }}
+          {...fadeInUpView}
+          transition={{ ...fadeInUpView.transition, delay: 0.2 }}
         >
           <p className="text-background/60 mb-6 text-base">
             {faqConfig.contact.text}
           </p>
           <a
             href={faqConfig.contact.cta.href}
-            className="group bg-accent inline-flex items-center gap-3 rounded-[3.5px] py-3 pr-3 pl-4 font-medium tracking-tight text-black transition-all duration-500 ease-out hover:rounded-[50px]"
+            className={`${chrome_arrow_cta} bg-accent text-black`}
           >
             <span>{faqConfig.contact.cta.text}</span>
-            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-black transition-all duration-300 ease-out group-hover:scale-110">
+            <span className={`${chrome_arrow_cta_badge} bg-white text-black`}>
               <ChevronRightIcon className="relative left-px h-4 w-4" />
             </span>
           </a>

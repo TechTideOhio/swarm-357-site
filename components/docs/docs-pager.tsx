@@ -5,6 +5,7 @@
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { DocNeighbor } from "@/lib/content/types";
+import { content_card } from "@/lib/ui-classes";
 import type { ReactNode } from "react";
 
 export function DocsPager({
@@ -21,7 +22,7 @@ export function DocsPager({
       {prev ? (
         <Link
           href={prev.href}
-          className="group border-border hover:bg-muted rounded-xl border p-4 transition-colors"
+          className={`${content_card} group active:opacity-90`}
         >
           <span className="text-muted-foreground flex items-center gap-1 text-xs uppercase tracking-wider">
             <ChevronLeft className="h-3 w-3" /> Previous
@@ -34,7 +35,7 @@ export function DocsPager({
       {next ? (
         <Link
           href={next.href}
-          className="group border-border hover:bg-muted rounded-xl border p-4 text-right transition-colors"
+          className={`${content_card} group text-right active:opacity-90`}
         >
           <span className="text-muted-foreground flex items-center justify-end gap-1 text-xs uppercase tracking-wider">
             Next <ChevronRight className="h-3 w-3" />

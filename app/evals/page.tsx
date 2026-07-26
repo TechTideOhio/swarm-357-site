@@ -1,12 +1,13 @@
 // file: app/evals/page.tsx
 // description: Standalone eval results summary page
-// reference: content/data/eval-baseline.json, docs/evals/latest-baseline, components/page-shell.tsx
+// reference: lib/eval-baseline.ts, docs/evals/latest-baseline, components/page-shell.tsx
 
 import Link from "next/link";
 import Image from "next/image";
 import { PageShell } from "@/components/page-shell";
 import { createMetadata } from "@/lib/metadata";
-import { load_data_json } from "@/lib/content/loader";
+import { get_eval_baseline } from "@/lib/eval-baseline";
+import { content_inline_link } from "@/lib/ui-classes";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
@@ -17,10 +18,7 @@ export const metadata: Metadata = createMetadata({
 });
 
 export default function EvalsPage(): ReactNode {
-  const baseline = load_data_json<{
-    meta?: { task_count?: number; passed?: number; budget_spent_usd?: number; budget_limit_usd?: number };
-    summary?: { single_agent_pass?: string; swarm_pass?: string };
-  }>("eval-baseline");
+  const baseline = get_eval_baseline();
 
   return (
     <PageShell
@@ -39,38 +37,47 @@ export default function EvalsPage(): ReactNode {
       </div>
 
       {baseline ? (
-        <div className="border-border mb-8 overflow-hidden rounded-xl border">
-          <table className="w-full text-sm">
+        <div className="border-border mb-8 overflow-x-auto rounded-xl border">
+          <table className="w-full min-w-[20rem] text-sm">
             <tbody>
               <tr className="border-border border-b">
                 <td className="px-4 py-3 font-medium">Executions</td>
-                <td className="px-4 py-3">{baseline.meta?.task_count ?? "n/a"}</td>
+                <td className="px-4 py-3">{baseline.executions}</td>
               </tr>
               <tr className="border-border border-b">
                 <td className="px-4 py-3 font-medium">Passed gates</td>
-                <td className="px-4 py-3">{baseline.meta?.passed ?? "n/a"}</td>
+                <td className="px-4 py-3">{baseline.passed}</td>
+              </tr>
+              <tr className="border-border border-b">
+                <td className="px-4 py-3 font-medium">Avg combined score</td>
+                <td className="px-4 py-3">{baseline.avg_combined_score.toFixed(3)}</td>
               </tr>
               <tr className="border-border border-b">
                 <td className="px-4 py-3 font-medium">Spend</td>
                 <td className="px-4 py-3">
-                  ${baseline.meta?.budget_spent_usd?.toFixed(2) ?? "n/a"} / $
-                  {baseline.meta?.budget_limit_usd ?? "n/a"}
+                  ${baseline.spent_usd.toFixed(2)} / ${baseline.budget_usd.toFixed(2)}
+                </td>
+              </tr>
+              <tr className="border-border border-b">
+                <td className="px-4 py-3 font-medium">Provider</td>
+                <td className="px-4 py-3">
+                  {baseline.provider} · {baseline.agent_model}
                 </td>
               </tr>
               <tr className="border-border border-b">
                 <td className="px-4 py-3 font-medium">Single-agent</td>
-                <td className="px-4 py-3">{baseline.summary?.single_agent_pass ?? "n/a"}</td>
+                <td className="px-4 py-3">{baseline.single_agent_pass}</td>
               </tr>
               <tr>
                 <td className="px-4 py-3 font-medium">Swarm</td>
-                <td className="px-4 py-3">{baseline.summary?.swarm_pass ?? "n/a"}</td>
+                <td className="px-4 py-3">{baseline.swarm_pass}</td>
               </tr>
             </tbody>
           </table>
         </div>
       ) : null}
 
-      <Link href="/docs/evals/methodology" className="font-medium underline underline-offset-4">
+      <Link href="/docs/evals/methodology" className={`${content_inline_link} font-medium`}>
         Read full eval methodology
       </Link>
     </PageShell>

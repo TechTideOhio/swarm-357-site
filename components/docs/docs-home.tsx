@@ -1,14 +1,20 @@
 // file: components/docs/docs-home.tsx
 // description: Documentation index page with section cards
-// reference: lib/content/nav.ts
+// reference: lib/content/nav.ts, lib/ui-classes.ts
 
-import Link from "next/link";
 import { docs_nav } from "@/lib/content/nav";
+import {
+  content_card,
+  content_inline_link,
+  content_nav_link,
+  content_nav_link_inactive,
+} from "@/lib/ui-classes";
+import Link from "next/link";
 import type { ReactNode } from "react";
 
 export function DocsHome(): ReactNode {
   return (
-    <main id="main-content" className="max-w-3xl">
+    <main id="main-content" className="mx-auto max-w-3xl">
       <h1 className="mb-4 text-4xl font-medium tracking-tight md:text-5xl">Documentation</h1>
       <p className="text-muted-foreground mb-12 text-lg leading-relaxed">
         Everything you need to install, configure, run, and operate Swarm 357. Layered agents,
@@ -17,14 +23,14 @@ export function DocsHome(): ReactNode {
 
       <div className="grid gap-6 sm:grid-cols-2">
         {docs_nav.map((section) => (
-          <section key={section.title} className="border-border rounded-2xl border p-6 shadow-sm">
+          <section key={section.title} className={`${content_card} p-6`}>
             <h2 className="mb-4 text-lg font-semibold">{section.title}</h2>
             <ul className="space-y-2">
               {section.items.slice(0, 4).map((item) => (
                 <li key={item.slug}>
                   <Link
                     href={item.href}
-                    className="text-muted-foreground hover:text-foreground text-sm transition-colors"
+                    className={`${content_nav_link} ${content_nav_link_inactive}`}
                   >
                     {item.title}
                   </Link>
@@ -34,7 +40,7 @@ export function DocsHome(): ReactNode {
                 <li>
                   <Link
                     href={section.items[0]?.href ?? "/docs"}
-                    className="text-sm font-medium underline underline-offset-4"
+                    className={`${content_inline_link} text-sm font-medium`}
                   >
                     View all {section.items.length} pages
                   </Link>

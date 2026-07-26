@@ -3,6 +3,12 @@
 import { footerConfig } from "@/lib/config";
 import { footer_links, github_social } from "@/lib/navigation";
 import { fadeInUpView } from "@/lib/motion";
+import {
+  chrome_arrow_cta,
+  chrome_arrow_cta_badge,
+  chrome_icon_circle,
+  content_inline_link,
+} from "@/lib/ui-classes";
 import { ChevronRightIcon } from "lucide-react";
 import { motion } from "motion/react";
 import Link from "next/link";
@@ -18,23 +24,23 @@ function GitHubIcon({ className }: { className?: string }): ReactNode {
 
 export function Footer(): ReactNode {
   return (
-    <footer className="bg-accent rounded-tr-4xl rounded-tl-4xl px-6 py-16 text-black md:px-12 lg:px-20">
+    <footer className="bg-accent rounded-tr-4xl rounded-tl-4xl px-6 py-8 text-black md:px-12 md:py-16 lg:px-20">
       <div className="mx-auto max-w-6xl">
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-20">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-20">
           <motion.div className="max-w-md" {...fadeInUpView}>
             <p className="text-lg leading-relaxed text-black/80">{footerConfig.description}</p>
             <Link
               href={footerConfig.cta.href}
-              className="group mt-8 inline-flex items-center gap-3 rounded-md bg-white py-3 pl-4 pr-3 font-medium shadow-lg shadow-black/10 transition-all duration-500 ease-out hover:rounded-[50px] hover:bg-white/90 hover:shadow-xl hover:shadow-black/20"
+              className={`${chrome_arrow_cta} mt-8 bg-white shadow-lg shadow-black/10 hover:bg-white/90 hover:shadow-xl hover:shadow-black/20`}
             >
               <span>{footerConfig.cta.text}</span>
-              <span className="bg-accent relative left-px flex h-10 w-10 items-center justify-center rounded-full text-black transition-all duration-300 group-hover:scale-110">
+              <span className={`${chrome_arrow_cta_badge} bg-accent relative left-px text-black`}>
                 <ChevronRightIcon className="relative left-px h-4 w-4" />
               </span>
             </Link>
           </motion.div>
 
-          <div className="grid grid-cols-2 gap-8 lg:justify-items-end">
+          <div className="grid max-[400px]:grid-cols-1 grid-cols-2 gap-6 gap-y-6 lg:justify-items-end">
             <motion.div {...fadeInUpView} transition={{ ...fadeInUpView.transition, delay: 0.1 }}>
               <h4 className="mb-4 text-sm font-semibold tracking-wider text-black/50 uppercase">
                 Product
@@ -44,7 +50,7 @@ export function Footer(): ReactNode {
                   <li key={link.label}>
                     <Link
                       href={link.href}
-                      className="inline-block text-black/80 transition-all duration-300 hover:translate-x-1 hover:text-black"
+                      className="nav-link-underline focus-ring inline-flex min-h-11 items-center text-black/80 transition-opacity duration-200 hover:text-black active:opacity-80"
                     >
                       {link.label}
                     </Link>
@@ -61,7 +67,7 @@ export function Footer(): ReactNode {
                   <li key={link.label}>
                     <Link
                       href={link.href}
-                      className="inline-block text-black/80 transition-all duration-300 hover:translate-x-1 hover:text-black"
+                      className="nav-link-underline focus-ring inline-flex min-h-11 items-center text-black/80 transition-opacity duration-200 hover:text-black active:opacity-80"
                     >
                       {link.label}
                     </Link>
@@ -72,9 +78,9 @@ export function Footer(): ReactNode {
           </div>
         </div>
 
-        <div className="my-16 h-px bg-black/10" />
+        <div className="my-8 h-px bg-black/10 md:my-16" />
 
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-20">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-20">
           <motion.div {...fadeInUpView}>
             <h2 className="text-5xl leading-none font-medium tracking-tight md:text-6xl lg:text-7xl">
               Build with
@@ -96,7 +102,7 @@ export function Footer(): ReactNode {
               </div>
               <Link
                 href="/docs/resources/contributing"
-                className="inline-block text-lg font-medium underline underline-offset-4 transition-opacity hover:opacity-70"
+                className={`${content_inline_link} inline-block text-lg font-medium`}
               >
                 Contributing guide
               </Link>
@@ -111,7 +117,7 @@ export function Footer(): ReactNode {
                 href={github_social.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex h-10 w-10 items-center justify-center rounded-full bg-black/10 text-black transition-all duration-300 hover:scale-110 hover:bg-black hover:text-accent"
+                className={`${chrome_icon_circle} bg-black/10 text-black hover:bg-black hover:text-accent`}
                 aria-label={github_social.ariaLabel}
               >
                 <GitHubIcon className="h-4 w-4" />

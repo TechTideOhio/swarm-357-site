@@ -38,15 +38,70 @@ function read_core(relative: string): string {
   return fs.readFileSync(path.join(CORE_ROOT, relative), "utf8");
 }
 
+const CORE_REPO_URL = "https://github.com/TechTideOhio/swarm-357";
+const SITE_REPO_URL = "https://github.com/TechTideOhio/swarm-357-site";
+
+/** Core repo file paths that have a published equivalent on this site. */
+const CORE_DOC_ROUTES: ReadonlyArray<readonly [RegExp, string]> = [
+  [/STATUS\.md/i, "/docs/resources/status"],
+  [/VERIFY\.md/i, "/docs/resources/verification"],
+  [/EVALS\.md/i, "/docs/evals/methodology"],
+  [/ENTERPRISE_CONTROLS\.md/i, "/docs/security/enterprise-controls"],
+  [/SECURITY\.md/i, "/docs/security/security-model"],
+  [/MEMVID_BRIDGE\.md/i, "/docs/guides/memvid-bridge"],
+  [/COMPARISON\.md/i, "/docs/resources/comparison"],
+  [/ROADMAP\.md/i, "/docs/resources/roadmap"],
+  [/CONTRIBUTING\.md/i, "/docs/resources/contributing"],
+  [/RELEASE\.md/i, "/docs/resources/release"],
+  [/DEPLOY_RAILWAY\.md/i, "/docs/deployment/railway"],
+  [/DATA_PLANE\.md/i, "/docs/deployment/supabase"],
+  [/DESIGN\.md/i, "/docs/resources/design"],
+  [/CHANGELOG\.md/i, "/changelog"],
+];
+
 function strip_em_dashes(text: string): string {
   return text
     .replace(/\u2014/g, " - ")
     .replace(/\u2013/g, "-")
-    .replace(/  +/g, " ")
-    .replace(/github\.com\/TechTideOhio\/swarm-357[^\s)"]*/g, (match) => {
-      if (match.includes("security/advisories")) return match;
-      return "/docs";
-    });
+    .replace(/  +/g, " ");
+}
+
+/**
+ * Resolve a link target written for the core repo into a link that works on this site.
+ * Repo-relative paths and repo URLs both map to the published doc route when one exists,
+ * otherwise to the canonical repo URL.
+ */
+function resolve_core_href(href: string): string {
+  if (href.startsWith("#") || href.startsWith("/") || href.startsWith("mailto:")) return href;
+
+  if (href.includes("github.com/TechTideOhio/swarm-357-site")) return SITE_REPO_URL;
+
+  const is_core_repo_url = href.includes("github.com/TechTideOhio/swarm-357");
+  const is_absolute = /^https?:\/\//.test(href);
+  if (is_absolute && !is_core_repo_url) return href;
+
+  for (const [pattern, route] of CORE_DOC_ROUTES) {
+    if (pattern.test(href)) return route;
+  }
+
+  return is_core_repo_url || !is_absolute ? CORE_REPO_URL : href;
+}
+
+/** Rewrite bare core repo URLs left in prose or code-free text. */
+function rewrite_bare_repo_urls(text: string): string {
+  return text.replace(
+    /(?:https?:\/\/)?github\.com\/TechTideOhio\/swarm-357[^\s)"'`]*/g,
+    (match) => (match.includes("swarm-357-site") ? SITE_REPO_URL : CORE_REPO_URL)
+  );
+}
+
+/** Prepare a core markdown file for rendering as a plain markdown snapshot. */
+function md_for_data(md: string): string {
+  const converted = strip_em_dashes(md).replace(
+    /\[([^\]]+)\]\(([^)]+)\)/g,
+    (_, label: string, href: string) => `[${label}](${resolve_core_href(href)})`
+  );
+  return rewrite_bare_repo_urls(converted);
 }
 
 
@@ -75,23 +130,11 @@ function sanitize_for_mdx(text: string): string {
 function md_to_mdx(md: string): string {
   const converted = strip_em_dashes(md)
     .replace(/^# .+\n+/m, "")
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, label: string, href: string) => {
-      if (href.includes("github.com/TechTideOhio/swarm-357")) {
-        if (href.includes("STATUS")) return `[${label}](/docs/resources/status)`;
-        if (href.includes("VERIFY")) return `[${label}](/docs/resources/verification)`;
-        if (href.includes("EVALS")) return `[${label}](/docs/evals/methodology)`;
-        if (href.includes("SECURITY")) return `[${label}](/docs/security/security-model)`;
-        if (href.includes("CHANGELOG")) return `[${label}](/changelog)`;
-        if (href.includes("CONTRIBUTING")) return `[${label}](/docs/resources/contributing)`;
-        if (href.includes("RELEASE")) return `[${label}](/docs/resources/release)`;
-        if (href.includes("ENTERPRISE")) return `[${label}](/docs/security/enterprise-controls)`;
-        if (href.includes("MEMVID")) return `[${label}](/docs/guides/memvid-bridge)`;
-        if (href.includes("swarm-357-site")) return `[${label}](https://swarm357fe.up.railway.app)`;
-        return `[${label}](/docs)`;
-      }
-      return `[${label}](${href})`;
-    });
-  return sanitize_for_mdx(converted);
+    .replace(
+      /\[([^\]]+)\]\(([^)]+)\)/g,
+      (_, label: string, href: string) => `[${label}](${resolve_core_href(href)})`
+    );
+  return sanitize_for_mdx(rewrite_bare_repo_urls(converted));
 }
 
 function sync_data() {
@@ -118,11 +161,8 @@ function sync_data() {
   };
   fs.writeFileSync(path.join(DATA, "roster.json"), JSON.stringify(roster, null, 2));
 
-  const status_md = strip_em_dashes(read_core("STATUS.md"));
-  fs.writeFileSync(path.join(DATA, "status.md"), status_md);
-
-  const changelog_md = strip_em_dashes(read_core("CHANGELOG.md"));
-  fs.writeFileSync(path.join(DATA, "changelog.md"), changelog_md);
+  fs.writeFileSync(path.join(DATA, "status.md"), md_for_data(read_core("STATUS.md")));
+  fs.writeFileSync(path.join(DATA, "changelog.md"), md_for_data(read_core("CHANGELOG.md")));
 }
 
 function generate_getting_started() {
@@ -902,7 +942,65 @@ swarm eval --save-baseline --compare
   generate_from_core_doc("resources/roadmap", "Roadmap", "Planned features and backlog.", "Resources", 4, "ROADMAP.md");
   generate_from_core_doc("resources/contributing", "Contributing", "Development setup and contribution guidelines.", "Resources", 5, "CONTRIBUTING.md");
   generate_from_core_doc("resources/release", "Release process", "Versioning, tagging, and PyPI publish workflow.", "Resources", 6, "RELEASE.md");
-  write_mdx("resources/glossary", { title: "Glossary", description: "Key terms used across Swarm 357 documentation.", section: "Resources", order: 7, slug: "resources/glossary" }, `
+  write_mdx("resources/design", { title: "Design system", description: "Tokens, class tiers, interaction rules, and content standards for the Swarm 357 product surface.", section: "Resources", order: 7, slug: "resources/design" }, `
+The product surface follows a documented design system. The full reference is \`DESIGN.md\` at the root of the landing repository, [TechTideOhio/swarm-357-site](${SITE_REPO_URL}).
+
+## Principles
+
+1. **Honest before impressive.** Copy and maturity labels mirror [status and maturity](/docs/resources/status) rather than marketing ambition.
+2. **One accent, used sparingly.** A single yellow accent carries calls to action and active states.
+3. **Tokens over literals.** Components consume CSS variables and exported class strings.
+4. **Interaction is a system.** Hover, press, focus, and motion behave the same way on marketing and documentation surfaces.
+5. **Motion is optional.** Every animation has a reduced-motion path.
+
+## Color tokens
+
+| Token | Light | Dark | Use |
+|-------|-------|------|-----|
+| Background | \`#ffffff\` | \`#0a0a0a\` | Page and panel base |
+| Foreground | \`#0a0a0a\` | \`#fafafa\` | Body text |
+| Muted | \`#f5f5f5\` | \`#171717\` | Secondary surfaces |
+| Border | \`#e5e5e5\` | \`#262626\` | Hairlines |
+| Accent | \`#ffd900\` | \`#ffd900\` | Calls to action, active nav |
+| Ring | \`#0066ff\` | \`#3b82f6\` | Focus outlines |
+
+The accent is constant across themes and always pairs with black text. The focus ring differs per theme so it stays visible on both backgrounds.
+
+## Typography
+
+Geist Sans for interface and body, Geist Mono for code and metrics, both self-hosted through \`next/font\`. Headings use medium weight with tight tracking; emphasis comes from size and spacing rather than bold weights.
+
+## Class tiers
+
+Canonical class strings live in \`lib/ui-classes.ts\`. Tier A covers marketing chrome (header, landing sections, footer). Tier B covers documentation and long-form reading. A shared group provides press feedback, card hover, and 44px touch targets.
+
+## Interaction states
+
+| State | Behavior |
+|-------|----------|
+| Hover | Color or brightness shift; cards lift; buttons morph toward a pill |
+| Press | \`active:scale-[0.96]\` on buttons, reduced opacity on links |
+| Focus | 2px ring outline at 2px offset, on \`:focus-visible\` only |
+| Disabled | Half opacity, pointer events off, press and morph suppressed |
+
+Exactly one primary call to action per page carries the accent glow.
+
+## Accessibility
+
+Visible focus on every interactive element, 44px minimum hit areas, a skip link to main content, focus trapping and scroll locking in dialogs, and \`text-base\` inputs on small screens to prevent iOS zoom.
+
+## Content standards
+
+Public copy contains no em dashes or en dashes. Numbers shown on the site come from generated data rather than hand-written prose. Both rules are enforced in CI by \`bun run check:content\`.
+
+## Related
+
+- [Contributing](/docs/resources/contributing)
+- [Status and maturity](/docs/resources/status)
+- [Verification scorecard](/docs/resources/verification)
+`);
+
+  write_mdx("resources/glossary", { title: "Glossary", description: "Key terms used across Swarm 357 documentation.", section: "Resources", order: 8, slug: "resources/glossary" }, `
 | Term | Definition |
 |------|------------|
 | SOUL | Role template markdown with persona and workflows |
@@ -911,7 +1009,7 @@ swarm eval --save-baseline --compare
 | Memvid | Single-file .mv2 portable memory format |
 | Compact roster | YAML format with role counts instead of 357 flat entries |
 `);
-  write_mdx("resources/faq", { title: "FAQ", description: "Frequently asked questions about Swarm 357.", section: "Resources", order: 8, slug: "resources/faq" }, `
+  write_mdx("resources/faq", { title: "FAQ", description: "Frequently asked questions about Swarm 357.", section: "Resources", order: 9, slug: "resources/faq" }, `
 ## Is this 357 parallel Opus sessions?
 
 No. 357 is the role catalog size. Default execution uses one agent per role with a cap.

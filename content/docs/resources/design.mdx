@@ -1,0 +1,63 @@
+---
+title: "Design system"
+description: "Tokens, class tiers, interaction rules, and content standards for the Swarm 357 product surface."
+section: "Resources"
+order: "7"
+slug: "resources/design"
+---
+
+The product surface follows a documented design system. The full reference is `DESIGN.md` at the root of the landing repository, [TechTideOhio/swarm-357-site](https://github.com/TechTideOhio/swarm-357-site).
+
+## Principles
+
+1. **Honest before impressive.** Copy and maturity labels mirror [status and maturity](/docs/resources/status) rather than marketing ambition.
+2. **One accent, used sparingly.** A single yellow accent carries calls to action and active states.
+3. **Tokens over literals.** Components consume CSS variables and exported class strings.
+4. **Interaction is a system.** Hover, press, focus, and motion behave the same way on marketing and documentation surfaces.
+5. **Motion is optional.** Every animation has a reduced-motion path.
+
+## Color tokens
+
+| Token | Light | Dark | Use |
+|-------|-------|------|-----|
+| Background | `#ffffff` | `#0a0a0a` | Page and panel base |
+| Foreground | `#0a0a0a` | `#fafafa` | Body text |
+| Muted | `#f5f5f5` | `#171717` | Secondary surfaces |
+| Border | `#e5e5e5` | `#262626` | Hairlines |
+| Accent | `#ffd900` | `#ffd900` | Calls to action, active nav |
+| Ring | `#0066ff` | `#3b82f6` | Focus outlines |
+
+The accent is constant across themes and always pairs with black text. The focus ring differs per theme so it stays visible on both backgrounds.
+
+## Typography
+
+Geist Sans for interface and body, Geist Mono for code and metrics, both self-hosted through `next/font`. Headings use medium weight with tight tracking; emphasis comes from size and spacing rather than bold weights.
+
+## Class tiers
+
+Canonical class strings live in `lib/ui-classes.ts`. Tier A covers marketing chrome (header, landing sections, footer). Tier B covers documentation and long-form reading. A shared group provides press feedback, card hover, and 44px touch targets.
+
+## Interaction states
+
+| State | Behavior |
+|-------|----------|
+| Hover | Color or brightness shift; cards lift; buttons morph toward a pill |
+| Press | `active:scale-[0.96]` on buttons, reduced opacity on links |
+| Focus | 2px ring outline at 2px offset, on `:focus-visible` only |
+| Disabled | Half opacity, pointer events off, press and morph suppressed |
+
+Exactly one primary call to action per page carries the accent glow.
+
+## Accessibility
+
+Visible focus on every interactive element, 44px minimum hit areas, a skip link to main content, focus trapping and scroll locking in dialogs, and `text-base` inputs on small screens to prevent iOS zoom.
+
+## Content standards
+
+Public copy contains no em dashes or en dashes. Numbers shown on the site come from generated data rather than hand-written prose. Both rules are enforced in CI by `bun run check:content`.
+
+## Related
+
+- [Contributing](/docs/resources/contributing)
+- [Status and maturity](/docs/resources/status)
+- [Verification scorecard](/docs/resources/verification)

@@ -6,6 +6,7 @@
 
 import { CORE_PACKAGE_VERSION, heroConfig, siteConfig } from "@/lib/config";
 import { easeOut } from "@/lib/motion";
+import { chrome_primary_cta, chrome_secondary_cta } from "@/lib/ui-classes";
 import { motion } from "motion/react";
 import Link from "next/link";
 import { useEffect, useRef, useState, type ReactNode } from "react";
@@ -164,16 +165,10 @@ export function Hero(): ReactNode {
           transition={{ duration: 0.6, delay: 0.95, ease: easeOut }}
           className="mt-8 flex flex-wrap items-center justify-center gap-3"
         >
-          <Link
-            href={heroConfig.cta.primary.href}
-            className="bg-accent rounded-[3.5px] px-5 py-3 text-sm font-medium tracking-tight text-black transition-all duration-500 ease-out hover:rounded-[50px]"
-          >
+          <Link href={heroConfig.cta.primary.href} className={`${chrome_primary_cta} glow-accent`}>
             {heroConfig.cta.primary.text}
           </Link>
-          <Link
-            href={heroConfig.cta.secondary.href}
-            className="bg-muted text-foreground rounded-[3.5px] px-5 py-3 text-sm font-medium tracking-tight transition-all duration-500 ease-out hover:rounded-[50px]"
-          >
+          <Link href={heroConfig.cta.secondary.href} className={chrome_secondary_cta}>
             {heroConfig.cta.secondary.text}
           </Link>
         </motion.div>
@@ -188,7 +183,7 @@ export function Hero(): ReactNode {
       </div>
 
       <div
-        className="relative -mx-6 mt-10 h-72 w-screen overflow-hidden sm:mt-14 sm:h-96 md:h-[28rem] lg:h-[32rem]"
+        className="relative -mx-6 mt-10 h-72 w-full max-w-[100vw] overflow-hidden sm:mt-14 sm:h-96 md:h-[28rem] lg:h-[32rem]"
         style={{
           maskImage:
             "linear-gradient(to bottom, black 0%, black 70%, transparent 100%)",

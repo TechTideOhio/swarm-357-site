@@ -1,6 +1,7 @@
 "use client";
 
-import { easeOut } from "@/lib/motion";
+import { fadeInUpView } from "@/lib/motion";
+import { chrome_icon_circle } from "@/lib/ui-classes";
 import { useRef, useState, useEffect, useCallback } from "react";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { motion } from "motion/react";
@@ -114,10 +115,7 @@ export function Testimonials() {
       <div className="mx-auto max-w-6xl px-6">
         <motion.div
           className="mb-8 flex flex-col items-start justify-between gap-4 md:mb-16 md:flex-row md:items-center"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.5 }}
-          transition={{ duration: 0.8, ease: easeOut }}
+          {...fadeInUpView}
         >
           <div>
             <h2 className="text-3xl font-medium tracking-tight text-foreground md:text-4xl lg:text-5xl">
@@ -133,7 +131,7 @@ export function Testimonials() {
             <button
               onClick={() => scroll("left")}
               disabled={!canScrollLeft}
-              className="bg-accent flex h-10 w-10 cursor-pointer items-center justify-center rounded-full text-black transition-all duration-500 ease-out hover:scale-110 hover:bg-accent/80 focus:outline-none disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100"
+              className={`${chrome_icon_circle} bg-accent text-black hover:bg-accent/80 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100`}
               aria-label="Scroll left"
             >
               <ArrowLeft className="h-5 w-5" />
@@ -141,7 +139,7 @@ export function Testimonials() {
             <button
               onClick={() => scroll("right")}
               disabled={!canScrollRight}
-              className="bg-accent flex h-10 w-10 cursor-pointer items-center justify-center rounded-full text-black transition-all duration-500 ease-out hover:scale-110 hover:bg-accent/80 focus:outline-none disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100"
+              className={`${chrome_icon_circle} bg-accent text-black hover:bg-accent/80 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100`}
               aria-label="Scroll right"
             >
               <ArrowRight className="h-5 w-5" />

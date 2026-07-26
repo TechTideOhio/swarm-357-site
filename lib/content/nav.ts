@@ -139,6 +139,7 @@ export const docs_nav: NavSection[] = [
       { title: "Roadmap", slug: "resources/roadmap", href: "/docs/resources/roadmap" },
       { title: "Contributing", slug: "resources/contributing", href: "/docs/resources/contributing" },
       { title: "Release process", slug: "resources/release", href: "/docs/resources/release" },
+      { title: "Design system", slug: "resources/design", href: "/docs/resources/design" },
       { title: "Glossary", slug: "resources/glossary", href: "/docs/resources/glossary" },
       { title: "FAQ", slug: "resources/faq", href: "/docs/resources/faq" },
     ],
