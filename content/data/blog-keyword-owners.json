@@ -1,0 +1,24 @@
+{
+  "_comment": "One primary search phrase per post. check-content.ts fails the build if two posts claim the same phrase or if a post claims a phrase that is not registered here. Add the row before you write the post.",
+  "owners": {
+    "multi agent orchestration": "multi-agent-orchestration-without-headcount-fantasy",
+    "pip install techtide-swarm": "pip-install-techtide-swarm-first-run",
+    "llm agent cost control": "cost-control-for-llm-agent-fleets",
+    "portable agent memory": "portable-agent-memory-with-memvid",
+    "agent bash policy gate": "why-your-agent-needs-a-bash-policy-gate",
+    "human in the loop agent approvals": "human-in-the-loop-approvals-for-agents",
+    "crewai vs autogen": "crewai-autogen-vs-role-ontology",
+    "agent swarm evaluation": "how-to-evaluate-an-agent-swarm",
+    "deploy claude agent runtime on railway": "deploying-claude-agent-runtime-railway",
+    "what is an agent swarm": "what-agent-swarm-means-in-production",
+    "langgraph alternative": "langgraph-vs-role-catalog-runtimes",
+    "multi agent token budgeting": "multi-agent-token-budgeting-patterns",
+    "openrouter cheap models": "openrouter-cheap-models-for-swarm-tests",
+    "agent checkpoint resume": "durable-checkpoints-resume-cancel-replay",
+    "ai sales agent crm handoff": "scenario-sales-layer-crm-handoff",
+    "fastapi agent api sse": "fastapi-swarm-api-sse-auth",
+    "ai agent role catalog": "building-a-357-role-catalog",
+    "ai support agent guardrails": "scenario-support-bash-denied-until-hitl",
+    "swarm 357 status": "swarm-357-mid-year-status"
+  }
+}

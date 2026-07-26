@@ -1,0 +1,106 @@
+---
+title: "Scenario: a sales layer that stops at the CRM handoff"
+description: "A worked scenario for research, drafting, and handoff notes, with the send left to a human. What the sales layer does, what it refuses to do, and why that line is the product."
+date: "2026-06-29"
+updated: "2026-07-26"
+slug: "scenario-sales-layer-crm-handoff"
+cover: "/art/blog/sales-handoff.jpg"
+coverAlt: "Gold light paths converging on a single polished form, a pipeline resolving to one handoff"
+author: "Alex Cinovoj"
+keyword: "ai sales agent crm handoff"
+tags: ["Scenarios", "Sales", "Operations"]
+faq:
+  - question: "Should an AI agent send sales emails automatically?"
+    answer: "No. Drafting is reversible and sending is not. Keep the agent on research, drafting, and handoff notes, and keep the send with the person whose name is on it."
+  - question: "What does an AI sales agent actually produce that is useful?"
+    answer: "A researched account brief, a first-draft message grounded in that brief, and a structured handoff note a human can paste into the CRM after reviewing it."
+  - question: "How do you stop an agent pipeline from contacting the wrong people?"
+    answer: "Keep the suppression list outside the agent, check it before drafting rather than after, and require a human approval on the send."
+---
+
+This is a worked scenario, not a customer story. No logos, no invented metrics. It is the shape I would build for a sales layer, and the line I would refuse to cross.
+
+The line: **agents research and draft, humans send.** Everything below follows from that.
+
+## Why the line sits at the send
+
+Drafting is reversible. A bad draft costs a delete. Sending is not reversible. A bad send costs a relationship, and at volume it costs a domain reputation.
+
+Those are different risk classes, and most "AI SDR" pitches conflate them because the send is where the demo gets impressive. I have watched an automated sequence contact someone who had already asked to be left alone. The apology was mine to write. The system did exactly what it was told.
+
+So the sales layer stops at a handoff note, and a person with their name on the message decides whether it goes.
+
+## What runs, step by step
+
+Five steps, three roles, one human gate.
+
+**1. Suppression check, before anything else.** The do-not-contact list, existing open opportunities, and anyone a teammate is already working. This runs first, not last, because research on an account you must not contact is money spent on a decision already made.
+
+Critically, the suppression list lives outside the agent. It is a data source the pipeline reads, not knowledge an agent is expected to remember. Agent memory is for context, not for compliance.
+
+**2. Account research.** A research-layer role gathers public signals: what the company does, recent public changes, the stack they talk about publicly. Tool grant is `WebSearch`, `Read`, `Write`, and the budget ceiling is low because this step runs on every account.
+
+```python
+AgentConfig(
+    name="research-account-001",
+    layer=LayerType.RESEARCH,
+    role="market_researcher",
+    soul="templates/soul/research/market-analyst.md",
+    tools=["WebSearch", "Read", "Write"],
+    model="sonnet",
+    budget_limit_usd=0.40,
+)
+```
+
+**3. Fit assessment.** A sales-layer role reads the brief and answers one question: is there a plausible reason to talk. The useful output here is a "no" with a reason. A layer that qualifies everything in is a layer that produces work rather than pipeline.
+
+**4. Draft.** An outreach role writes the first message, grounded in the brief. It is a draft. It has the reasoning attached, so the human reviewing it can check whether the premise is right rather than only whether the prose is good.
+
+**5. Handoff note.** Structured output a person can review and paste: the account, the signal, the suggested angle, the draft, and the sources. Then it stops.
+
+## Sequencing beats parallelism here
+
+The temptation is to research fifty accounts at once because the runtime makes it easy. Two reasons not to.
+
+First, cost. Fifty parallel research runs at a low per-agent budget still sum to a real number, and most of those accounts will fail the fit check. Sequencing means you stop paying when you have enough.
+
+Second, and this is the one that matters operationally: one contact at a time, logged before moving on. A batch that half-succeeds leaves you unable to say who was contacted and who was not, and the recovery from that is worse than the time you saved.
+
+The runtime supports this posture by default. One agent per selected role under a hard agent cap, with full fan-out behind `full_fanout` or `SWARM_UNSAFE_FULL_FANOUT`. Underneath, the reserve-and-commit ledger means parallel steps cannot race past the layer budget. See [cost control for LLM agent fleets](/blog/cost-control-for-llm-agent-fleets).
+
+## The tool grant is the security model
+
+Each role gets only what it needs.
+
+| Role | Tools | Cannot |
+|------|-------|--------|
+| Account researcher | `WebSearch`, `Read`, `Write` | Reach the CRM or any send path |
+| Fit assessor | `Read`, `Write` | Reach the network at all |
+| Outreach drafter | `Read`, `Write` | Send anything |
+
+No role in this pipeline has a send capability, which means no prompt injection through a scraped page can produce a send. That is a stronger guarantee than a policy telling an agent not to send, because it is enforced by absence rather than by instruction.
+
+Read and Write are confined to the workspace root, and Bash is denied by default in server and production modes. Details in [filesystem confinement](/docs/security/filesystem) and [the bash policy gate](/blog/why-your-agent-needs-a-bash-policy-gate).
+
+## What this scenario does not claim
+
+- **It does not replace a salesperson.** It removes the research tax before the conversation. The conversation is still the job.
+- **It does not measure conversion.** I have no honest numbers to publish, so I am not publishing any.
+- **It does not send.** By design, permanently.
+- **The orchestration underneath is Beta.** Swarm orchestration and layer execution are both Beta on the [status page](/docs/resources/status).
+
+## Where this breaks
+
+- **High-volume outbound.** A human gate at volume becomes a rubber stamp, and a rubber stamp is worse than no gate because it produces an audit trail that looks like oversight.
+- **Regulated outreach.** Financial and healthcare contexts have approval requirements this shape does not satisfy on its own.
+- **Thin public signal.** If there is nothing public about an account, the research step produces filler, and filler in a first message is worse than a short honest one.
+
+## Build the layer
+
+```bash
+pip install techtide-swarm
+swarm init
+swarm demo
+```
+
+Then read the [sales layer roster](/docs/roster/sales) for the 62 roles, [layer routing](/docs/guides/layer-routing) for how tasks reach them, [running a task](/docs/guides/running-a-task) for the execution path, and [scenario: a support layer where Bash stays denied](/blog/scenario-support-bash-denied-until-hitl) for the same treatment on the support side.

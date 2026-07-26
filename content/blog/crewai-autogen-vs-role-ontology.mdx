@@ -1,18 +1,106 @@
 ---
 title: "CrewAI, AutoGen, and role ontologies"
-description: "When a 357-role catalog beats ad-hoc crews."
-date: "2026-07-05"
+description: "Ad-hoc crews, conversation graphs, and pre-declared role catalogs solve different problems. A criteria table for choosing, and the cases where a catalog is the wrong answer."
+date: "2026-04-14"
+updated: "2026-07-26"
 slug: "crewai-autogen-vs-role-ontology"
+cover: "/art/blog/framework-comparison.jpg"
+coverAlt: "Three structures side by side: scattered chrome spheres, a tangled gold web, and an ordered gold lattice"
+author: "Alex Cinovoj"
+keyword: "crewai vs autogen"
+tags: ["Comparison", "Architecture", "Orchestration"]
+faq:
+  - question: "What is the difference between CrewAI and AutoGen?"
+    answer: "CrewAI centres on task-scoped crews with assigned roles and a process for running them. AutoGen centres on conversational agents exchanging messages, with the conversation structure carrying the coordination. Both define agents at call time."
+  - question: "When is a role catalog better than defining agents per task?"
+    answer: "When the same roles recur across many tasks and you need stable per-role budgets, tool grants, and standards. If every task is bespoke, per-task definitions are less overhead."
+  - question: "Can I use a role ontology with an existing framework?"
+    answer: "Yes. The catalog is configuration, not a runtime lock-in. The roles, tool grants, and standards can inform agent definitions in whichever runtime you already run."
 ---
 
-When a 357-role catalog beats ad-hoc crews.
+CrewAI, AutoGen, and role-catalog runtimes like Swarm 357 all coordinate multiple model-backed workers. They differ in where the roles come from. CrewAI and AutoGen let you define agents when you define the task. A role ontology declares the roles up front, in configuration, and the task selects from them.
 
-Swarm 357 ships open-core orchestration with honest maturity labels. Read the [documentation](/docs) for installation, API reference, and eval methodology.
+That sounds like a small distinction. It changes what you can govern.
 
-## Key takeaways
+## The three shapes
 
-- Operators own API keys, budgets, and side-effect approvals
-- Security defaults: Bash gate, filesystem confinement, HITL in production
-- Eval baselines report single-agent and swarm metrics separately
+**Task-scoped crews.** You describe a task, name the agents that will work on it, give each one a goal and a backstory, and run the process. Coordination is a property of the crew you assembled. This is CrewAI's centre of gravity, and it is genuinely fast to get moving with.
 
-[Get started](/docs/getting-started/quickstart) or view [latest eval baseline](/docs/evals/latest-baseline).
+**Conversation graphs.** Agents exchange messages. Coordination emerges from who talks to whom and when, and the framework gives you the primitives for structuring that exchange. AutoGen is strongest here, especially for problems where the right sequence is not known in advance.
+
+**Role catalogs.** Roles exist before any task does. Each carries a soul template with its standards, a tool grant, a model default, and a budget ceiling. A task routes to roles rather than instantiating them. That is what the 357 roles across six layers are in Swarm 357.
+
+## Criteria table
+
+| Criterion | Task-scoped crews | Conversation graphs | Role catalog |
+|-----------|-------------------|---------------------|--------------|
+| Time to first working demo | Fastest | Fast | Slowest, config comes first |
+| Governance of tool grants | Per crew definition | Per agent definition | Per role, declared once |
+| Budget attribution | Per run | Per run | Per role and per layer |
+| Reuse of standards across tasks | Copy the definition | Copy the definition | Inherited from the soul template |
+| Fit for open-ended exploration | Good | Best | Weakest |
+| Fit for recurring business functions | Adequate | Adequate | Best |
+| Risk of role sprawl | High, definitions multiply | High | Low, the catalog is the list |
+| Onboarding a new engineer | Read the task code | Read the conversation flow | Read the catalog |
+
+Read that table as a fit question, not a scoreboard. I use conversation-style coordination for research spikes where I do not know the shape of the answer. I use a catalog for the work that repeats.
+
+## The case for declaring roles first
+
+Three things get easier when the role exists before the task.
+
+**Tool grants stop drifting.** In per-task definitions, the same conceptual role gets defined a dozen times across a codebase, and the twelfth copy has one extra tool because somebody needed it once. With a catalog, `research/market-analyst` has one tool list, in one file, and changing it is a reviewable diff.
+
+```python
+AgentConfig(
+    name="research-market-001",
+    layer=LayerType.RESEARCH,
+    role="market_researcher",
+    soul="templates/soul/research/market-analyst.md",
+    tools=["WebSearch", "Read", "Write"],
+    model="sonnet",
+    budget_limit_usd=1.00,
+)
+```
+
+**Budgets attribute to something durable.** Per-run cost tells you a task was expensive. Per-role cost tells you which function is expensive, which is the number you can actually act on.
+
+**Standards live in one place.** The soul template carries how that role does its job. Improving the market analyst improves every market analysis, not just the next one someone writes.
+
+## The case against
+
+I would be selling you something if I stopped there.
+
+**Catalogs are slower to start.** You write configuration before you see output. For a weekend prototype that is the wrong trade, and I would reach for a crew.
+
+**A catalog can encode the wrong org.** 357 roles is an opinion about how business work decomposes. If your work decomposes differently, you are fighting the ontology, and fighting an ontology is miserable.
+
+**Declared roles do not help open-ended problems.** When you do not know which roles the problem needs, selecting from a list is a worse tool than letting a conversation find its own shape.
+
+**Nothing here removes review.** No framework makes agent output trustworthy. It only makes it attributable.
+
+## The concurrency point that applies to all three
+
+Whatever you pick, the failure mode is the same: unbounded fan-out. Crews, conversations, and layers can all spawn more workers than the problem needs, and every framework makes it easy.
+
+Swarm 357 defaults to one agent per selected role under a hard agent cap, with full fan-out behind `full_fanout` or `SWARM_UNSAFE_FULL_FANOUT`, and a reserve-and-commit budget ledger underneath. If you use a different runtime, find its equivalent controls before your first production run. More detail in [cost control for LLM agent fleets](/blog/cost-control-for-llm-agent-fleets).
+
+## How to choose in five minutes
+
+Ask three questions.
+
+1. **Do the same roles recur across tasks?** If yes, a catalog pays for itself. If every task is bespoke, it does not.
+2. **Do you need per-role budgets and tool grants for a security or finance review?** If yes, declare roles up front. Reviewers cannot audit definitions that only exist at call time.
+3. **Is the problem shape known?** If no, use a conversation-first framework and come back to catalogs once patterns emerge.
+
+There is a fourth answer that is often right: use one agent. If the task does not decompose, orchestration is overhead in every framework listed here.
+
+## Look at the catalog before you commit
+
+```bash
+pip install techtide-swarm
+swarm init
+swarm demo
+```
+
+Then read the [roster overview](/docs/roster/overview) to see how the six layers divide the work, [core concepts](/docs/getting-started/core-concepts) for the vocabulary, and the [comparison](/docs/resources/comparison) doc for the maintained version of this table. The [status and maturity](/docs/resources/status) page says which parts are Stable before you rely on them.

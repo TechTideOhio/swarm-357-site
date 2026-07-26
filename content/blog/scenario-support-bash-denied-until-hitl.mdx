@@ -1,0 +1,112 @@
+---
+title: "Scenario: a support layer where Bash stays denied"
+description: "Triage, macro drafting, and escalation summaries with no shell access at all. What the support layer can do without it, and the one case where a human unlocks a command."
+date: "2026-07-20"
+updated: "2026-07-26"
+slug: "scenario-support-bash-denied-until-hitl"
+cover: "/art/blog/support-guardrails.jpg"
+coverAlt: "Gold light contained behind polished black forms, guardrails rendered in the dark"
+author: "Alex Cinovoj"
+keyword: "ai support agent guardrails"
+tags: ["Scenarios", "Support", "Security"]
+faq:
+  - question: "Should a support agent have shell access?"
+    answer: "Almost never. Triage, macro drafting, and escalation summaries need reading and writing, not execution. Denying Bash removes an entire class of incident for no loss of capability."
+  - question: "What guardrails does an AI support agent need?"
+    answer: "Deny Bash by default, confine the filesystem to a workspace, grant only the tools the role uses, and keep a human in front of anything a customer will see."
+  - question: "How do you let an agent run a diagnostic command safely?"
+    answer: "Keep Bash denied by default, and treat any exception as a human decision: a policy gate at the argv level plus an explicit approval with a durable record."
+---
+
+Another worked scenario. No customer, no logos, no numbers I cannot back.
+
+The support layer has 55 roles and none of them need a shell. That is the interesting part, so it is what this post is about.
+
+## What support work actually requires
+
+Walk through a ticket. Read it. Find the related history. Classify it. Draft a response using the team's existing macros. If it cannot be resolved, write an escalation summary an engineer can act on.
+
+Every one of those is reading and writing. None of them is execution.
+
+| Step | Tools needed | Bash? |
+|------|--------------|-------|
+| Triage and classify | `Read` | No |
+| Find related history | `Read`, memory recall | No |
+| Draft response from macros | `Read`, `Write` | No |
+| Escalation summary | `Read`, `Write` | No |
+| Diagnostic command | Would need Bash | Human decision, see below |
+
+Only the last row wants a shell, and it is rare enough to be handled as an exception rather than a capability.
+
+## Deny by default is not a restriction here
+
+Server and production modes deny Bash unless `SWARM_ALLOW_BASH=1`. For this layer, you never set it, and you lose nothing.
+
+The important design property: the deny keys off `SWARM_SERVER_MODE`, which the API container image sets and the server re-asserts at import. It does not depend on an operator remembering a dashboard variable, because the deploy where somebody forgets is always the deploy that matters.
+
+Alongside that, Read and Write are confined to the workspace root or `SWARM_WORKSPACE_ROOT`. A support agent reading tickets cannot wander into the filesystem, and it cannot write to a shell profile to obtain execution later. The escape hatch is named `SWARM_UNSAFE_FS=1` so nobody sets it casually.
+
+## Tool grants per role
+
+Capability enforced by absence, not by instruction.
+
+```python
+AgentConfig(
+    name="support-tier1-001",
+    layer=LayerType.SUPPORT,
+    role="tier1_resolver",
+    soul="templates/soul/support/tier1-resolver.md",
+    tools=["Read", "Write"],
+    model="haiku",
+    budget_limit_usd=0.15,
+)
+```
+
+Two things to notice. The tool list has no network and no shell, so no amount of injected text in a ticket can produce either. And the model is Haiku with a fifteen cent ceiling, because triage runs constantly and the cost per ticket is the number that decides whether this is viable at all.
+
+Prompt injection is not hypothetical in support. Tickets are user-controlled text, and a customer can paste anything. A role whose tool list cannot reach the network is not vulnerable to exfiltration through a clever ticket, regardless of how good the injection is. That is why the grant matters more than the prompt.
+
+## The one exception, handled as an exception
+
+Occasionally an engineer wants a diagnostic command run as part of triage. The path for that is not "enable Bash for the support layer".
+
+It is three gates in series:
+
+1. **Deny by default holds** unless someone explicitly enables Bash for that deployment.
+2. **The policy gate validates** the command at the argv level against the thirteen patterns in `BashSecurityGate`, which parses program and arguments rather than matching the raw string. Flag reordering and whitespace tricks do not get through. See [why your agent needs a bash policy gate](/blog/why-your-agent-needs-a-bash-policy-gate).
+3. **A human approves** through `ApprovalGate`, producing a durable `ApprovalRecord`. Timeouts reject, because an unanswered request is not consent.
+
+```bash
+swarm inspect
+swarm approve <id>
+swarm reject <id>
+```
+
+Approvals are Beta; the Bash gate and filesystem confinement are Stable. The [status page](/docs/resources/status) tracks all of it.
+
+## The customer-facing line
+
+The layer drafts. A person sends.
+
+Same reasoning as the [sales layer scenario](/blog/scenario-sales-layer-crm-handoff): drafting is reversible and sending is not. A wrong draft costs a delete. A wrong response to a frustrated customer costs the relationship, and at support volume it compounds.
+
+What the layer hands over is a draft plus the reasoning: which macro it matched, which history it found, why it classified the ticket that way. A reviewer can check the premise, not just the prose, and that is what makes the review fast enough to be worth doing.
+
+## Where this breaks
+
+- **Ticket volume high enough that review becomes a rubber stamp.** A gate that is always approved is worse than no gate, because it produces an audit trail resembling oversight. If you are at that volume, narrow what the agent is allowed to touch rather than removing the human.
+- **Regulated support.** Healthcare and financial contexts have response requirements this shape does not satisfy alone.
+- **No macro library.** Without existing patterns, the agent invents tone, and invented tone is the fastest way to make an escalation worse.
+- **Multi-tenant isolation.** Not implemented. A shared key is not a tenancy model, and support data is exactly the data you do not want crossing tenants.
+
+## Build it
+
+```bash
+pip install techtide-swarm
+swarm init
+swarm demo
+```
+
+`swarm init` installs the Support soul templates, so the tier one resolver is there to read.
+
+Then see the [support layer roster](/docs/roster/support) for the 55 roles, [bash security gate](/docs/guides/bash-security-gate) and [filesystem confinement](/docs/security/filesystem) for the guardrails, and [human-in-the-loop approvals for autonomous agents](/blog/human-in-the-loop-approvals-for-agents) for the exception path.

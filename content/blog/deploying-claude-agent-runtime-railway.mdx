@@ -1,18 +1,128 @@
 ---
 title: "Deploying a Claude agent runtime on Railway"
-description: "API + landing split, BFF auth, and health probes."
-date: "2026-07-01"
+description: "Split the API from the landing site, keep write keys server-only, force simulate on the public demo, and let the container set server mode so Bash fails closed. A production deploy walkthrough."
+date: "2026-05-12"
+updated: "2026-07-26"
 slug: "deploying-claude-agent-runtime-railway"
+cover: "/art/blog/railway-deploy.jpg"
+coverAlt: "Polished black runbook forms lit by gold seams, an operations surface in the dark"
+author: "Alex Cinovoj"
+keyword: "deploy claude agent runtime on railway"
+tags: ["Deployment", "Security", "Operations"]
+faq:
+  - question: "Should the agent API and the marketing site be one deployment?"
+    answer: "No. Split them. The API needs secrets, long-lived connections, and a locked-down posture. The site needs a CDN-friendly build. One deployment forces the weaker requirements on both."
+  - question: "How do I keep an API key out of a Next.js build?"
+    answer: "Only NEXT_PUBLIC_ variables should enter as build arguments. Read the server key at runtime inside a route handler, and never reference it in client code, so it never lands in the bundle."
+  - question: "What stops a public demo endpoint from spending real money?"
+    answer: "Force simulation server-side, clamp the budget, cap the request body, limit the task length, and rate limit per IP. Client-side limits are suggestions, not controls."
 ---
 
-API + landing split, BFF auth, and health probes.
+Deploying a Claude agent runtime means shipping two things with opposite requirements. The API holds secrets, runs long jobs, and must fail closed. The landing site is public, cacheable, and holds nothing. Put them in one service and the strictest requirement wins in the wrong direction, because the thing that leaks is always the thing you were not thinking about.
 
-Swarm 357 ships open-core orchestration with honest maturity labels. Read the [documentation](/docs) for installation, API reference, and eval methodology.
+This is the layout I run for Swarm 357 on Railway, and the mistakes that shaped it.
 
-## Key takeaways
+## Two services, one project
 
-- Operators own API keys, budgets, and side-effect approvals
-- Security defaults: Bash gate, filesystem confinement, HITL in production
-- Eval baselines report single-agent and swarm metrics separately
+| Service | Contains | Holds secrets | Build |
+|---------|----------|---------------|-------|
+| API | FastAPI runtime, agents, memory | Yes, runtime only | Container image |
+| Frontend | Next.js site, docs, demo BFF | Server-only key at runtime | Multi-stage Dockerfile |
 
-[Get started](/docs/getting-started/quickstart) or view [latest eval baseline](/docs/evals/latest-baseline).
+The frontend never talks to the model provider. It talks to the API through a backend-for-frontend route on its own origin, which is the only place a write key is ever read.
+
+## The build-time secret leak
+
+Here is the mistake that made me stop using an autodetecting builder.
+
+A Next.js build inlines anything reachable from client code. If a builder injects all service variables into the build environment, and any code path touches the server key during prerender, the value can end up in the output bundle. Nothing warns you. The deploy is green. The key is in a JavaScript file served to every visitor.
+
+The fix is to control the build yourself.
+
+```dockerfile
+FROM oven/bun:1 AS builder
+WORKDIR /app
+
+# Only public configuration crosses into the build.
+ARG NEXT_PUBLIC_SITE_URL
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+
+COPY package.json bun.lock ./
+RUN bun install --frozen-lockfile
+COPY . .
+RUN bun run build
+```
+
+Two rules fall out of that file. Only `NEXT_PUBLIC_` values are declared as build arguments, so nothing else can be inlined even by accident. And the server key is never an ARG at all, because it is read at runtime inside a route handler.
+
+One Railway-specific trap: if your ignore file excludes the lockfile, `--frozen-lockfile` fails in a way whose error message points at dependencies rather than at the ignore file. Keep the lockfile in the build context.
+
+## The public demo is an abuse surface
+
+A "try it live" box on a marketing site is an unauthenticated endpoint that spends money. Treat it that way.
+
+Every control below is server-side, because client-side limits are suggestions:
+
+- **Force simulation.** The backend-for-frontend pins `simulate: true` regardless of what the request body says. A visitor cannot ask for a live run.
+- **Clamp the budget.** Whatever number arrives, it is clamped to the demo cap before it reaches the API.
+- **Cap the body size.** Oversized requests get a 413 rather than being parsed.
+- **Bound the task length.** A 500-character limit on the input, enforced on the server, with the same limit set on the textarea so the UI agrees with reality.
+- **Rate limit per IP.** A sliding window returning 429.
+
+The write key stays server-only. There is no public environment variable that carries it, and there should be no code path where a browser could obtain one.
+
+## Let the container decide server mode
+
+Bash deny and human-in-the-loop approvals must fail closed in production. The brittle way to arrange that is an environment variable you set by hand in a dashboard, because the one deploy where somebody forgets is the deploy that matters.
+
+Instead, the API image sets `SWARM_SERVER_MODE` and the server re-asserts it at import. Bash is denied unless `SWARM_ALLOW_BASH=1`, HITL is on for Bash, and Read and Write are confined to the workspace root. That posture comes from the artifact rather than from a checklist.
+
+Authentication follows the same principle. SSE and write endpoints require `SWARM_API_KEY` when it is set, and production auth is fail-closed. Unauthenticated reads of run telemetry are redacted rather than blocked, so the public surface is useful without leaking task content.
+
+## Environment variables, sorted by where they are read
+
+```bash
+# API service, runtime
+ANTHROPIC_API_KEY=sk-ant-...
+SWARM_API_KEY=...
+ALLOWED_ORIGINS=https://swarm357.techtideai.io
+
+# Frontend, build time only
+NEXT_PUBLIC_SITE_URL=https://swarm357.techtideai.io
+NEXT_PUBLIC_API_URL=https://your-api-host
+
+# Frontend, runtime only, never a build arg
+SWARM_API_KEY=...
+```
+
+Keep local values in a gitignored `.env.local`. Never paste a key into a chat window, an issue, or a commit, and run a secret scanner over full git history in CI rather than trusting that you did not.
+
+## Deploying
+
+```bash
+railway link
+railway up
+railway redeploy --service api --yes
+```
+
+After the deploy, check the things that actually break:
+
+1. `/api/health` responds and reports the version you expect.
+2. The demo endpoint returns a simulated result, and a crafted request asking for a live run still returns a simulated one.
+3. An oversized body returns 413, and a rapid loop returns 429.
+4. No `NEXT_PUBLIC_` variable contains a secret, and the client bundle does not contain the write key. Grep the build output for it once, so you know rather than assume.
+5. CORS allows only the origins you listed.
+
+Do not keep polling a cached version endpoint after the platform confirms the deployment. Run the manual truth test instead.
+
+## When Railway is the wrong host
+
+- **You need distributed rate limiting across replicas.** The limiter is single-process, and stacking per-process caps is not the same guarantee.
+- **You have compliance requirements on data residency.** Check the region story before you build on it.
+- **The workload is bursty and idle-heavy.** A serverless runtime may cost less, at the price of cold starts that hurt long agent runs.
+
+## Follow the checklist
+
+Read [Railway deployment](/docs/deployment/railway) for the step-by-step, [production checklist](/docs/deployment/production-checklist) for the gates, [Docker](/docs/deployment/docker) for the API image, and the [security model](/docs/security/security-model) for the posture the container enforces. For the runtime controls behind all of this, [why your agent needs a bash policy gate](/blog/why-your-agent-needs-a-bash-policy-gate) covers the deny-by-default path.

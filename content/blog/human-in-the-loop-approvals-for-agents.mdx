@@ -1,18 +1,101 @@
 ---
 title: "Human-in-the-loop approvals for autonomous agents"
-description: "Durable ApprovalRecord workflow for Bash commands."
-date: "2026-07-10"
+description: "A durable ApprovalRecord, a control plane on both CLI and HTTP, and timeouts that reject. How to put a person in front of side effects without stalling every run."
+date: "2026-03-24"
+updated: "2026-07-26"
 slug: "human-in-the-loop-approvals-for-agents"
+cover: "/art/blog/approval-gate.jpg"
+coverAlt: "A gate of black pillars with a gold light beam, filtering a dense network down to a few paths"
+author: "Alex Cinovoj"
+keyword: "human in the loop agent approvals"
+tags: ["Security", "Operations", "Architecture"]
+faq:
+  - question: "What is a human-in-the-loop approval for an AI agent?"
+    answer: "A pause inserted before a side effect, where a named person approves or rejects the specific action. The agent cannot proceed until the decision is recorded."
+  - question: "What happens if nobody responds to an approval request?"
+    answer: "It rejects on timeout. An unanswered request is not consent, so the safe default is to refuse and let the operator retry deliberately."
+  - question: "Does HITL make agents too slow to be useful?"
+    answer: "Only if you gate everything. Gate side effects with real blast radius, such as shell commands, and let reads and drafts run unattended."
 ---
 
-Durable ApprovalRecord workflow for Bash commands.
+Human-in-the-loop approval is a pause placed in front of a side effect, where a person approves or rejects the specific action before the agent continues. In Swarm 357 it is `ApprovalGate`, it produces a durable `ApprovalRecord`, and the current target is Bash commands under `SWARM_HITL_BASH`.
 
-Swarm 357 ships open-core orchestration with honest maturity labels. Read the [documentation](/docs) for installation, API reference, and eval methodology.
+The reason this exists is not compliance theatre. It is that autonomy and reversibility are different axes, and most agent frameworks conflate them. An agent that drafts an email autonomously is fine, because the draft is reversible. An agent that sends the email autonomously is a different product with a different risk profile, and pretending otherwise is how teams end up apologising to customers.
 
-## Key takeaways
+## Approvals must be durable, or they are decoration
 
-- Operators own API keys, budgets, and side-effect approvals
-- Security defaults: Bash gate, filesystem confinement, HITL in production
-- Eval baselines report single-agent and swarm metrics separately
+The version that does not work: hold the pending request in memory, block the coroutine, wait for input.
 
-[Get started](/docs/getting-started/quickstart) or view [latest eval baseline](/docs/evals/latest-baseline).
+It breaks the first time the process restarts. The pending request evaporates, the operator's approval lands on nothing, and the run is stuck in a state nobody can inspect. I have debugged that. It is worse than no approval flow, because the team believes the control exists.
+
+A durable record fixes it. The request is written before the agent blocks, so:
+
+- A restart does not lose the request.
+- The operator can list pending requests from a different process.
+- The decision, the decider, and the timestamp are all recoverable afterwards.
+- The audit question "who approved this?" has an answer that does not depend on chat history.
+
+## The control plane
+
+Two surfaces, same records.
+
+```bash
+swarm inspect            # what is pending, and what is each run waiting on
+swarm approve <id>
+swarm reject <id>
+```
+
+The HTTP API exposes the same operations, documented in [approvals and execution](/docs/api/approvals-execution), so approval can live in whatever tool your team already watches instead of forcing everyone into a terminal. In practice that is the difference between a control that gets used and a control that gets bypassed.
+
+## Timeouts reject
+
+This is the single most important default in the whole feature.
+
+An approval request that nobody answered is not an approval. If a timeout resolved to approve, the entire mechanism would be a delay rather than a gate, and it would fail exactly when your team is busiest, which is exactly when you most want the gate.
+
+So timeouts reject, the run stops, and the operator retries deliberately. That is more annoying and it is correct.
+
+## What to gate, and what to leave alone
+
+Gate the things you cannot take back.
+
+| Action | Gate it | Why |
+|--------|---------|-----|
+| Shell command | Yes | Unrecoverable, and the current HITL target |
+| Write outside the workspace | Blocked entirely | Confinement handles this before approval matters |
+| External send, payment, publish | Yes, in your own integration | Third-party side effects have no undo |
+| File write inside the workspace | No | Git is your undo |
+| Read, search, draft | No | Reversible by definition |
+
+The failure mode I see most often is gating everything. It feels safe for a week. Then approval requests pile up, someone starts approving without reading, and you have trained your team to rubber-stamp. A gate that is always green is worse than no gate, because it produces an audit trail that looks like oversight.
+
+Gate less, and mean it.
+
+## How it composes with the other controls
+
+Approvals are the last layer, not the only one.
+
+1. **Deny by default.** Server and production modes refuse Bash unless `SWARM_ALLOW_BASH=1`. Most deployments should stop here.
+2. **Policy gate.** If Bash is enabled, `BashSecurityGate` validates the command at the argv level against thirteen patterns. See [why your agent needs a bash policy gate](/blog/why-your-agent-needs-a-bash-policy-gate).
+3. **Filesystem confinement.** Read and Write stay inside the workspace root regardless of what any gate decides.
+4. **Human approval.** For what survives, a person decides.
+
+Each layer assumes the one before it may fail. That is the point of layering, and it is why I do not describe any single one of them as "the security model".
+
+HITL approvals are Beta on the [status page](/docs/resources/status). The Bash gate underneath is Stable.
+
+## When not to use HITL
+
+- **High-frequency automation.** If a workflow runs hundreds of times a day, a human gate is a queue, and queues get drained carelessly. Constrain the tools instead.
+- **Nobody owns the queue.** An approval flow with no named owner and no alerting is a way to stall runs, not to supervise them. Decide who watches it before you turn it on.
+- **The action is already reversible.** Approving a git commit on a feature branch is ceremony. Save the attention for the irreversible steps.
+
+## Get started
+
+```bash
+pip install techtide-swarm
+swarm init
+swarm demo
+```
+
+Then read [human-in-the-loop approvals](/docs/guides/hitl-approvals) for configuration, [ApprovalGate](/docs/sdk/approval-gate) for the API, [approve and reject](/docs/cli/approve-reject) for the CLI, and the [security model](/docs/security/security-model) for the full layered picture.

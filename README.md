@@ -10,11 +10,14 @@ Public product surface and documentation library for [TechTide Swarm 357](https:
 
 | Surface | URL |
 |---------|-----|
-| Marketing and docs | https://swarm357fe.up.railway.app |
-| Documentation home | https://swarm357fe.up.railway.app/docs |
-| About | https://swarm357fe.up.railway.app/about |
-| Changelog | https://swarm357fe.up.railway.app/changelog |
-| Evals | https://swarm357fe.up.railway.app/evals |
+| Marketing and docs | https://swarm357.techtideai.io |
+| Documentation home | https://swarm357.techtideai.io/docs |
+| Blog | https://swarm357.techtideai.io/blog |
+| Blog feed (RSS 2.0) | https://swarm357.techtideai.io/feed.xml |
+| About | https://swarm357.techtideai.io/about |
+| Changelog | https://swarm357.techtideai.io/changelog |
+| Evals | https://swarm357.techtideai.io/evals |
+| Machine-readable index | https://swarm357.techtideai.io/llms.txt |
 | Backend API | https://swarm357be.up.railway.app |
 
 ## Contents
@@ -25,6 +28,7 @@ Public product surface and documentation library for [TechTide Swarm 357](https:
 - [Commands](#commands)
 - [Environment](#environment)
 - [Content pipeline](#content-pipeline)
+- [Blog](#blog)
 - [Design system](#design-system)
 - [Deployment](#deployment)
 - [Editorial standards](#editorial-standards)
@@ -108,7 +112,7 @@ bun run build
 
 ```bash
 # Public site URL for the sitemap, JSON-LD, and llms.txt
-NEXT_PUBLIC_SITE_URL=https://swarm357fe.up.railway.app
+NEXT_PUBLIC_SITE_URL=https://swarm357.techtideai.io
 
 # Public API base for read-only client fetches (health, agents, status)
 NEXT_PUBLIC_API_URL=https://swarm357be.up.railway.app
@@ -144,9 +148,25 @@ bun run check:content && bun run verify:links
 
 `scripts/generate-content.ts` converts Markdown to MDX, strips em dashes, and rewrites repository-relative links. A path such as `STATUS.md` resolves to its published route; anything else falls back to the canonical repository URL. Sidebar order comes from `lib/content/nav.ts`, and a documentation page listed there must exist on disk or `check:content` fails.
 
+## Blog
+
+Posts live in `content/blog/*.mdx` and are hand authored. `generate:content` only scaffolds a slug that does not exist yet, so regeneration never overwrites editorial work.
+
+Required frontmatter, enforced by `bun run check:content`:
+
+| Field | Purpose |
+|-------|---------|
+| `title`, `description`, `date`, `slug` | Listing, feed, and `BlogPosting` schema |
+| `cover`, `coverAlt` | 1200x630 JPEG under `public/art/blog/`, also the `og:image` |
+| `author` | Rendered as a schema.org `Person` with `worksFor` TechTide AI |
+| `keyword` | Primary search phrase, registered in `content/data/blog-keyword-owners.json` |
+| `tags`, `faq`, `updated` | Tag chips, `FAQPage` schema, and `dateModified` |
+
+One post owns one keyword. `check:content` fails the build if two posts claim the same phrase or a post claims an unregistered one, which is what keeps the cluster from cannibalizing itself. Each post emits `BlogPosting`, `BreadcrumbList`, and, when `faq` is present, `FAQPage` JSON-LD. The index, RSS feed at `/feed.xml`, sitemap, `llms.txt`, and the landing page strip all read from the same loader, so publishing a post updates every surface.
+
 ## Design system
 
-[DESIGN.md](DESIGN.md) is the canonical reference for color tokens, typography, class tiers, interaction states, motion, accessibility, and the link policy. A reader-friendly summary is published at [/docs/resources/design](https://swarm357fe.up.railway.app/docs/resources/design).
+[DESIGN.md](DESIGN.md) is the canonical reference for color tokens, typography, class tiers, interaction states, motion, accessibility, and the link policy. A reader-friendly summary is published at [/docs/resources/design](https://swarm357.techtideai.io/docs/resources/design).
 
 Before writing UI:
 
@@ -178,7 +198,7 @@ docker image inspect <image> --format '{{json .Config.Env}}'
 - Demo writes go through the same-origin BFF. The write key stays server-side and is never exposed as a `NEXT_PUBLIC_*` value.
 - Use-case scenarios on the landing page are illustrative composites, not named customer endorsements.
 - Opik cloud observability is Not implemented in core. Local JSONL traces are the source of truth.
-- Feature maturity mirrors the [status page](https://swarm357fe.up.railway.app/docs/resources/status). Dream cycle is Experimental; HITL and SSE are Beta.
+- Feature maturity mirrors the [status page](https://swarm357.techtideai.io/docs/resources/status). Dream cycle is Experimental; HITL and SSE are Beta.
 - Eval numbers are read from the committed baseline in `content/data/eval-baseline.json` through `lib/eval-baseline.ts`, never typed into prose.
 - Public copy contains no em dashes or en dashes. This is enforced in continuous integration.
 

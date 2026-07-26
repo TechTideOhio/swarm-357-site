@@ -26,9 +26,18 @@ export function GET() {
       .filter((e) => e.type === "blog")
       .map((e) => `- [${e.title}](${SITE_URL}${e.href}): ${e.description}`),
     "",
+    "## Pages",
+    "",
+    `- [About](${SITE_URL}/about): who builds Swarm 357 and why.`,
+    `- [Status](${SITE_URL}/docs/resources/status): maturity matrix for every subsystem.`,
+    `- [Security](${SITE_URL}/docs/security/security-model): auth, HITL, filesystem, and model honesty.`,
+    `- [Evals](${SITE_URL}/evals): baseline driven metrics.`,
+    `- [Changelog](${SITE_URL}/changelog): release history.`,
+    "",
     "## Optional",
     "",
     `- Full text bundle: ${SITE_URL}/llms-full.txt`,
+    `- Blog feed: ${SITE_URL}/feed.xml`,
   ];
 
   return new Response(lines.join("\n"), {

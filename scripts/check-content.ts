@@ -309,7 +309,101 @@ function check_ui_consistency() {
   }
 }
 
+const BLOG_REQUIRED_FIELDS = [
+  "title",
+  "description",
+  "date",
+  "slug",
+  "cover",
+  "coverAlt",
+  "author",
+  "keyword",
+] as const;
+
+function check_blog_frontmatter() {
+  const blog_dir = path.join(ROOT, "content/blog");
+  if (!fs.existsSync(blog_dir)) return;
+
+  const owners_path = path.join(ROOT, "content/data/blog-keyword-owners.json");
+  if (!fs.existsSync(owners_path)) {
+    errors.push("Missing content/data/blog-keyword-owners.json");
+    return;
+  }
+
+  const owners = (
+    JSON.parse(fs.readFileSync(owners_path, "utf8")) as { owners: Record<string, string> }
+  ).owners;
+  const claimed = new Map<string, string>();
+
+  for (const entry of fs.readdirSync(blog_dir)) {
+    if (!entry.endsWith(".mdx")) continue;
+
+    const slug = entry.replace(/\.mdx$/, "");
+    const rel = `content/blog/${entry}`;
+    // Normalised so a Windows checkout does not report a missing frontmatter block.
+    const raw = fs.readFileSync(path.join(blog_dir, entry), "utf8").replace(/\r\n/g, "\n");
+    const front_matter = /^---\n([\s\S]*?)\n---/.exec(raw)?.[1];
+
+    if (!front_matter) {
+      errors.push(`${rel}: missing frontmatter block`);
+      continue;
+    }
+
+    for (const field of BLOG_REQUIRED_FIELDS) {
+      if (!new RegExp(`^${field}:`, "m").test(front_matter)) {
+        errors.push(`${rel}: missing required frontmatter field "${field}"`);
+      }
+    }
+
+    const read_field = (field: string): string | null => {
+      const value = new RegExp(`^${field}:\\s*"?([^"\\n]*)"?\\s*$`, "m").exec(front_matter)?.[1];
+      return value ? value.trim() : null;
+    };
+
+    const declared_slug = read_field("slug");
+    if (declared_slug && declared_slug !== slug) {
+      errors.push(`${rel}: slug "${declared_slug}" does not match the filename`);
+    }
+
+    const date = read_field("date");
+    if (date && !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+      errors.push(`${rel}: date "${date}" must be YYYY-MM-DD`);
+    }
+
+    const updated = read_field("updated");
+    if (updated && !/^\d{4}-\d{2}-\d{2}$/.test(updated)) {
+      errors.push(`${rel}: updated "${updated}" must be YYYY-MM-DD`);
+    }
+
+    const cover = read_field("cover");
+    if (cover) {
+      if (!cover.startsWith("/")) {
+        errors.push(`${rel}: cover "${cover}" must be an absolute path under /public`);
+      } else if (!fs.existsSync(path.join(ROOT, "public", cover.replace(/^\//, "")))) {
+        errors.push(`${rel}: cover "${cover}" does not exist in public/`);
+      }
+    }
+
+    const keyword = read_field("keyword");
+    if (keyword) {
+      const owner = owners[keyword];
+      if (!owner) {
+        errors.push(`${rel}: keyword "${keyword}" is not registered in blog-keyword-owners.json`);
+      } else if (owner !== slug) {
+        errors.push(`${rel}: keyword "${keyword}" belongs to ${owner}`);
+      }
+
+      const previous = claimed.get(keyword);
+      if (previous) {
+        errors.push(`${rel}: keyword "${keyword}" already claimed by ${previous}`);
+      }
+      claimed.set(keyword, slug);
+    }
+  }
+}
+
 check_frontmatter();
+check_blog_frontmatter();
 check_internal_links();
 check_nav_external_links();
 check_ui_consistency();

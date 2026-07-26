@@ -214,9 +214,12 @@ The mobile navigation is a full-screen sheet opened from the header, not a botto
 |------|----------|
 | `public/assets/` | Architecture and eval diagrams shared with the core repo |
 | `public/art/hero/`, `public/art/testimonials/` | Landing artwork |
+| `public/art/blog/` | Blog covers, one per post |
 | `public/og-image.png` | Open Graph and social card image |
 
 Diagrams are authored as SVG in the core repo under `docs/assets/` and mirrored here. Regenerate them in the core repo rather than editing the copies in `public/`.
+
+Blog covers are exactly 1200x630 progressive JPEG, quality 82, and stay under roughly 150 KB so a full blog index stays light. They share the landing artwork language: near black studio background, accent gold light paths, chrome and faceted black geometry, no baked-in text. Titles are rendered in HTML next to the cover, never inside the image, so a retitled post never needs new art. Social cards come from `/api/og` instead, which draws the title live.
 
 ## Link policy
 

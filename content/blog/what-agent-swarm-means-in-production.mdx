@@ -1,0 +1,85 @@
+---
+title: "What an agent swarm actually means in production"
+description: "The word swarm gets used for three different systems. A definition that survives a security review, plus a teardown of the four claims vendors make that do not hold up."
+date: "2026-05-26"
+updated: "2026-07-26"
+slug: "what-agent-swarm-means-in-production"
+cover: "/art/blog/layer-health.jpg"
+coverAlt: "Layered gold light bands reading as system health across a dark plane"
+author: "Alex Cinovoj"
+keyword: "what is an agent swarm"
+tags: ["Definitions", "Architecture", "Operations"]
+faq:
+  - question: "What is an agent swarm?"
+    answer: "A set of model-backed workers with distinct roles, coordinated by a runtime that decides who handles what. In production it also needs shared budget accounting, a tool permission model, and per-step attribution."
+  - question: "Is an agent swarm the same as parallel LLM calls?"
+    answer: "No. Parallel calls without routing, shared budget, and attribution are a fan-out, not a swarm. The coordination layer is what makes it one system rather than many requests."
+  - question: "How many agents make a swarm?"
+    answer: "Count is the wrong measure. One runtime coordinating three roles with shared budget and routing is more of a swarm than fifty uncoordinated parallel calls."
+---
+
+An agent swarm is a set of model-backed workers with distinct roles, coordinated by a runtime that decides who handles what. That is the useful definition. The word is currently applied to at least three different systems, which is why buyers and engineers keep talking past each other.
+
+I want to write down the definition I would defend in a security review, because that is the room where fuzzy definitions get expensive.
+
+## Three things people mean by "swarm"
+
+**Parallel calls.** N requests to a model at once, results collected. No routing, no shared budget, no attribution. This is a fan-out, and it is a perfectly good technique. It is not a swarm, and calling it one sets expectations the system cannot meet.
+
+**A conversation between agents.** Several agents exchanging messages until they converge. Coordination is emergent. Genuinely useful for open-ended problems, genuinely hard to bound, because nothing in the structure says when to stop.
+
+**A coordinated role system.** Roles declared in advance, a runtime that routes work to them, shared budget accounting, and per-step attribution. This is what survives a production review, because every question a reviewer asks has an answer that is not "the model decides".
+
+Swarm 357 is the third. 357 roles across six business layers plus ten management meta-agents, executed one agent per selected role by default under a hard agent cap.
+
+## The four claims that do not hold up
+
+**"357 agents running at once."** No. The catalog is an ontology, not a concurrency target. Naming a role costs nothing; running one costs money. A typical task touches a handful of roles, and full fan-out is behind an opt-in flag literally named `SWARM_UNSAFE_FULL_FANOUT`.
+
+**"Agents that run your business."** Agents draft, research, summarise, and prepare. Operators own API keys, budgets, and side-effect approvals. Anything with an external consequence, sending, publishing, paying, signing, sits behind a human. A vendor who tells you otherwise is describing a liability transfer they have not thought through.
+
+**"Autonomous and safe."** These pull in opposite directions and the honest framing is a dial, not a checkbox. Swarm 357 denies Bash by default in server and production modes, validates surviving commands at the argv level, confines the filesystem to the workspace root, and puts human approval in front of shell execution. That is not autonomy. That is supervised capability, and it is the right trade for anything touching a customer.
+
+**"Enterprise-grade observability."** Structured traces land in `.swarm/traces.jsonl`, with optional OpenTelemetry export behind `SWARM_OTEL_EXPORT=1`. Opik cloud observability is not implemented. Local JSONL is the source of truth. I would rather write that sentence than let you find out during an incident.
+
+## The five questions a production swarm has to answer
+
+If a system cannot answer these, it is a prototype regardless of its architecture diagram.
+
+| Question | What it means | Where Swarm 357 answers it |
+|----------|---------------|----------------------------|
+| Who handled this? | Named role, not "an agent" | Role catalog and layer routing |
+| What did it cost? | Per step, per role, per layer | Reserve-and-commit budget ledger |
+| What could it touch? | Explicit tool grant per role | `AgentConfig.tools` |
+| What stopped it? | A bound that is enforced, not advisory | Agent cap, budget cap, policy gate |
+| Who approved the side effect? | A person, with a durable record | `ApprovalGate` and `ApprovalRecord` |
+
+Notice that none of these are about model quality. Model quality determines whether the output is good. These five determine whether you can operate the system at all.
+
+## What maturity actually looks like
+
+The [status and maturity](/docs/resources/status) page splits every subsystem into Stable, Beta, Experimental, and Not implemented. The short version as it stands:
+
+- **Stable.** Single-agent runner, `AgentConfig`, flat-file memory, the Bash security gate, filesystem confinement, `swarm init`, `swarm demo`.
+- **Beta.** Swarm orchestration, layer execution, the budget ledger, `CostController`, the Memvid bridge, the HTTP API, HITL approvals, SSE, traces, UltraPlan.
+- **Experimental.** The dream cycle. Consolidation quality is heuristic and not guaranteed.
+- **Not implemented.** Multi-tenant SaaS control plane, SSO, distributed rate limiting across replicas, full Opik cloud observability.
+
+A maturity table you can read before you commit is worth more than a feature list. If a project does not publish one, ask why.
+
+## When you do not need a swarm
+
+- **The task does not decompose.** Two agents on an indivisible problem produce two partial answers.
+- **You cannot attribute cost per step.** Without attribution you are not operating a system, you are receiving invoices.
+- **Nobody owns the approvals.** A gate with no named owner becomes a rubber stamp within a month.
+- **One agent already works.** This is the most common case and the least often admitted.
+
+## See the definition in code
+
+```bash
+pip install techtide-swarm
+swarm init
+swarm demo
+```
+
+Then read the [roster overview](/docs/roster/overview) for how the layers divide work, [architecture](/docs/getting-started/architecture) for the runtime shape, [status and maturity](/docs/resources/status) for the honest table, and [multi-agent orchestration without the headcount fantasy](/blog/multi-agent-orchestration-without-headcount-fantasy) for why the catalog is not a concurrency claim.

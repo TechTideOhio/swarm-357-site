@@ -1,0 +1,92 @@
+---
+title: "Four token budgeting patterns for multi-agent systems"
+description: "Reserve before the call, budget by layer not by run, degrade loudly, and cap the context you load. The patterns that keep parallel agents inside a number you chose."
+date: "2026-06-08"
+updated: "2026-07-26"
+slug: "multi-agent-token-budgeting-patterns"
+cover: "/art/blog/token-budget.jpg"
+coverAlt: "A stack of glass vessels holding gold liquid light at descending levels"
+author: "Alex Cinovoj"
+keyword: "multi agent token budgeting"
+tags: ["Cost control", "FinOps", "Architecture"]
+faq:
+  - question: "How do you budget tokens across parallel agents?"
+    answer: "Reserve the estimated cost before the request goes out and commit the actual cost afterwards, both under a lock. Reading a remaining balance and then spending is a race that parallel agents lose."
+  - question: "Should budgets be per run or per layer?"
+    answer: "Both, but the layer budget is the one you act on. Per-run tells you a task was expensive; per-layer tells you which function is expensive."
+  - question: "What is the biggest hidden token cost in a multi-agent system?"
+    answer: "Context that loads automatically. Memory files, system preambles, and handoff payloads are paid on every step, and they grow quietly until quality degrades."
+---
+
+Token budgeting for a multi-agent system is not a dashboard problem. By the time a dashboard shows you the number, you have paid it. These are the four patterns that move the decision in front of the spend.
+
+## Pattern 1: reserve before the call, commit after
+
+The version that fails: read the remaining budget, decide there is room, make the call, subtract the cost.
+
+With one agent that is correct. With eight agents in a layer it is the classic lost-update race. Several agents read the same balance, all see room, and the layer overspends by a multiple of the concurrency.
+
+```
+reserve(estimate)   ->  balance drops immediately, other agents see it
+call model          ->  failure here releases the reservation
+commit(actual)      ->  estimate replaced by truth, drift corrected
+```
+
+`BudgetLedger` in Swarm 357 does this under an asyncio lock. Two details matter as much as the lock. A failed call must release its reservation, or the budget leaks downward until the layer stalls. And commit must replace the estimate rather than add to it, or estimation error compounds across every step of a long run.
+
+## Pattern 2: budget by layer, not only by run
+
+A per-run budget answers "did this task cost too much". A per-layer budget answers "which function is expensive", and that is the number you can act on.
+
+| Scope | Set on | Answers | Act on it by |
+|-------|--------|---------|--------------|
+| Agent | `budget_limit_usd` | Is one worker misbehaving | Fixing a soul template or tool grant |
+| Layer | `CostController` | Is a business function too expensive | Rethinking how that function decomposes |
+| Run | Outer cap | Is this task worth it | Approving or refusing the work |
+
+Research is allowed to be expensive because research has expensive inputs. Support triage is not, because triage runs constantly. One global number cannot express that, and a system that only has one global number will get tuned down to the cheapest thing it does.
+
+## Pattern 3: degrade loudly
+
+At 80 percent of a layer budget, `CostController` downgrades to Haiku. That is a good behaviour attached to a real hazard: quality drops on the last steps of a long run and nobody knows why.
+
+So the downgrade emits a `model_downgrade` event into `.swarm/traces.jsonl`. When the final section of a report reads thinner than the rest, the trace has the timestamp and the reason.
+
+The general rule, worth applying to any system you build: an automatic action that changes output quality must leave a record. A silent optimisation does not save money, it relocates the cost into somebody's debugging afternoon.
+
+## Pattern 4: cap the context you load, not just the calls you make
+
+This is the one that gets missed, and it is the one that got me.
+
+Every automatic inclusion is paid on every step. System preamble, memory files, handoff payloads from the previous agent, tool schemas. None of it appears in a per-call decision because none of it is a decision. It is just there.
+
+An agent of mine wrote to a topic file on every run with nothing pruning it. Six weeks later the file was large enough to eat a meaningful slice of the context window before the agent read the task. Quality degraded a little each week, which is the worst way for anything to degrade, because there is no incident to investigate.
+
+Three defences:
+
+- **A pointer index instead of bulk loading.** `.swarm/MEMORY.md` is deliberately small and tells the agent what exists, so it opens what it needs. If everything loads by default you have built a preamble, not a memory system.
+- **Bounded handoffs.** Pass a summary between agents, not the full transcript. Otherwise the last agent in a chain pays for every message before it.
+- **Scheduled hygiene.** A boring job that archives old topics beats a clever consolidation pass. The `run_dream_cycle()` heuristic is Experimental and I do not rely on it to prevent accumulation.
+
+## Cheap models for the loop
+
+Most of the money in agent development goes to iteration, not production. You will run the same task forty times while fixing one soul template.
+
+Route that loop through OpenRouter with a cheap tool-capable model, and keep premium models for the runs that matter. Note that OpenRouter does not silently remap to Haiku unless you set `SWARM_OPENROUTER_CHEAP=1`, which is opt-in on purpose. More detail in [OpenRouter and cheap models for swarm tests](/blog/openrouter-cheap-models-for-swarm-tests).
+
+## When budgeting machinery is overkill
+
+- **One short call per request.** Set a provider-level spend limit and stop.
+- **You need hard multi-tenant quotas.** The limiter is single-process, and distributed rate limiting across replicas is not implemented. Stacking per-process caps is not the same guarantee.
+- **You want a quote before the run.** Estimation gives you an order of magnitude. Reserve-and-commit is a safety mechanism, not a forecast.
+
+## Wire it up
+
+```bash
+pip install techtide-swarm
+swarm init
+swarm demo
+swarm cost
+```
+
+Read [cost control and budgets](/docs/guides/cost-control) for configuration, [CostController](/docs/sdk/cost-controller) for the API, [telemetry and traces](/docs/guides/telemetry-traces) for the event stream, and [cost control for LLM agent fleets](/blog/cost-control-for-llm-agent-fleets) for the operational side of the same problem.

@@ -8,12 +8,13 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: "*",
-        allow: "/",
+        // /api/og renders the social card, so it stays crawlable while the rest of the API does not.
+        allow: ["/", "/api/og"],
         disallow: ["/api/", "/private/"],
       },
       ...AI_CRAWLERS.map((userAgent) => ({
         userAgent,
-        allow: ["/", "/docs/", "/blog/", "/llms.txt", "/llms-full.txt"],
+        allow: ["/", "/docs/", "/blog/", "/llms.txt", "/llms-full.txt", "/feed.xml"],
         disallow: ["/api/"],
       })),
     ],

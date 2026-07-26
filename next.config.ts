@@ -66,6 +66,14 @@ const nextConfig: NextConfig = {
   async headers() {
     return [{ source: "/:path*", headers: security_headers }];
   },
+  // Short marketing URLs that resolve into docs. Permanent so crawlers fold them
+  // into the canonical doc page instead of indexing two addresses.
+  async redirects() {
+    return [
+      { source: "/status", destination: "/docs/resources/status", permanent: true },
+      { source: "/security", destination: "/docs/security/security-model", permanent: true },
+    ];
+  },
 };
 
 export default nextConfig;

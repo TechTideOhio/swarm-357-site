@@ -1,0 +1,107 @@
+---
+title: "Durable checkpoints: resume, cancel, replay, and fork"
+description: "A long agent run that dies at step nine should not restart at step one. How SQLite-backed run state turns a crash into a resume, and why cancel has to be a persisted flag."
+date: "2026-06-22"
+updated: "2026-07-26"
+slug: "durable-checkpoints-resume-cancel-replay"
+cover: "/art/blog/checkpoints.jpg"
+coverAlt: "Glowing gold crystal markers along a black rail, one rewound with a trail of light"
+author: "Alex Cinovoj"
+keyword: "agent checkpoint resume"
+tags: ["Operations", "Architecture", "Reliability"]
+faq:
+  - question: "Why do agent runs need checkpoints?"
+    answer: "Because model calls are slow and expensive. A run that fails at step nine of twelve should resume from step nine, not repay for the first eight."
+  - question: "What is the difference between resume, replay, and fork?"
+    answer: "Resume continues an interrupted run from its last checkpoint. Replay re-executes a completed run to reproduce it. Fork branches from a checkpoint to try a different path without losing the original."
+  - question: "Why must cancel be persisted rather than held in memory?"
+    answer: "Because the process that receives the cancel is often not the process running the step. Writing cancel_requested to the checkpoint means the cancellation survives a restart and is observable from anywhere."
+---
+
+A twelve-step agent run that dies at step nine has already spent the money for steps one through eight. If your only recovery is to start again, you pay twice and you wait twice. Durable checkpoints are the fix, and they are less about reliability theatre than about not repurchasing work you already own.
+
+`RunState` with SQLite checkpoints under `.swarm/` is how Swarm 357 handles it.
+
+## Four operations on the same state
+
+| Operation | Starting point | Use it when |
+|-----------|----------------|-------------|
+| Resume | Last checkpoint of an interrupted run | A crash, a deploy, a timeout, an approval that arrived late |
+| Cancel | Any point, via a persisted flag | The run is going somewhere expensive or wrong |
+| Replay | A completed run, re-executed | Reproducing a result, or verifying a fix |
+| Fork | Any checkpoint, on a new branch | Trying an alternative path without losing the original |
+
+```bash
+swarm inspect <id>      # state, step, and anything pending
+swarm resume <id>
+swarm cancel <id>
+swarm replay <id>
+swarm fork <id>
+```
+
+All of these are Beta, tracked on the [status page](/docs/resources/status).
+
+## Cancel is the one people get wrong
+
+The intuitive implementation holds a cancellation token in memory and checks it between steps. That works in one process on one machine, which is not where your runs live.
+
+The problem: the process receiving the cancel is usually not the process executing the step. An operator hits cancel through the API, the API process sets a flag in its own memory, and the worker never hears about it. Meanwhile the run keeps spending.
+
+So cancel persists. `cancel_requested` is written onto the checkpoint, the executing run reads it at its next safe boundary, and the flag survives a restart. Three properties follow:
+
+- A restart does not resurrect a cancelled run. The flag is still there.
+- Any process can observe the request, so `swarm inspect` tells you a cancel is pending even if the worker has not reached its boundary yet.
+- The record of who cancelled and when outlives the process.
+
+The tradeoff is that cancellation is not instantaneous. A run cancels at the next boundary, not mid-call. That is the correct trade, because tearing down mid-call leaves partial side effects with no record.
+
+## Resume needs a boundary you can trust
+
+Checkpointing is only useful if the state at the boundary is coherent. Two rules make that true.
+
+**Checkpoint after side effects, not before.** If a step writes a file and then the checkpoint fails, resuming re-runs the write. Idempotent steps survive that; most real steps are not idempotent. Record the effect, then checkpoint.
+
+**Keep the checkpoint boundary at the step level, not inside it.** A half-finished model call is not a resumable state. Resume from the last completed step and repay for the one that was in flight. That is one step of waste, bounded and predictable.
+
+This is also where approvals meet persistence. When a run pauses for [human-in-the-loop approval](/blog/human-in-the-loop-approvals-for-agents), it may sit for hours. If pending approvals lived in memory, every deploy would strand every waiting run. Durable `ApprovalRecord` plus durable run state means the approval can arrive after a restart and the run continues.
+
+## Replay and fork are debugging tools
+
+Replay re-executes a completed run. Its value is reproduction: a run behaved oddly, you fix a soul template, you replay to see whether the fix changes the outcome. Note that model outputs vary, so a replay that differs is evidence, not proof.
+
+Fork branches from a checkpoint. Its value is comparison: you have a run that got to step six correctly and then went sideways. Fork at six, change the routing, and run both. You keep the original.
+
+The habit worth building is forking rather than editing and re-running. Editing loses the artifact you were comparing against, and you will want it twenty minutes later.
+
+## What lives on disk
+
+```
+.swarm/
+├── MEMORY.md          # pointer index
+├── topics/            # flat-file knowledge
+├── checkpoints/       # durable run state, SQLite
+└── traces.jsonl       # structured events
+```
+
+Checkpoints hold run state. Topics hold knowledge. They are separate on purpose: you frequently want to discard a bad run without discarding what the agent learned, and occasionally the reverse. See [portable agent memory with Memvid](/blog/portable-agent-memory-with-memvid) for the knowledge half.
+
+Two operational notes. Back up `.swarm/checkpoints/` if runs are long enough that losing one hurts, because a container without a persistent volume loses everything on redeploy. And retain traces longer than checkpoints, since traces are what you read during an incident.
+
+## When checkpoints are not worth it
+
+- **Sub-minute runs.** Restarting costs less than the state management.
+- **Genuinely idempotent pipelines.** If re-running from scratch is free and safe, that is simpler.
+- **Runs with no side effects and trivial cost.** Checkpointing a cheap read-only summarisation is machinery for its own sake.
+
+The threshold in practice is roughly: if a failed run would make you sigh, checkpoint it.
+
+## Try the control plane
+
+```bash
+pip install techtide-swarm
+swarm init
+swarm demo
+swarm inspect
+```
+
+Then read [checkpoints and resume](/docs/guides/checkpoints-resume), [replay and fork](/docs/guides/replay-fork), [inspect, resume, cancel](/docs/cli/inspect-resume-cancel), and [runtime files](/docs/configuration/runtime-files) for what each path under `.swarm/` holds.
