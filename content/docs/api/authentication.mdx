@@ -1,0 +1,11 @@
+---
+title: "Authentication"
+description: "X-SWARM-API-KEY header and production fail-closed behavior."
+section: "API reference"
+order: "2"
+slug: "api/authentication"
+---
+
+Set `SWARM_API_KEY` on the server. Clients send `X-SWARM-API-KEY` on write routes.
+
+Production (`SWARM_ENV=production`, `SWARM_REQUIRE_AUTH=1`, or `RAILWAY_ENVIRONMENT`) fails closed without a key (503).

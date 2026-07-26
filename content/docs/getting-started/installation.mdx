@@ -1,0 +1,49 @@
+---
+title: "Installation"
+description: "Install from PyPI, editable dev install, Docker, and optional Memvid bridge build."
+section: "Getting started"
+order: "3"
+slug: "getting-started/installation"
+---
+
+## PyPI install
+
+```bash
+pip install "techtide-swarm[dev]==0.2.2"
+```
+
+## Editable install from source
+
+```bash
+git clone https://github.com/TechTideOhio/swarm-357
+cd swarm-357
+pip install -e "packages/techtide-swarm[dev]"
+```
+
+## Optional: Memvid bridge
+
+```bash
+cd packages/memvid-swarm-bridge
+cargo build --release
+export MEMVID_SWARM_BRIDGE=$(pwd)/target/release/memvid-swarm-bridge
+```
+
+See [Memvid bridge guide](/docs/guides/memvid-bridge).
+
+## Docker
+
+```bash
+docker build -t swarm357-api .
+docker run --rm -p 8000:8000 -e SWARM_API_KEY=dev swarm357-api
+```
+
+See [Docker deployment](/docs/deployment/docker).
+
+## Verify install
+
+```bash
+swarm status
+swarm boot
+```
+
+Expect 357 agents loaded from the compact roster.

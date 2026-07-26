@@ -1,0 +1,23 @@
+---
+title: "FAQ"
+description: "Frequently asked questions about Swarm 357."
+section: "Resources"
+order: "8"
+slug: "resources/faq"
+---
+
+## Is this 357 parallel Opus sessions?
+
+No. 357 is the role catalog size. Default execution uses one agent per role with a cap.
+
+## Do I need Memvid?
+
+No. Flat-file memory works without the bridge. Memvid adds portable .mv2 recall.
+
+## Is Opik supported?
+
+Opik cloud is not implemented. Use local JSONL traces.
+
+## What models work on OpenRouter?
+
+Use tool-capable models. Free Llama models fail tool calling. Haiku works for judges; Sonnet-4 for agents in baselines.

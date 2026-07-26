@@ -1,5 +1,7 @@
 import type { MetadataRoute } from "next";
-import { siteConfig } from "@/lib/metadata";
+import { SITE_URL } from "@/lib/site-url";
+
+const AI_CRAWLERS = ["GPTBot", "ClaudeBot", "PerplexityBot", "Google-Extended", "anthropic-ai"];
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -9,8 +11,13 @@ export default function robots(): MetadataRoute.Robots {
         allow: "/",
         disallow: ["/api/", "/private/"],
       },
+      ...AI_CRAWLERS.map((userAgent) => ({
+        userAgent,
+        allow: ["/", "/docs/", "/blog/", "/llms.txt", "/llms-full.txt"],
+        disallow: ["/api/"],
+      })),
     ],
-    sitemap: `${siteConfig.url}/sitemap.xml`,
-    host: siteConfig.url,
+    sitemap: `${SITE_URL}/sitemap.xml`,
+    host: SITE_URL,
   };
 }

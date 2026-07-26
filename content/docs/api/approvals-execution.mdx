@@ -1,0 +1,13 @@
+---
+title: "Approvals and execution"
+description: "HITL approvals and run execution endpoints."
+section: "API reference"
+order: "9"
+slug: "api/approvals-execution"
+---
+
+`POST /api/swarm/approvals/{id}/approve` and `/reject`
+
+`POST /api/swarm/run` body: `{ task, budget_usd, layer?, simulate, full_fanout }`
+
+`POST /api/agent/run` body: `{ agent_name, task }`

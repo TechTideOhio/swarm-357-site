@@ -1,0 +1,14 @@
+---
+title: "Replay and fork"
+description: "Re-run or branch from prior checkpoints."
+section: "Guides"
+order: "9"
+slug: "guides/replay-fork"
+---
+
+```bash
+swarm replay <run_id>
+swarm fork <run_id> --edit-task "Revised objective"
+```
+
+Fork creates a new run with optional task edit and `parent_run_id` linkage.

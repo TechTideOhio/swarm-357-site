@@ -1,0 +1,11 @@
+---
+title: "SSE event stream"
+description: "Server-sent events for run progress."
+section: "API reference"
+order: "8"
+slug: "api/sse-events"
+---
+
+`GET /api/swarm/runs/{id}/events` returns `text/event-stream`.
+
+Requires write key when `SWARM_API_KEY` is set. Ends with `event: stream.end`.

@@ -1,0 +1,15 @@
+---
+title: "run, boot, agent"
+description: "Execute tasks, boot the roster, and inspect individual agents."
+section: "CLI reference"
+order: "3"
+slug: "cli/run-boot-agent"
+---
+
+```bash
+swarm boot
+swarm run "task" --layer sales --budget 25 --max-parallel 10
+swarm agent --list
+swarm agent sales-outreach-specialist-001 --info
+swarm agent sales-outreach-specialist-001 --run "Draft email"
+```

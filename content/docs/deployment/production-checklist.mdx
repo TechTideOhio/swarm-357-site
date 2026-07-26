@@ -1,0 +1,14 @@
+---
+title: "Production checklist"
+description: "Pre-launch verification for production deployments."
+section: "Deployment"
+order: "4"
+slug: "deployment/production-checklist"
+---
+
+- [ ] Set `SWARM_API_KEY` and `SWARM_REQUIRE_AUTH=1`
+- [ ] Restrict CORS via `ALLOWED_ORIGINS`
+- [ ] Keep Bash disabled or HITL-enabled
+- [ ] Set rate limits
+- [ ] Verify `/api/health` returns agents=357
+- [ ] Run [verification scorecard](/docs/resources/verification)

@@ -10,8 +10,10 @@ import { Testimonials } from "@/components/testimonials";
 import { RecentRuns } from "@/components/recent-runs";
 import { TryItLive } from "@/components/try-it-live";
 import { features } from "@/lib/config";
+import { landing_faqs } from "@/lib/faq-data";
 import type { Metadata } from "next";
 import { createMetadata, siteConfig } from "@/lib/metadata";
+import { SITE_URL } from "@/lib/site-url";
 import type { ReactNode } from "react";
 
 export const metadata: Metadata = createMetadata({
@@ -20,9 +22,45 @@ export const metadata: Metadata = createMetadata({
   path: "/",
 });
 
+const software_json_ld = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: "Swarm 357",
+  applicationCategory: "DeveloperApplication",
+  operatingSystem: "Cross-platform",
+  description: siteConfig.description,
+  url: SITE_URL,
+  offers: {
+    "@type": "Offer",
+    price: "0",
+    priceCurrency: "USD",
+  },
+};
+
+const faq_json_ld = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: landing_faqs.map((faq) => ({
+    "@type": "Question",
+    name: faq.question,
+    acceptedAnswer: {
+      "@type": "Answer",
+      text: faq.answer,
+    },
+  })),
+};
+
 export default function HomePage(): ReactNode {
   return (
     <main id="main-content" className="flex-1">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(software_json_ld) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faq_json_ld) }}
+      />
       <Hero />
       <section id="try-it-live" className="scroll-mt-24">
         <TryItLive />

@@ -1,0 +1,17 @@
+---
+title: "Layer routing"
+description: "How the Conductor routes tasks to business layers."
+section: "Guides"
+order: "2"
+slug: "guides/layer-routing"
+---
+
+The Conductor agent parses natural-language tasks into structured routing JSON. Layers receive work based on intent keywords and configured defaults.
+
+## Default fan-out
+
+One agent per role, capped by `SWARM_LAYER_MAX_AGENTS` (default 16). Full fan-out requires `--full-fanout` or `SWARM_UNSAFE_FULL_FANOUT=1`.
+
+## Layer budgets
+
+Each layer has a daily limit in `swarm-compact.yaml`. See [Cost control](/docs/guides/cost-control).

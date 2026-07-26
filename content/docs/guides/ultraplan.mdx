@@ -1,0 +1,17 @@
+---
+title: "UltraPlan"
+description: "Deep Opus-class planning sessions."
+section: "Guides"
+order: "12"
+slug: "guides/ultraplan"
+---
+
+```bash
+swarm plan "Launch Q3 campaign" --model opus
+```
+
+```python
+from techtide_swarm import UltraPlan, UltraPlanConfig
+plan = UltraPlan(UltraPlanConfig(max_budget_usd=10))
+result = await plan.plan("Your objective")
+```

@@ -124,3 +124,39 @@ body {
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
+
+.scrollbar-fluid {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--accent) 55%, transparent) transparent;
+}
+
+.scrollbar-fluid::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.scrollbar-fluid::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--accent) 45%, var(--muted-foreground));
+  border-radius: 999px;
+  transition: background 0.2s ease;
+}
+
+.scrollbar-fluid::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+}
+
+.scrollbar-fluid::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}

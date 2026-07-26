@@ -1,17 +1,17 @@
 import type { Metadata } from "next";
 import { siteConfig as appSiteConfig } from "@/lib/config";
+import { SITE_URL } from "@/lib/site-url";
 
 export const siteConfig = {
   name: appSiteConfig.name,
   tagline: appSiteConfig.tagline,
   description: appSiteConfig.description,
-  url: appSiteConfig.url,
-  ogImage: "/og-image.png",
-  creator: appSiteConfig.social.twitter,
+  url: SITE_URL,
+  creator: "TechTide AI",
   authors: [
     {
       name: "TechTide AI",
-      url: appSiteConfig.url,
+      url: SITE_URL,
     },
   ],
   keywords: [
@@ -22,8 +22,16 @@ export const siteConfig = {
     "Memvid",
     "agent orchestration",
     "TechTide",
+    "techtide-swarm",
+    "agent documentation",
   ],
 } as const;
+
+function og_image_url(title: string, subtitle?: string): string {
+  const params = new URLSearchParams({ title });
+  if (subtitle) params.set("subtitle", subtitle);
+  return `/api/og?${params.toString()}`;
+}
 
 export const baseMetadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
@@ -57,20 +65,11 @@ export const baseMetadata: Metadata = {
     title: siteConfig.name,
     description: siteConfig.description,
     siteName: siteConfig.name,
-    images: [
-      {
-        url: siteConfig.ogImage,
-        width: 1200,
-        height: 630,
-        alt: siteConfig.name,
-      },
-    ],
   },
   twitter: {
     card: "summary_large_image",
     title: siteConfig.name,
     description: siteConfig.description,
-    images: [siteConfig.ogImage],
     creator: siteConfig.creator,
   },
   icons: {
@@ -84,17 +83,17 @@ export function createMetadata({
   title,
   description,
   path = "/",
-  image,
   noIndex = false,
 }: {
   title?: string;
   description?: string;
   path?: string;
-  image?: string;
   noIndex?: boolean;
 }): Metadata {
   const url = `${siteConfig.url}${path}`;
-  const ogImage = image ?? siteConfig.ogImage;
+  const page_title = title ?? siteConfig.name;
+  const page_description = description ?? siteConfig.description;
+  const og_image = og_image_url(page_title, page_description);
 
   return {
     title,
@@ -103,22 +102,16 @@ export function createMetadata({
       canonical: path,
     },
     openGraph: {
-      title: title ?? siteConfig.name,
-      description: description ?? siteConfig.description,
+      title: page_title,
+      description: page_description,
       url,
-      images: [
-        {
-          url: ogImage,
-          width: 1200,
-          height: 630,
-          alt: title ?? siteConfig.name,
-        },
-      ],
+      images: [{ url: og_image, width: 1200, height: 630, alt: page_title }],
     },
     twitter: {
-      title: title ?? siteConfig.name,
-      description: description ?? siteConfig.description,
-      images: [ogImage],
+      card: "summary_large_image",
+      title: page_title,
+      description: page_description,
+      images: [og_image],
     },
     ...(noIndex && {
       robots: {

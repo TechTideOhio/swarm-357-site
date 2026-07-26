@@ -1,0 +1,33 @@
+---
+title: "Architecture"
+description: "How the Conductor, layers, memory, and observability fit together."
+section: "Getting started"
+order: "6"
+slug: "getting-started/architecture"
+---
+
+## High-level flow
+
+1. **Task** enters via CLI or HTTP API
+2. **Conductor** (management layer) parses routing intent
+3. **Layer executor** dispatches agents with role-aware SOUL prompts
+4. **Tools** run through the registry (Read, Write, Bash, WebSearch, MCP)
+5. **Memory** writes to topics or Memvid
+6. **Checkpoint** saves `RunState`; **SSE** streams events to clients
+
+![Architecture diagram](/assets/architecture.png)
+
+## Components
+
+| Component | Location | Role |
+|-----------|----------|------|
+| Python package | `techtide-swarm` | Agent, Swarm, CLI, FastAPI server |
+| Memvid bridge | `memvid-swarm-bridge` | Rust CLI for `.mv2` memory |
+| Landing site | Separate Next.js repo | Marketing, docs, live demo BFF |
+| Config | `swarm-compact.yaml` | 357-role roster |
+
+## Request lifecycle
+
+Write operations require `X-SWARM-API-KEY` when `SWARM_API_KEY` is set. SSE streams end with `stream.end` on terminal run status.
+
+See [HTTP API overview](/docs/api/overview) and [Streaming events](/docs/guides/streaming-events).

@@ -1,0 +1,48 @@
+---
+title: "Your first run"
+description: "Boot the roster, execute a layer task, and inspect the checkpoint."
+section: "Getting started"
+order: "4"
+slug: "getting-started/first-run"
+---
+
+## Boot the swarm
+
+```bash
+swarm boot
+```
+
+Loads all 357 agent identities from `config/swarm-compact.yaml`.
+
+## Run a single-layer task
+
+```bash
+swarm run "Draft a tier-1 support macro for password reset" --layer support --budget 2
+```
+
+Default fan-out selects **one agent per role** with a hard cap (`SWARM_LAYER_MAX_AGENTS`, default 16).
+
+## Inspect the run
+
+```bash
+swarm inspect <run_id>
+```
+
+Shows `RunState`: steps, costs, approvals, and cancel flag.
+
+## Resume or cancel
+
+```bash
+swarm resume <run_id>
+swarm cancel <run_id>
+```
+
+Cancel persists `cancel_requested` on the checkpoint so a new process can honor it.
+
+## Simulate without keys
+
+```bash
+swarm run "test" --simulate
+```
+
+Explicit simulation. The runtime does not silently succeed without credentials.

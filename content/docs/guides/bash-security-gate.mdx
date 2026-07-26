@@ -1,0 +1,23 @@
+---
+title: "Bash security gate"
+description: "13-pattern Bash validator and server-mode defaults."
+section: "Guides"
+order: "6"
+slug: "guides/bash-security-gate"
+---
+
+`BashSecurityGate` blocks destructive and exfiltration-shaped commands before execution.
+
+## Server defaults
+
+- Bash denied unless `SWARM_ALLOW_BASH=1`
+- `SWARM_HITL_BASH` requires approval in server/production
+
+## Validate
+
+```python
+from techtide_swarm import BashSecurityGate
+ok, reason = BashSecurityGate().validate("rm -rf /")
+```
+
+See [Bash policy](/docs/security/bash-policy).

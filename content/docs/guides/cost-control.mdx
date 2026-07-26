@@ -1,0 +1,26 @@
+---
+title: "Cost control and budgets"
+description: "Layer budgets, run caps, and model downgrade behavior."
+section: "Guides"
+order: "3"
+slug: "guides/cost-control"
+---
+
+## CostController
+
+Tracks spend per layer. At 80% of layer budget, may force Haiku and emit `model_downgrade` telemetry.
+
+## Run budget cap
+
+`SWARM_MAX_RUN_BUDGET_USD` (default 500) caps HTTP request budgets.
+
+## Per-agent budgets
+
+Each role in the roster has `budget_usd`. Enforcement is Beta; layer totals are authoritative for downgrade.
+
+## Reports
+
+```bash
+swarm cost
+curl http://localhost:8000/api/swarm/cost
+```
