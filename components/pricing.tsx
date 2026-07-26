@@ -28,7 +28,7 @@ const plans: Plan[] = [
       "Memvid .mv2 via optional bridge (crates.io)",
       "BashSecurityGate (13 rules)",
       "CostController and budget caps",
-      "Local JSONL traces (Opik optional / planned)",
+      "Local JSONL traces (Opik cloud not implemented)",
       "Apache-2.0 license",
     ],
   },

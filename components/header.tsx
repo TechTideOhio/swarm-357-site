@@ -41,7 +41,9 @@ const menuCards = [
     title: "RESOURCES",
     links: [
       { label: "About", href: "/about", badge: null },
-      { label: "Documentation", href: siteConfig.nav.signIn.href, badge: null },
+      { label: "STATUS", href: "https://github.com/TechTideOhio/swarm-357/blob/main/STATUS.md", badge: null },
+      { label: "VERIFY", href: "https://github.com/TechTideOhio/swarm-357/blob/main/docs/VERIFY.md", badge: null },
+      { label: "SECURITY", href: "https://github.com/TechTideOhio/swarm-357/blob/main/SECURITY.md", badge: null },
       { label: "Evals", href: "https://github.com/TechTideOhio/swarm-357/blob/main/docs/EVALS.md", badge: null },
       { label: "Changelog", href: "https://github.com/TechTideOhio/swarm-357/blob/main/CHANGELOG.md", badge: null },
     ],

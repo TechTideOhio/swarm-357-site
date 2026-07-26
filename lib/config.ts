@@ -5,12 +5,20 @@
  * Update these values to personalize your template.
  */
 
+/** Landing release train — keep in lockstep with package.json version. */
+export const SITE_VERSION = "0.2.2" as const;
+
+/** Core PyPI package this landing is built against. */
+export const CORE_PACKAGE_VERSION = "0.2.2" as const;
+
 export const siteConfig = {
   name: "Swarm 357",
   tagline: "Layered agents. Durable memory. Observable runs.",
   description:
     "357 Claude agents across six business layers—sales, support, marketing, SEO, research, and operations—backed by portable Memvid memory and a Claude Code–native workflow.",
   url: "https://swarm357fe.up.railway.app",
+  siteVersion: SITE_VERSION,
+  corePackageVersion: CORE_PACKAGE_VERSION,
   social: {
     twitter: "@techtide",
     github: "https://github.com/TechTideOhio/swarm-357",
@@ -21,8 +29,8 @@ export const siteConfig = {
       href: "https://github.com/TechTideOhio/swarm-357",
     },
     signIn: {
-      text: "Docs",
-      href: "https://github.com/TechTideOhio/swarm-357/blob/main/CLAUDE.md",
+      text: "Status",
+      href: "https://github.com/TechTideOhio/swarm-357/blob/main/STATUS.md",
     },
   },
 } as const;
@@ -31,17 +39,18 @@ export const heroConfig = {
   headline: {
     prefix: "Run the",
     accent: "Swarm",
-    suffix: "enterprise agents actually ship",
+    /** Second line — keep short so the hero stays two lines, not a full-width sentence. */
+    suffix: "agents that actually ship",
   },
   description:
-    "Orchestrate domain specialists with a single CLI, replace flat-file memory with searchable .mv2 capsules when you are ready, and keep costs and traces honest—without pretending three hundred agents are a substitute for governance.",
+    "Layered specialists, portable memory, and honest cost controls — without pretending three hundred agents replace governance.",
   cta: {
     primary: {
-      text: "Install the Python package",
-      href: "https://github.com/TechTideOhio/swarm-357/tree/main/packages/techtide-swarm",
+      text: "Install techtide-swarm 0.2.2",
+      href: "https://pypi.org/project/techtide-swarm/0.2.2/",
     },
     secondary: {
-      text: "See architecture",
+      text: "See how it works",
       href: "#how-it-works",
     },
   },
@@ -64,10 +73,10 @@ export const heroConfig = {
 export const howItWorksConfig = {
   title: "Acquire, orchestrate, remember, observe",
   description:
-    "Marketing site and docs bring people in; the swarm CLI and YAML layers coordinate work; Memvid stores portable memory; Opik (optional) and cost reports keep production honest.",
+    "Marketing site and docs bring people in; the swarm CLI and YAML layers coordinate work; Memvid (optional Beta bridge) stores portable memory; local JSONL traces and cost reports keep production honest. Opik cloud is not implemented.",
   cta: {
-    text: "Read CLAUDE.md",
-    href: "https://github.com/TechTideOhio/swarm-357/blob/main/CLAUDE.md",
+    text: "Read STATUS.md",
+    href: "https://github.com/TechTideOhio/swarm-357/blob/main/STATUS.md",
   },
 } as const;
 
@@ -83,7 +92,7 @@ export const statsConfig = {
 } as const;
 
 export const testimonialsConfig = {
-  title: "What teams ask for",
+  title: "Use-case scenarios",
 } as const;
 
 export const pricingConfig = {
@@ -127,18 +136,19 @@ export const footerConfig = {
     "Swarm 357 pairs layered business agents with Memvid single-file memory and honest cost surfaces—so your GitHub story matches what security and FinOps reviewers can verify.",
   cta: {
     text: "Documentation",
-    href: "https://github.com/TechTideOhio/swarm-357/blob/main/CLAUDE.md",
+    href: "https://github.com/TechTideOhio/swarm-357/blob/main/STATUS.md",
   },
   links: {
     product: [
       { label: "Python package", href: "https://github.com/TechTideOhio/swarm-357/tree/main/packages/techtide-swarm" },
       { label: "Memvid bridge", href: "https://github.com/TechTideOhio/swarm-357/tree/main/packages/memvid-swarm-bridge" },
-      { label: "CLI reference", href: "https://github.com/TechTideOhio/swarm-357/blob/main/CLAUDE.md" },
+      { label: "STATUS", href: "https://github.com/TechTideOhio/swarm-357/blob/main/STATUS.md" },
+      { label: "VERIFY", href: "https://github.com/TechTideOhio/swarm-357/blob/main/docs/VERIFY.md" },
       { label: "Enterprise controls", href: "https://github.com/TechTideOhio/swarm-357/blob/main/docs/ENTERPRISE_CONTROLS.md" },
     ],
     company: [
       { label: "About", href: "/about" },
-      { label: "Architecture", href: "https://github.com/TechTideOhio/swarm-357/blob/main/CLAUDE.md" },
+      { label: "Changelog", href: "https://github.com/TechTideOhio/swarm-357/blob/main/CHANGELOG.md" },
       { label: "Evals", href: "https://github.com/TechTideOhio/swarm-357/blob/main/docs/EVALS.md" },
       { label: "Contributing", href: "https://github.com/TechTideOhio/swarm-357/blob/main/CONTRIBUTING.md" },
     ],
@@ -149,7 +159,7 @@ export const footerConfig = {
     hours: "",
     email: "https://github.com/TechTideOhio/swarm-357/issues",
   },
-  copyright: `© ${new Date().getFullYear()} TechTide Swarm 357`,
+  copyright: `© ${new Date().getFullYear()} TechTide Swarm 357 · landing ${SITE_VERSION} · techtide-swarm ${CORE_PACKAGE_VERSION}`,
 } as const;
 
 /**

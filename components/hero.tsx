@@ -1,18 +1,16 @@
+// file: components/hero.tsx
+// description: Full-bleed hero with two-line brand headline, art carousel, and CTAs
+// reference: lib/config.ts, components/rotating-cards.tsx, components/dither-cursor.tsx
+
 "use client";
 
-import { heroConfig } from "@/lib/config";
+import { CORE_PACKAGE_VERSION, heroConfig, siteConfig } from "@/lib/config";
 import { easeOut } from "@/lib/motion";
 import { motion } from "motion/react";
+import Link from "next/link";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import DitherCursor from "./dither-cursor";
 import RotatingCards, { type Card } from "./rotating-cards";
-import { TryItLive } from "./try-it-live";
-
-const headlineText = [
-  heroConfig.headline.prefix,
-  heroConfig.headline.accent,
-  heroConfig.headline.suffix,
-].join(" ");
 
 const CAROUSEL_ART: Record<string, string> = {
   "Sales plays": "/art/hero/sales-plays.png",
@@ -44,8 +42,38 @@ const carouselCards: Card[] = heroConfig.carousel.map((label, index) => ({
   ),
 }));
 
+function AnimatedLine({
+  text,
+  delayBase,
+  className,
+}: {
+  text: string;
+  delayBase: number;
+  className?: string;
+}): ReactNode {
+  return (
+    <span className={`block ${className ?? ""}`}>
+      {text.split("").map((char, index) => (
+        <motion.span
+          key={`${text}-${index}`}
+          initial={{ opacity: 0, filter: "blur(10px)" }}
+          animate={{ opacity: 1, filter: "blur(0px)" }}
+          transition={{
+            duration: 0.35,
+            delay: delayBase + index * 0.02,
+            ease: easeOut,
+          }}
+          className="inline-block"
+          style={{ whiteSpace: char === " " ? "pre" : "normal" }}
+        >
+          {char}
+        </motion.span>
+      ))}
+    </span>
+  );
+}
+
 export function Hero(): ReactNode {
-  const sectionRef = useRef<HTMLElement>(null);
   const headlineRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
   const [shouldRender, setShouldRender] = useState(false);
@@ -53,6 +81,9 @@ export function Hero(): ReactNode {
   const [isMobile, setIsMobile] = useState(true);
   const opacityRef = useRef(0);
   const animationRef = useRef<number | null>(null);
+
+  const lineOne = `${heroConfig.headline.prefix} ${heroConfig.headline.accent}`;
+  const lineTwo = heroConfig.headline.suffix;
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -105,68 +136,68 @@ export function Hero(): ReactNode {
   }, [isVisible]);
 
   return (
-    <section
-      ref={sectionRef}
-      className="relative flex min-h-dvh flex-col items-center justify-start overflow-hidden px-6 pt-40 sm:pt-82"
-    >
-      {!isMobile && shouldRender && (
-        <DitherCursor opacity={opacity} />
-      )}
-      <div ref={headlineRef} className="relative z-10 mx-auto md:text-center">
-        <h1 className="mb-8 text-5xl font-medium tracking-tighter md:text-8xl lg:text-8xl">
-          {headlineText.split("").map((char, index) => (
-            <motion.span
-              key={index}
-              initial={{ opacity: 0, filter: "blur(10px)" }}
-              animate={{ opacity: 1, filter: "blur(0px)" }}
-              transition={{
-                duration: 0.4,
-                delay: index * 0.03,
-                ease: easeOut,
-              }}
-              className="inline-block"
-              style={{ whiteSpace: char === " " ? "pre" : "normal" }}
-            >
-              {char}
-            </motion.span>
-          ))}
+    <section className="relative flex min-h-dvh flex-col items-center justify-start overflow-hidden px-6 pt-32 sm:pt-40 md:pt-44">
+      {!isMobile && shouldRender && <DitherCursor opacity={opacity} />}
+
+      <div
+        ref={headlineRef}
+        className="relative z-10 mx-auto w-full max-w-3xl text-center"
+      >
+        <p className="text-muted-foreground mb-5 text-xs font-medium tracking-[0.2em] uppercase md:text-sm">
+          {siteConfig.name}
+        </p>
+        <h1 className="mb-6 text-4xl font-medium leading-[1.05] tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl">
+          <AnimatedLine text={lineOne} delayBase={0} />
+          <AnimatedLine text={lineTwo} delayBase={0.35} className="mt-1" />
         </h1>
         <motion.p
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{
-            duration: 0.8,
-            delay: 0.8,
-            ease: easeOut,
-          }}
-          className="text-muted-foreground mx-auto mt-6 max-w-xl text-2xl leading-12 tracking-tight md:text-3xl"
+          transition={{ duration: 0.7, delay: 0.7, ease: easeOut }}
+          className="text-muted-foreground mx-auto max-w-xl text-base leading-relaxed tracking-tight md:text-lg"
         >
-          <span className="text-foreground bg-foreground/5 inline-block rounded-md px-2 py-0.5 leading-10">
-            357 agents
-          </span>{" "}
-          across{" "}
-          <span className="text-foreground bg-foreground/5 inline-block rounded-md px-4 py-0.5 leading-10">
-            6 layers
-          </span>{" "}
-          with{" "}
-          <span className="text-foreground bg-foreground/5 inline-block rounded-md px-2 py-0.5 leading-10">
-            portable memory
-          </span>{" "}
-          and honest cost controls.
+          {heroConfig.description}
+        </motion.p>
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.95, ease: easeOut }}
+          className="mt-8 flex flex-wrap items-center justify-center gap-3"
+        >
+          <Link
+            href={heroConfig.cta.primary.href}
+            className="bg-accent rounded-[3.5px] px-5 py-3 text-sm font-medium tracking-tight text-black transition-all duration-500 ease-out hover:rounded-[50px]"
+          >
+            {heroConfig.cta.primary.text}
+          </Link>
+          <Link
+            href={heroConfig.cta.secondary.href}
+            className="bg-muted text-foreground rounded-[3.5px] px-5 py-3 text-sm font-medium tracking-tight transition-all duration-500 ease-out hover:rounded-[50px]"
+          >
+            {heroConfig.cta.secondary.text}
+          </Link>
+        </motion.div>
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 1.1, ease: easeOut }}
+          className="text-muted-foreground mt-4 text-xs tracking-tight"
+        >
+          Landing {siteConfig.siteVersion} · techtide-swarm {CORE_PACKAGE_VERSION}
         </motion.p>
       </div>
 
       <div
-        className="relative -mx-6 mt-2 h-100 w-screen overflow-hidden sm:h-125 md:h-137.5 lg:h-150 xl:h-175"
+        className="relative -mx-6 mt-10 h-72 w-screen overflow-hidden sm:mt-14 sm:h-96 md:h-[28rem] lg:h-[32rem]"
         style={{
           maskImage:
-            "linear-gradient(to bottom, black 0%, black 60%, transparent 100%)",
+            "linear-gradient(to bottom, black 0%, black 70%, transparent 100%)",
           WebkitMaskImage:
-            "linear-gradient(to bottom, black 0%, black 60%, transparent 100%)",
+            "linear-gradient(to bottom, black 0%, black 70%, transparent 100%)",
         }}
       >
-        <div className="absolute left-1/2 top-25 -translate-x-1/2 sm:top-30 lg:top-35 xl:top-40">
-          <div className="origin-top scale-[0.6] lg:scale-[0.7] xl:scale-100">
+        <div className="absolute left-1/2 top-16 -translate-x-1/2 sm:top-20 lg:top-24">
+          <div className="origin-top scale-[0.55] sm:scale-[0.65] lg:scale-[0.8] xl:scale-100">
             <RotatingCards
               cards={carouselCards}
               radius={1000}
@@ -183,8 +214,6 @@ export function Hero(): ReactNode {
           </div>
         </div>
       </div>
-
-      <TryItLive />
     </section>
   );
 }

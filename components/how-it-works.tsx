@@ -13,7 +13,7 @@ const steps = [
     icon: Download,
     title: "Install the package",
     description:
-      "pip install techtide-swarm. The wheel ships the compact 357-agent roster and soul templates so swarm boot works out of the box.",
+      "pip install techtide-swarm==0.2.2. The wheel ships the compact 357-agent roster and soul templates so swarm boot works out of the box.",
   },
   {
     icon: Layers,

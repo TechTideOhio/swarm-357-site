@@ -20,7 +20,7 @@ const faqs = [
   {
     question: "Does this work without an Anthropic API key?",
     answer:
-      "Yes. The CLI runs in simulation mode without a key. swarm demo shows the full architecture and pipeline with stub outputs. Set ANTHROPIC_API_KEY for live Claude execution.",
+      "Yes. The CLI runs in simulation mode without a key. swarm demo shows the full architecture and pipeline with stub outputs. For live runs set ANTHROPIC_API_KEY, or use OpenRouter via OPENROUTER_API_KEY and ANTHROPIC_BASE_URL.",
   },
   {
     question: "How does the security gate work?",
@@ -30,7 +30,7 @@ const faqs = [
   {
     question: "Can I use models other than Claude?",
     answer:
-      "Currently the Agent class targets Claude (opus, sonnet, haiku) via the Anthropic API. The architecture is model-agnostic at the config level (AgentConfig.model is a string), but the runtime adapter only implements Anthropic today.",
+      "Short names (opus, sonnet, haiku) resolve to Claude model IDs. Live calls go through the Anthropic Messages API shape — directly with ANTHROPIC_API_KEY, or via OpenRouter (OPENROUTER_API_KEY + ANTHROPIC_BASE_URL). Cheap OpenRouter remaps are opt-in only (SWARM_OPENROUTER_CHEAP=1).",
   },
 ];
 

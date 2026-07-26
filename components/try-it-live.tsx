@@ -124,7 +124,7 @@ export function TryItLive(): ReactNode {
 
   return (
     <motion.div
-      className="relative z-10 mx-auto w-full max-w-2xl px-6 pb-24"
+      className="relative z-10 mx-auto w-full max-w-2xl px-6 py-16 md:py-24"
       initial={{ opacity: 0, y: 40 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.3 }}
