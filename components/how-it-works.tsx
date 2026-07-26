@@ -43,7 +43,7 @@ function StepCard({
   return (
     <motion.div
       ref={ref}
-      className="bg-muted flex min-h-70 flex-col rounded-2xl border border-neutral-200/10 p-6 shadow-2xl/20 md:p-8"
+      className="bg-muted flex min-h-70 flex-col rounded-2xl border border-neutral-200/10 p-6 shadow-2xl/20 transition-colors duration-300 ease-out hover:bg-muted/80 md:p-8"
       initial={{ opacity: 0, y: 30 }}
       animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
       transition={{ duration: 0.8, delay: index * 0.1, ease: easeOut }}
@@ -83,7 +83,7 @@ export function HowItWorks(): ReactNode {
           </p>
           <Link
             href={howItWorksConfig.cta.href}
-            className="text-foreground mt-6 inline-block text-sm font-medium underline underline-offset-4 transition-opacity hover:opacity-70"
+            className="text-muted-foreground mt-6 inline-block rounded-[3.5px] px-3 py-1.5 text-sm font-medium tracking-tight transition-colors duration-300 ease-out hover:bg-foreground/5 hover:text-foreground"
           >
             {howItWorksConfig.cta.text}
           </Link>

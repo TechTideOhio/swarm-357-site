@@ -10,7 +10,7 @@ export const siteConfig = {
   tagline: "Layered agents. Durable memory. Observable runs.",
   description:
     "357 Claude agents across six business layers—sales, support, marketing, SEO, research, and operations—backed by portable Memvid memory and a Claude Code–native workflow.",
-  url: "https://swarm357.techtide.ai",
+  url: "https://swarm357fe.up.railway.app",
   social: {
     twitter: "@techtide",
     github: "https://github.com/TechTideOhio/swarm-357",
@@ -53,7 +53,7 @@ export const heroConfig = {
     "Research packs",
     "Ops runbooks",
     "Memvid recall",
-    "Opik traces",
+    "Local traces",
     "Budget caps",
     "Bash policy gate",
     "Layer health",
@@ -74,7 +74,7 @@ export const howItWorksConfig = {
 export const featuresConfig = {
   title: "Built for Claude Code",
   description:
-    "One repository ties a Next.js surface, a Python agent package, and the Memvid Rust core—so contributors can improve memory, hooks, or UI without three separate releases.",
+    "Core runtime (Python + Memvid bridge) lives in swarm-357; this site is the separate Next.js product surface—so memory, hooks, and UI ship on independent release trains.",
 } as const;
 
 export const statsConfig = {
@@ -162,7 +162,7 @@ export const features = {
   darkMode: true,
   ditherCursor: true,
   statsSection: true,
-  testimonialsSection: false,
+  testimonialsSection: true,
 } as const;
 
 export const apiConfig = {

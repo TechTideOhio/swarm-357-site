@@ -25,24 +25,24 @@ function RunRow({ run, index }: { run: RunEvent; index: number }): ReactNode {
     >
       <div className="min-w-0">
         <p className="text-foreground truncate text-sm font-medium">
-          {run.task ?? run.pipeline_id ?? "\—"}
+          {run.task ?? run.pipeline_id ?? "-"}
         </p>
         <p className="text-muted-foreground text-xs">
           {Array.isArray(run.agents_used) && run.agents_used.length > 0
             ? `${run.agents_used.length} agents`
-            : run.agent_name ?? "\—"}
+            : run.agent_name ?? "-"}
         </p>
       </div>
-      <span className={`text-xs font-medium ${statusColor}`}>
-        {run.status ?? "\—"}
+      <span className={`text-xs font-medium tracking-tight ${statusColor}`}>
+        {run.status ?? "-"}
       </span>
       <span className="text-muted-foreground text-xs">
-        {run.latency_ms != null ? `${run.latency_ms}ms` : "\—"}
+        {run.latency_ms != null ? `${run.latency_ms}ms` : "-"}
       </span>
       <span className="text-muted-foreground text-xs">
         {run.total_cost_usd != null || run.cost_usd != null
           ? `$${((run.total_cost_usd ?? run.cost_usd) as number).toFixed(4)}`
-          : "\—"}
+          : "-"}
       </span>
     </motion.div>
   );

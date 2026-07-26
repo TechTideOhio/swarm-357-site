@@ -1,14 +1,12 @@
 "use client";
 
 import { siteConfig } from "@/lib/config";
+import { easeInOut, easeOut, spring } from "@/lib/motion";
 import { ArrowUpRight } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import React, { useState, useSyncExternalStore, type ReactNode } from "react";
 
-const easeOut = [0.16, 1, 0.3, 1] as const;
-const easeInOut = [0.65, 0, 0.35, 1] as const;
-const spring = { type: "spring", stiffness: 100, damping: 20, mass: 1 } as const;
 const DESKTOP_BREAKPOINT = 700;
 
 const socialLinks = [

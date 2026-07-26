@@ -1,9 +1,10 @@
 "use client";
 
+import { pricingConfig } from "@/lib/config";
+import { easeOut } from "@/lib/motion";
 import { Check, ChevronRightIcon } from "lucide-react";
 import { motion } from "motion/react";
 import type { ReactNode } from "react";
-import { easeOut } from "@/lib/motion";
 
 interface Plan {
   name: string;
@@ -24,26 +25,26 @@ const plans: Plan[] = [
       "357 agent templates",
       "swarm CLI (init, demo, status, cost, run)",
       ".swarm/ flat-file memory",
+      "Memvid .mv2 via optional bridge (crates.io)",
       "BashSecurityGate (13 rules)",
       "CostController and budget caps",
-      "Opik trace hooks",
+      "Local JSONL traces (Opik optional / planned)",
       "Apache-2.0 license",
     ],
   },
   {
     name: "Enterprise Controls",
-    tagline: "Durable memory + verification + support",
+    tagline: "Priority support + architecture review",
     price: "Custom",
     period: "year",
     highlighted: true,
     features: [
       "Everything in Open Source",
-      "Memvid .mv2 durable memory",
-      "Integrity verification (memvid verify --deep)",
-      "Encrypted capsules (.mv2e) path",
-      "Migration tooling (swarm migrate)",
       "Priority issue triage",
       "Architecture review session",
+      "Migration / hardening guidance",
+      "Encrypted capsules (.mv2e) path advice",
+      "Production auth and deploy review",
     ],
   },
 ];
@@ -51,10 +52,10 @@ const plans: Plan[] = [
 function PlanCard({ plan }: { plan: Plan }): ReactNode {
   return (
     <motion.div
-      className={`rounded-2xl border border-neutral-200/10 p-6 shadow-2xl/20 md:p-8 ${
+      className={`rounded-2xl border p-6 shadow-2xl/20 transition-colors duration-300 ease-out md:p-8 ${
         plan.highlighted
-          ? "border-accent bg-background transition-colors duration-300"
-          : "bg-background transition-colors duration-300 hover:bg-background/80"
+          ? "border-accent bg-background"
+          : "border-neutral-200/10 bg-background hover:bg-background/80"
       }`}
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
@@ -62,7 +63,7 @@ function PlanCard({ plan }: { plan: Plan }): ReactNode {
       transition={{ duration: 0.8, ease: easeOut }}
     >
       <div className="mb-6">
-        <h3 className="text-lg font-medium">{plan.name}</h3>
+        <h3 className="text-lg font-medium tracking-tight">{plan.name}</h3>
         <p className="text-muted-foreground text-sm">{plan.tagline}</p>
       </div>
 
@@ -88,7 +89,7 @@ function PlanCard({ plan }: { plan: Plan }): ReactNode {
 export function Pricing(): ReactNode {
   const freePlan = plans[0];
   const proPlan = plans[1];
-  
+
   if (!freePlan || !proPlan) {
     return null;
   }
@@ -107,7 +108,8 @@ export function Pricing(): ReactNode {
             Open-Core Pricing
           </h2>
           <p className="text-muted-foreground text-lg">
-            Open-source agent harness and memory bridge — bring your own Anthropic keys and hosting.
+            Open-source agent harness and memory bridge. Bring your own Anthropic
+            keys and hosting.
           </p>
         </motion.div>
 
@@ -129,19 +131,19 @@ export function Pricing(): ReactNode {
           transition={{ duration: 0.8, delay: 0.2, ease: easeOut }}
         >
           <a
-            href="#"
-            className="group relative inline-flex w-full items-center justify-center gap-3 rounded-[3.5px] bg-accent py-3 pl-5 pr-3 font-medium tracking-tight text-black transition-all duration-500 ease-out hover:rounded-[50px] sm:w-auto"
+            href={pricingConfig.cta.primary.href}
+            className="group bg-accent relative inline-flex w-full items-center justify-center gap-3 rounded-[3.5px] py-3 pr-3 pl-5 font-medium tracking-tight text-black transition-all duration-500 ease-out hover:rounded-[50px] sm:w-auto"
           >
-            <span>View on GitHub</span>
-            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-black transition-all duration-300 group-hover:scale-110">
+            <span>{pricingConfig.cta.primary.text}</span>
+            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-black transition-all duration-300 ease-out group-hover:scale-110">
               <ChevronRightIcon className="relative left-px h-4 w-4" />
             </span>
           </a>
           <a
-            href="#"
-            className="text-muted-foreground text-sm transition-all duration-300 hover:translate-x-1 hover:text-foreground"
+            href={pricingConfig.cta.secondary.href}
+            className="text-muted-foreground rounded-[3.5px] px-3 py-1.5 text-sm transition-colors duration-300 ease-out hover:bg-foreground/5 hover:text-foreground"
           >
-            Read the docs
+            {pricingConfig.cta.secondary.text}
           </a>
         </motion.div>
       </div>
