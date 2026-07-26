@@ -3,6 +3,7 @@
 // reference: app/blog/page.tsx, app/changelog/page.tsx, app/evals/page.tsx
 
 import Link from "next/link";
+import { content_breadcrumb_link } from "@/lib/ui-classes";
 import type { ReactNode } from "react";
 
 type PageShellWidth = "narrow" | "wide";
@@ -34,13 +35,13 @@ export function PageShell({
       <nav aria-label="Breadcrumb" className="text-muted-foreground mb-8 text-sm">
         <ol className="flex flex-wrap items-center gap-2">
           <li>
-            <Link href="/" className="transition-opacity hover:opacity-70">
+            <Link href="/" className={content_breadcrumb_link}>
               Home
             </Link>
           </li>
           <li aria-hidden="true">/</li>
           <li>
-            <Link href="/docs" className="transition-opacity hover:opacity-70">
+            <Link href="/docs" className={content_breadcrumb_link}>
               Docs
             </Link>
           </li>

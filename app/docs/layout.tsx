@@ -2,6 +2,7 @@
 // description: Documentation section layout with sidebar and search
 // reference: components/docs/docs-sidebar.tsx, components/docs/docs-search.tsx
 
+import { DocsMobileToolbar } from "@/components/docs/docs-mobile-toolbar";
 import { DocsSearch } from "@/components/docs/docs-search";
 import { DocsSidebar } from "@/components/docs/docs-sidebar";
 import { get_search_index } from "@/lib/content/loader";
@@ -21,7 +22,10 @@ export default function DocsLayout({ children }: { children: ReactNode }) {
             </div>
           </div>
         </aside>
-        <div className="min-w-0 flex-1">{children}</div>
+        <div className="min-w-0 flex-1">
+          <DocsMobileToolbar search_entries={search_entries} />
+          {children}
+        </div>
       </div>
     </div>
   );

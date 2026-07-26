@@ -2,7 +2,8 @@
 
 import { getStatus, getCost, getAgents } from "@/lib/api";
 import { apiConfig } from "@/lib/config";
-import { easeOut, spring as springConfig } from "@/lib/motion";
+import { fadeInUpView, spring as springConfig } from "@/lib/motion";
+import { content_inline_link } from "@/lib/ui-classes";
 import { motion, useInView, useSpring, useTransform } from "motion/react";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 
@@ -55,15 +56,11 @@ function StatCard({
   stat: StatItem;
   index: number;
 }): ReactNode {
-  const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true, amount: 0.5 });
   return (
     <motion.div
-      ref={ref}
       className="text-center"
-      initial={{ opacity: 0, y: 30 }}
-      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-      transition={{ duration: 0.8, delay: index * 0.1, ease: easeOut }}
+      {...fadeInUpView}
+      transition={{ ...fadeInUpView.transition, delay: index * 0.1 }}
     >
       <div className="text-foreground text-5xl font-medium tracking-tight md:text-6xl lg:text-7xl">
         <AnimatedNumber value={stat.value} suffix={stat.suffix} decimals={stat.decimals} />
@@ -84,8 +81,6 @@ const FALLBACK_STATS: StatItem[] = [
 
 export function LiveStats(): ReactNode {
   const [stats, setStats] = useState<StatItem[]>(FALLBACK_STATS);
-  const headerRef = useRef<HTMLDivElement>(null);
-  const isHeaderInView = useInView(headerRef, { once: true, amount: 0.5 });
 
   useEffect(() => {
     Promise.all([getStatus(), getCost(), getAgents()])
@@ -125,13 +120,7 @@ export function LiveStats(): ReactNode {
   return (
     <section className="bg-background px-6 py-16 md:py-32">
       <div className="mx-auto max-w-6xl">
-        <motion.div
-          ref={headerRef}
-          className="mb-12 text-center md:mb-20"
-          initial={{ opacity: 0, y: 30 }}
-          animate={isHeaderInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-          transition={{ duration: 0.8, ease: easeOut }}
-        >
+        <motion.div className="mb-12 text-center md:mb-20" {...fadeInUpView}>
           <h2 className="text-3xl font-medium tracking-tight md:text-4xl lg:text-5xl">
             Live Numbers
           </h2>
@@ -140,7 +129,7 @@ export function LiveStats(): ReactNode {
           </p>
           <p className="text-muted-foreground mt-2 text-sm">
             <a
-              className="text-accent underline underline-offset-4 transition-opacity hover:opacity-70"
+              className={`${content_inline_link} text-accent`}
               href={`${apiConfig.url}/api/health`}
               target="_blank"
               rel="noreferrer"

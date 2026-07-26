@@ -1,13 +1,47 @@
 "use client";
 
 import { getRuns, type RunEvent } from "@/lib/api";
-import { easeOut } from "@/lib/motion";
-import { motion, useInView } from "motion/react";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { fadeInUpView } from "@/lib/motion";
+import { chrome_card_shell } from "@/lib/ui-classes";
+import { motion } from "motion/react";
+import { useEffect, useState, type ReactNode } from "react";
+
+function RunCard({ run, index }: { run: RunEvent; index: number }): ReactNode {
+  const statusColor =
+    run.status === "ok" || run.status === "success"
+      ? "text-foreground"
+      : "text-muted-foreground";
+
+  return (
+    <motion.div
+      className="border-border/40 space-y-2 border-b py-4 last:border-0 sm:hidden"
+      {...fadeInUpView}
+      transition={{ ...fadeInUpView.transition, delay: index * 0.05 }}
+    >
+      <p className="text-foreground text-sm font-medium">
+        {run.task ?? run.pipeline_id ?? "-"}
+      </p>
+      <p className="text-muted-foreground text-xs">
+        {Array.isArray(run.agents_used) && run.agents_used.length > 0
+          ? `${run.agents_used.length} agents`
+          : (run.agent_name ?? "-")}
+      </p>
+      <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs">
+        <span className={statusColor}>{run.status ?? "-"}</span>
+        <span className="text-muted-foreground">
+          {run.latency_ms != null ? `${run.latency_ms}ms` : "-"}
+        </span>
+        <span className="text-muted-foreground">
+          {run.total_cost_usd != null || run.cost_usd != null
+            ? `$${((run.total_cost_usd ?? run.cost_usd) as number).toFixed(4)}`
+            : "-"}
+        </span>
+      </div>
+    </motion.div>
+  );
+}
 
 function RunRow({ run, index }: { run: RunEvent; index: number }): ReactNode {
-  const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true, amount: 0.3 });
   const statusColor =
     run.status === "ok" || run.status === "success"
       ? "text-foreground"
@@ -17,11 +51,9 @@ function RunRow({ run, index }: { run: RunEvent; index: number }): ReactNode {
 
   return (
     <motion.div
-      ref={ref}
-      className="border-border/40 grid grid-cols-[1fr_auto_auto_auto] items-center gap-4 border-b py-4 last:border-0"
-      initial={{ opacity: 0, y: 30 }}
-      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-      transition={{ duration: 0.8, delay: index * 0.05, ease: easeOut }}
+      className="border-border/40 hidden grid-cols-[1fr_auto_auto_auto] items-center gap-4 border-b py-4 last:border-0 sm:grid"
+      {...fadeInUpView}
+      transition={{ ...fadeInUpView.transition, delay: index * 0.05 }}
     >
       <div className="min-w-0">
         <p className="text-foreground truncate text-sm font-medium">
@@ -30,7 +62,7 @@ function RunRow({ run, index }: { run: RunEvent; index: number }): ReactNode {
         <p className="text-muted-foreground text-xs">
           {Array.isArray(run.agents_used) && run.agents_used.length > 0
             ? `${run.agents_used.length} agents`
-            : run.agent_name ?? "-"}
+            : (run.agent_name ?? "-")}
         </p>
       </div>
       <span className={`text-xs font-medium tracking-tight ${statusColor}`}>
@@ -60,19 +92,10 @@ export function RecentRuns(): ReactNode {
       .finally(() => setLoading(false));
   }, []);
 
-  const headerRef = useRef<HTMLDivElement>(null);
-  const isHeaderInView = useInView(headerRef, { once: true, amount: 0.5 });
-
   return (
     <section className="bg-background px-6 py-16 md:py-32">
       <div className="mx-auto max-w-4xl">
-        <motion.div
-          ref={headerRef}
-          className="mb-10 text-center"
-          initial={{ opacity: 0, y: 30 }}
-          animate={isHeaderInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-          transition={{ duration: 0.8, ease: easeOut }}
-        >
+        <motion.div className="mb-10 text-center" {...fadeInUpView}>
           <h2 className="text-3xl font-medium tracking-tight md:text-4xl lg:text-5xl">
             Recent Runs
           </h2>
@@ -84,40 +107,36 @@ export function RecentRuns(): ReactNode {
         {loading && (
           <div className="space-y-3">
             {Array.from({ length: 4 }).map((_, i) => (
-              <div
-                key={i}
-                className="bg-muted h-14 animate-pulse rounded-2xl border border-neutral-200/10"
-              />
+              <div key={i} className="skeleton h-14 rounded-2xl border border-neutral-200/10" />
             ))}
           </div>
         )}
 
         {!loading && fetchError && (
-          <p className="text-muted-foreground text-center text-sm py-12">
+          <p className="text-muted-foreground py-12 text-center text-sm" role="alert">
             Could not load run history. Check that the backend is reachable.
           </p>
         )}
 
         {!loading && !fetchError && runs.length === 0 && (
-          <p className="text-muted-foreground text-center text-sm py-12">
+          <p className="text-muted-foreground py-12 text-center text-sm">
             No runs yet. Use the demo above to create your first run.
           </p>
         )}
 
         {!loading && !fetchError && runs.length > 0 && (
-          <div className="bg-muted rounded-2xl border border-neutral-200/10 px-4 shadow-2xl/20">
-            <div className="border-border/40 text-muted-foreground grid grid-cols-[1fr_auto_auto_auto] gap-4 border-b py-3 text-xs font-medium tracking-wider uppercase">
+          <div className={`${chrome_card_shell} overflow-x-auto px-4`}>
+            <div className="text-muted-foreground border-border/40 hidden min-w-[32rem] grid-cols-[1fr_auto_auto_auto] gap-4 border-b py-3 text-xs font-medium tracking-wider uppercase sm:grid">
               <span>Task</span>
               <span>Status</span>
               <span>Latency</span>
               <span>Cost</span>
             </div>
             {runs.map((run, index) => (
-              <RunRow
-                key={run.pipeline_id ?? index}
-                run={run}
-                index={index}
-              />
+              <div key={run.pipeline_id ?? index}>
+                <RunCard run={run} index={index} />
+                <RunRow run={run} index={index} />
+              </div>
             ))}
           </div>
         )}

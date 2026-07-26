@@ -100,6 +100,63 @@ export const defaultTransition = {
 
 export const springTransition = spring;
 
+/** Overlay fade for modals and drawers. */
+export const overlayFade = {
+  initial: { opacity: 0 },
+  animate: { opacity: 1 },
+  exit: { opacity: 0 },
+} as const;
+
+export const overlayFadeTransition = {
+  duration: 0.3,
+  ease: easeOut,
+} as const;
+
+/** Dialog panel spring entrance. */
+export const dialogSpring = {
+  initial: { opacity: 0, scale: 0.95 },
+  animate: { opacity: 1, scale: 1 },
+  exit: { opacity: 0, scale: 0.95 },
+} as const;
+
+export const dialogSpringTransition = {
+  type: "spring" as const,
+  stiffness: 400,
+  damping: 25,
+};
+
+/** Toast slide-up spring. */
+export const toastSpring = {
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: 20 },
+} as const;
+
+export const toastSpringTransition = {
+  type: "spring" as const,
+  stiffness: 400,
+  damping: 30,
+};
+
+/** Reduced-motion fallbacks for overlay/dialog/toast. */
+export const overlayFadeReduced = {
+  initial: { opacity: 0 },
+  animate: { opacity: 1 },
+  exit: { opacity: 0 },
+} as const;
+
+export const dialogSpringReduced = {
+  initial: { opacity: 0 },
+  animate: { opacity: 1 },
+  exit: { opacity: 0 },
+} as const;
+
+export const toastSpringReduced = {
+  initial: { opacity: 0 },
+  animate: { opacity: 1 },
+  exit: { opacity: 0 },
+} as const;
+
 /** Footer whileInView preset. Use as spread on motion.* elements. */
 export const fadeInUpView = {
   initial: { opacity: 0, y: 30 },

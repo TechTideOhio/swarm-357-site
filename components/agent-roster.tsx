@@ -1,7 +1,13 @@
 "use client";
 
 import { getAgents, type Agent } from "@/lib/api";
-import { easeOut } from "@/lib/motion";
+import { easeOut, fadeInUpView } from "@/lib/motion";
+import {
+  chrome_card_shell,
+  chrome_form_control,
+  chrome_quiet_link,
+  touch_target,
+} from "@/lib/ui-classes";
 import { ChevronDown } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
@@ -102,10 +108,7 @@ export function AgentRoster(): ReactNode {
       <div className="mx-auto max-w-3xl">
         <motion.div
           className="mb-8 text-center"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.5 }}
-          transition={{ duration: 0.8, ease: easeOut }}
+          {...fadeInUpView}
         >
           <h2 className="mb-3 text-3xl font-medium tracking-tight md:text-4xl lg:text-5xl">
             {loading
@@ -124,7 +127,7 @@ export function AgentRoster(): ReactNode {
         )}
 
         <motion.div
-          className="bg-muted rounded-2xl border border-neutral-200/10 shadow-2xl/20"
+          className={chrome_card_shell}
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
@@ -143,7 +146,7 @@ export function AgentRoster(): ReactNode {
                   setLayer(e.target.value as LayerId);
                   setOpen(true);
                 }}
-                className="bg-background text-foreground border-neutral-200/10 focus:ring-accent w-full appearance-none rounded-[3.5px] border py-2.5 pr-10 pl-3 text-sm font-medium tracking-tight shadow-2xl/20 focus:outline-none focus:ring-2 disabled:opacity-50"
+                className={`${chrome_form_control} appearance-none pr-10 pl-3`}
               >
                 {LAYER_ORDER.map((id) => (
                   <option key={id} value={id}>
@@ -166,7 +169,7 @@ export function AgentRoster(): ReactNode {
               value={search}
               disabled={loading}
               onChange={(e) => setSearch(e.target.value)}
-              className="bg-background text-foreground placeholder:text-muted-foreground border-neutral-200/10 focus:ring-accent min-w-0 flex-1 rounded-[3.5px] border px-3 py-2.5 text-sm shadow-2xl/20 focus:outline-none focus:ring-2 disabled:opacity-50"
+              className={`${chrome_form_control} placeholder:text-muted-foreground min-w-0 flex-1`}
             />
 
             <button
@@ -174,7 +177,7 @@ export function AgentRoster(): ReactNode {
               aria-expanded={open}
               aria-controls="agent-layer-list"
               onClick={() => setOpen((v) => !v)}
-              className="text-muted-foreground hover:text-foreground hover:bg-foreground/5 inline-flex items-center justify-center gap-1 rounded-[3.5px] px-3 py-2 text-xs font-medium tracking-tight transition-colors duration-300 ease-out"
+              className={`${chrome_quiet_link} ${touch_target} hover:text-foreground inline-flex items-center justify-center gap-1 px-3 text-xs font-medium tracking-tight active:opacity-80`}
             >
               {open ? "Collapse" : "Expand"}
               <ChevronDown
@@ -196,10 +199,7 @@ export function AgentRoster(): ReactNode {
                 {loading ? (
                   <div className="space-y-2 p-4">
                     {Array.from({ length: 6 }).map((_, i) => (
-                      <div
-                        key={i}
-                        className="bg-background/60 h-10 animate-pulse rounded-[3.5px]"
-                      />
+                      <div key={i} className="skeleton h-10" />
                     ))}
                   </div>
                 ) : (
@@ -212,7 +212,7 @@ export function AgentRoster(): ReactNode {
                         Model
                       </span>
                     </div>
-                    <ul className="scrollbar-fluid max-h-80 overflow-y-auto overscroll-contain">
+                    <ul className="scrollbar-fluid max-h-80 overflow-x-auto overflow-y-auto overscroll-contain">
                       {visible.map((agent) => (
                         <AgentRow key={agent.name} agent={agent} />
                       ))}

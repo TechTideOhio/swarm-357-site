@@ -4,6 +4,14 @@ import { motion } from "motion/react";
 import { useState, type ReactNode } from "react";
 import { postRun, type AgentResult, type SwarmRunResult } from "@/lib/api";
 import { easeOut } from "@/lib/motion";
+import { useToast } from "@/lib/toast";
+import {
+  chrome_card_shell,
+  chrome_form_control,
+  chrome_primary_cta,
+} from "@/lib/ui-classes";
+
+const result_panel = `${chrome_card_shell} transition-colors duration-300 hover:border-accent/30`;
 
 type DemoState = "idle" | "running" | "done" | "error" | "auth_required";
 
@@ -38,8 +46,10 @@ function AgentStepRow({ step }: { step: RunStep }): ReactNode {
       transition={{ duration: 0.3, ease: easeOut }}
     >
       <button
-        className="flex w-full items-center justify-between gap-3 text-left"
+        type="button"
+        className="focus-ring hover:bg-foreground/5 active:bg-foreground/10 flex w-full items-center justify-between gap-3 rounded-[3.5px] py-1 text-left transition-colors duration-200"
         onClick={() => setExpanded((p) => !p)}
+        aria-expanded={expanded}
       >
         <div className="flex items-center gap-3">
           <StatusDot status={step.status} />
@@ -69,6 +79,7 @@ export function TryItLive(): ReactNode {
   const [finalOutput, setFinalOutput] = useState("");
   const [totalCost, setTotalCost] = useState(0);
   const [errorMsg, setErrorMsg] = useState("");
+  const { showToast } = useToast();
 
   async function handleSubmit(e: React.FormEvent): Promise<void> {
     e.preventDefault();
@@ -84,8 +95,10 @@ export function TryItLive(): ReactNode {
       const result: SwarmRunResult = await postRun(task.trim(), 5.0);
 
       if (result.status === "error") {
-        setErrorMsg(result.error ?? "Unknown error");
+        const message = result.error ?? "Unknown error";
+        setErrorMsg(message);
         setState("error");
+        showToast(message, "error");
         return;
       }
 
@@ -115,10 +128,12 @@ export function TryItLive(): ReactNode {
       if (code === "auth_required" || /auth required|401|403|503/i.test(msg)) {
         setErrorMsg(msg);
         setState("auth_required");
+        showToast(msg, "error");
         return;
       }
       setErrorMsg(msg);
       setState("error");
+      showToast(msg, "error");
     }
   }
 
@@ -139,7 +154,7 @@ export function TryItLive(): ReactNode {
         in the browser bundle.
       </p>
 
-      <form onSubmit={handleSubmit} className="mb-6 flex gap-3">
+      <form onSubmit={handleSubmit} className="mb-6 flex flex-col gap-3 sm:flex-row">
         <label htmlFor="try-it-live-task" className="sr-only">
           Business task
         </label>
@@ -150,12 +165,15 @@ export function TryItLive(): ReactNode {
           onChange={(e) => setTask(e.target.value)}
           placeholder="e.g. Research the AI market"
           disabled={state === "running"}
-          className="bg-muted text-foreground placeholder:text-muted-foreground flex-1 rounded-md px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent disabled:opacity-50"
+          className={`${chrome_form_control} placeholder:text-muted-foreground min-w-0 flex-1`}
+          onFocus={(event) => {
+            event.currentTarget.scrollIntoView({ block: "nearest", behavior: "smooth" });
+          }}
         />
         <button
           type="submit"
           disabled={!task.trim() || state === "running"}
-          className="bg-accent rounded-[3.5px] px-5 py-3 text-sm font-medium tracking-tight text-black transition-all duration-500 ease-out hover:rounded-[50px] disabled:opacity-40 disabled:hover:rounded-[3.5px]"
+          className={`${chrome_primary_cta} min-h-12 w-full sm:w-auto`}
         >
           {state === "running" ? "Running\u2026" : "Submit"}
         </button>
@@ -163,7 +181,7 @@ export function TryItLive(): ReactNode {
 
       {steps.length > 0 && (
         <motion.div
-          className="bg-muted rounded-2xl border border-neutral-200/10 p-4 shadow-2xl/20"
+          className={`${result_panel} p-4`}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: easeOut }}
@@ -186,7 +204,7 @@ export function TryItLive(): ReactNode {
 
       {state === "done" && finalOutput && (
         <motion.div
-          className="bg-muted mt-4 rounded-2xl border border-neutral-200/10 p-4 shadow-2xl/20"
+          className={`${result_panel} mt-4 p-4`}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: easeOut }}
@@ -203,7 +221,7 @@ export function TryItLive(): ReactNode {
 
       {state === "auth_required" && (
         <motion.div
-          className="bg-muted mt-4 rounded-2xl border border-neutral-200/10 p-4 shadow-2xl/20"
+          className={`${result_panel} mt-4 p-4`}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: easeOut }}
@@ -218,7 +236,7 @@ export function TryItLive(): ReactNode {
 
       {state === "error" && (
         <motion.div
-          className="bg-muted mt-4 rounded-2xl border border-neutral-200/10 p-4 shadow-2xl/20"
+          className={`${result_panel} mt-4 p-4`}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: easeOut }}

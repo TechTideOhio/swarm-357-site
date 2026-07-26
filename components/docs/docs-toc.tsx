@@ -3,6 +3,7 @@
 // reference: lib/content/types.ts
 
 import type { TocHeading } from "@/lib/content/types";
+import { content_nav_link, content_nav_link_inactive } from "@/lib/ui-classes";
 import type { ReactNode } from "react";
 
 export function DocsToc({ headings }: { headings: TocHeading[] }): ReactNode {
@@ -18,7 +19,7 @@ export function DocsToc({ headings }: { headings: TocHeading[] }): ReactNode {
           <li key={heading.id}>
             <a
               href={`#${heading.id}`}
-              className={`text-muted-foreground block text-sm transition-colors hover:text-foreground ${
+              className={`${content_nav_link} ${content_nav_link_inactive} ${
                 heading.level === 3 ? "pl-3" : ""
               }`}
             >

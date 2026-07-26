@@ -1,7 +1,13 @@
 "use client";
 
 import { pricingConfig } from "@/lib/config";
-import { easeOut } from "@/lib/motion";
+import { fadeInUpView } from "@/lib/motion";
+import {
+  chrome_arrow_cta,
+  chrome_arrow_cta_badge,
+  chrome_quiet_link,
+  interactive_card,
+} from "@/lib/ui-classes";
 import { Check, ChevronRightIcon } from "lucide-react";
 import { motion } from "motion/react";
 import type { ReactNode } from "react";
@@ -52,15 +58,12 @@ const plans: Plan[] = [
 function PlanCard({ plan }: { plan: Plan }): ReactNode {
   return (
     <motion.div
-      className={`rounded-2xl border p-6 shadow-2xl/20 transition-colors duration-300 ease-out md:p-8 ${
+      className={`interactive-card rounded-2xl border p-6 shadow-2xl/20 md:p-8 ${
         plan.highlighted
-          ? "border-accent bg-background"
-          : "border-neutral-200/10 bg-background hover:bg-background/80"
-      }`}
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.5 }}
-      transition={{ duration: 0.8, ease: easeOut }}
+          ? "glow-accent-subtle border-accent bg-background hover:bg-background/80"
+          : "border-neutral-200/10 bg-background hover:border-accent/30 hover:bg-background/80"
+      } ${interactive_card}`}
+      {...fadeInUpView}
     >
       <div className="mb-6">
         <h3 className="text-lg font-medium tracking-tight">{plan.name}</h3>
@@ -97,13 +100,7 @@ export function Pricing(): ReactNode {
   return (
     <section className="bg-muted px-6 py-16 md:py-32">
       <div className="mx-auto max-w-6xl">
-        <motion.div
-          className="mb-12 text-center md:mb-16"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.5 }}
-          transition={{ duration: 0.8, ease: easeOut }}
-        >
+        <motion.div className="mb-12 text-center md:mb-16" {...fadeInUpView}>
           <h2 className="mb-4 text-3xl font-medium tracking-tight md:text-4xl lg:text-5xl">
             Open-Core Pricing
           </h2>
@@ -125,24 +122,19 @@ export function Pricing(): ReactNode {
 
         <motion.div
           className="mt-12 flex flex-col items-center gap-4 md:mt-16"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.5 }}
-          transition={{ duration: 0.8, delay: 0.2, ease: easeOut }}
+          {...fadeInUpView}
+          transition={{ ...fadeInUpView.transition, delay: 0.2 }}
         >
           <a
             href={pricingConfig.cta.primary.href}
-            className="group bg-accent relative inline-flex w-full items-center justify-center gap-3 rounded-[3.5px] py-3 pr-3 pl-5 font-medium tracking-tight text-black transition-all duration-500 ease-out hover:rounded-[50px] sm:w-auto"
+            className={`${chrome_arrow_cta} bg-accent relative w-full text-black sm:w-auto`}
           >
             <span>{pricingConfig.cta.primary.text}</span>
-            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-black transition-all duration-300 ease-out group-hover:scale-110">
+            <span className={`${chrome_arrow_cta_badge} bg-white text-black`}>
               <ChevronRightIcon className="relative left-px h-4 w-4" />
             </span>
           </a>
-          <a
-            href={pricingConfig.cta.secondary.href}
-            className="text-muted-foreground rounded-[3.5px] px-3 py-1.5 text-sm transition-colors duration-300 ease-out hover:bg-foreground/5 hover:text-foreground"
-          >
+          <a href={pricingConfig.cta.secondary.href} className={chrome_quiet_link}>
             {pricingConfig.cta.secondary.text}
           </a>
         </motion.div>

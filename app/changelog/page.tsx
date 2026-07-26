@@ -5,6 +5,7 @@
 import Link from "next/link";
 import { PageShell } from "@/components/page-shell";
 import { createMetadata } from "@/lib/metadata";
+import { content_inline_link } from "@/lib/ui-classes";
 import fs from "node:fs";
 import path from "node:path";
 import type { Metadata } from "next";
@@ -62,7 +63,7 @@ export default function ChangelogPage(): ReactNode {
       description={
         <>
           Release history for techtide-swarm. See also{" "}
-          <Link href="/docs/resources/release" className="underline">
+          <Link href="/docs/resources/release" className={content_inline_link}>
             release process
           </Link>
           .

@@ -1,7 +1,11 @@
 "use client";
 
 import { finalCtaConfig } from "@/lib/config";
-import { easeOut } from "@/lib/motion";
+import { easeOut, fadeInUpView } from "@/lib/motion";
+import {
+  chrome_arrow_cta,
+  chrome_arrow_cta_badge,
+} from "@/lib/ui-classes";
 import { ChevronRightIcon } from "lucide-react";
 import { motion } from "motion/react";
 import { useEffect, useState, type ReactNode } from "react";
@@ -40,34 +44,28 @@ export function FinalCTA(): ReactNode {
         <div className="relative z-10">
           <motion.h2
             className="mx-auto mb-6 max-w-2xl text-3xl font-medium tracking-tight md:text-4xl lg:text-5xl"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.5 }}
-            transition={{ duration: 0.8, delay: 0.1, ease: easeOut }}
+            {...fadeInUpView}
+            transition={{ ...fadeInUpView.transition, delay: 0.1 }}
           >
             {finalCtaConfig.headline}
           </motion.h2>
 
           <motion.p
             className="mx-auto mb-10 max-w-md text-lg text-black/70"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.5 }}
-            transition={{ duration: 0.8, delay: 0.2, ease: easeOut }}
+            {...fadeInUpView}
+            transition={{ ...fadeInUpView.transition, delay: 0.2 }}
           >
             {finalCtaConfig.description}
           </motion.p>
 
           <motion.a
             href={finalCtaConfig.cta.href}
-            className="group inline-flex w-full items-center justify-center gap-3 rounded-md bg-white py-3 pr-3 pl-4 font-medium text-black shadow-lg shadow-black/10 transition-all duration-500 ease-out hover:rounded-[50px] hover:bg-white/90 hover:shadow-xl hover:shadow-black/20 sm:w-auto"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.5 }}
-            transition={{ duration: 0.8, delay: 0.3, ease: easeOut }}
+            className={`${chrome_arrow_cta} w-full bg-white text-black shadow-lg shadow-black/10 hover:bg-white/90 hover:shadow-xl hover:shadow-black/20 sm:w-auto`}
+            {...fadeInUpView}
+            transition={{ ...fadeInUpView.transition, delay: 0.3 }}
           >
             <span>{finalCtaConfig.cta.text}</span>
-            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-accent text-black transition-all duration-300 group-hover:scale-110">
+            <span className={`${chrome_arrow_cta_badge} bg-accent text-black`}>
               <ChevronRightIcon className="relative left-px h-4 w-4" />
             </span>
           </motion.a>
