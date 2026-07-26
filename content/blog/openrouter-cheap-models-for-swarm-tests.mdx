@@ -1,0 +1,100 @@
+---
+title: "OpenRouter and cheap models for swarm tests"
+description: "Point the runtime at OpenRouter, use a cheap tool-capable model for the iteration loop, and keep premium models for baselines. Including why free models break tool calling."
+date: "2026-06-15"
+updated: "2026-07-26"
+slug: "openrouter-cheap-models-for-swarm-tests"
+cover: "/art/blog/model-routing.jpg"
+coverAlt: "A dense cluster of gold light paths branching through darkness, model routing made visible"
+author: "Alex Cinovoj"
+keyword: "openrouter cheap models"
+tags: ["Cost control", "Testing", "Models"]
+faq:
+  - question: "Can I run Swarm 357 through OpenRouter instead of Anthropic directly?"
+    answer: "Yes. Set ANTHROPIC_BASE_URL to the OpenRouter API and provide OPENROUTER_API_KEY. The runtime speaks the same protocol."
+  - question: "Why do free models fail with agent frameworks?"
+    answer: "Most free tiers either lack tool calling or implement it unreliably. The model emits text that resembles a tool call without invoking anything, so the orchestration stalls and the bug looks like yours."
+  - question: "Does OpenRouter automatically downgrade my model?"
+    answer: "No. Swarm 357 does not silently map OpenRouter traffic to a cheap model. That behaviour is opt-in behind SWARM_OPENROUTER_CHEAP=1."
+---
+
+Most of the money you will spend building an agent system goes to iteration, not production. You run the same task forty times while you fix one soul template, and thirty-nine of those runs exist only to tell you whether a change helped.
+
+Paying premium model prices for that loop is a choice, and it is usually the wrong one.
+
+## The setup
+
+```bash
+export ANTHROPIC_BASE_URL=https://openrouter.ai/api
+export OPENROUTER_API_KEY=sk-or-...
+```
+
+That is the whole change. The runtime speaks the same protocol, so routing through OpenRouter does not require a different code path in your agents.
+
+Keep the key in a gitignored `.env.local`. Never paste it into a chat window or an issue.
+
+One behaviour worth knowing explicitly: Swarm 357 does not silently remap OpenRouter traffic to a cheaper model. If you want that, set `SWARM_OPENROUTER_CHEAP=1`. Silent remapping would make your test results a measurement of a model you did not choose, which is a bad way to lose two days.
+
+## Free models will waste your afternoon
+
+I tried the free tiers first, because of course I did. Here is what happens.
+
+The model receives your tool schema. It produces something that reads like a tool call. Nothing is invoked. The orchestration waits, then proceeds without the tool result, and your agent produces confident output based on data it never fetched.
+
+That failure looks exactly like a bug in your tool registry. You will go read your tool registry. It is fine.
+
+Free tiers frequently either do not support tool calling or implement it unreliably enough that multi-step agent work falls over. Pay the fraction of a cent for a model that genuinely supports tools. `anthropic/claude-3-haiku` through OpenRouter is a reasonable default for the loop, and it is what I use.
+
+## Match the model to the phase
+
+| Phase | Model class | Why |
+|-------|-------------|-----|
+| Soul template iteration | Cheap, tool-capable | You are testing instructions, not reasoning depth |
+| Routing and handoff debugging | Cheap, tool-capable | You are watching which role gets called, not the answer quality |
+| Failure mode hunting | Cheap, tool-capable | Cheap runs let you run many, and many runs surface variance |
+| Published eval baselines | Production model | A baseline measured on a different model is not a baseline |
+| Production runs | Production model | Obviously |
+
+The dividing line is whether the run is measuring your system or measuring the model. Anything measuring your system can run cheap. Anything you will quote publicly cannot.
+
+## Do not let cheap runs become your quality signal
+
+The trap on the other side: you iterate on a cheap model until everything passes, then switch to production and behaviour changes.
+
+Three habits that keep that honest.
+
+**Test tool contracts, not prose quality, on cheap models.** Did the right tool get called with the right arguments in the right order? That transfers across models. Whether the summary reads well does not.
+
+**Run the full suite on the production model before you publish a number.** Baselines live in `evals/baselines/latest.json` in the core repo, and every published figure is rendered from that file rather than typed by hand. A baseline measured on the cheap loop model would be a fiction with a version number.
+
+**Record which model produced which result.** The trace carries it. When a number looks surprising, the first question is always which model ran, and you want that answered from a file rather than from memory.
+
+More on the split between measuring your system and measuring the model in [how to actually evaluate an agent swarm](/blog/how-to-evaluate-an-agent-swarm).
+
+## Model IDs and the downgrade path
+
+Short names map to configurable model IDs, so you can move a whole run to a different tier by changing one variable.
+
+| Short name | Environment variable | Default |
+|------------|---------------------|---------|
+| `opus` | `SWARM_MODEL_OPUS` | `claude-opus-4-6` |
+| `sonnet` | `SWARM_MODEL_SONNET` | `claude-sonnet-4-6` |
+| `haiku` | `SWARM_MODEL_HAIKU` | `claude-haiku-4-5-20251001` |
+
+Separately, `CostController` downgrades a layer to Haiku at 80 percent of its budget and logs a `model_downgrade` event when it does. That is a cost control, not a testing strategy, but it matters here for one reason: if a test run crossed the threshold, part of it ran on a different model than you intended. Check the trace before you trust the result.
+
+## When to skip OpenRouter
+
+- **Your organisation requires a direct provider relationship.** Data handling and contractual terms differ when you add a router. Ask your reviewer before, not after.
+- **You need a specific model version pinned exactly.** Availability through a router changes.
+- **The run is a published benchmark.** Use the provider you are claiming results for.
+
+## Try it on a demo first
+
+```bash
+pip install techtide-swarm
+swarm init
+swarm demo          # simulated, no key, no spend
+```
+
+Then point at OpenRouter and run one real task with a low `budget_limit_usd` before you run forty. Read [model IDs and providers](/docs/configuration/models) for the mapping, [environment variables](/docs/configuration/environment-variables) for the full list, and [four token budgeting patterns for multi-agent systems](/blog/multi-agent-token-budgeting-patterns) for keeping the loop cheap on the input side as well as the model side.

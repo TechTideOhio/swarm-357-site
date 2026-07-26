@@ -1,18 +1,98 @@
 ---
 title: "Why your agent needs a bash policy gate"
-description: "Pattern-based defense before autonomous shell access."
-date: "2026-07-12"
+description: "Thirteen patterns, argv-level validation, and a deny-by-default posture in production. What a bash policy gate stops, and the three things it will never stop."
+date: "2026-03-10"
+updated: "2026-07-26"
 slug: "why-your-agent-needs-a-bash-policy-gate"
+cover: "/art/blog/bash-gate.jpg"
+coverAlt: "Faceted black monolith split by a seam of gold light, a gate in the dark"
+author: "Alex Cinovoj"
+keyword: "agent bash policy gate"
+tags: ["Security", "Operations", "Architecture"]
+faq:
+  - question: "What is an agent bash policy gate?"
+    answer: "A validation layer that inspects a command before an agent executes it, matching it against a deny policy at the argument level rather than on the raw string, and refusing anything that matches."
+  - question: "Is pattern matching enough to secure shell access?"
+    answer: "No. Pattern matching stops known-dangerous shapes. Defence in depth needs filesystem confinement, deny-by-default in production, and human approval for anything that survives the gate."
+  - question: "How do I disable bash entirely for a deployment?"
+    answer: "Do nothing. Server and production modes deny Bash by default. You have to set SWARM_ALLOW_BASH=1 to turn it on, which makes enabling it an explicit, auditable decision."
 ---
 
-Pattern-based defense before autonomous shell access.
+A bash policy gate is a check that runs between an agent deciding to execute a command and the command actually executing. It parses the command, matches it against a deny policy at the argument level, and refuses anything dangerous. In Swarm 357 the gate is `BashSecurityGate`, it carries thirteen patterns, and it is marked Stable.
 
-Swarm 357 ships open-core orchestration with honest maturity labels. Read the [documentation](/docs) for installation, API reference, and eval methodology.
+Here is why I care about this more than about most security features: shell access is the only agent capability where a single bad decision is unrecoverable. A wrong API call can be retried. A wrong file write can be reverted from git. A wrong `rm -rf` on the wrong path is a restore-from-backup afternoon, assuming you have a backup.
 
-## Key takeaways
+## Why string matching fails
 
-- Operators own API keys, budgets, and side-effect approvals
-- Security defaults: Bash gate, filesystem confinement, HITL in production
-- Eval baselines report single-agent and swarm metrics separately
+The naive version of this check is a regex against the command string. It fails immediately, and it fails in ways that look fine in testing.
 
-[Get started](/docs/getting-started/quickstart) or view [latest eval baseline](/docs/evals/latest-baseline).
+Consider a policy that blocks `rm -rf /`. All of these get past it:
+
+```bash
+rm -rf  /              # extra whitespace
+rm -fr /               # flag order
+rm --recursive --force /
+rm -rf "$HOME/../.."   # expansion
+cd / && rm -rf .       # relocation
+```
+
+You can keep patching the regex. You will lose, because you are matching text while the shell is parsing structure. The gate has to work at the same level the shell does, which means parsing the command into a program and its arguments, then evaluating the policy against that structure. That is what argv-level validation means, and it is the difference between a check that stops attacks and a check that stops typos.
+
+## Deny by default where it counts
+
+Validation is the second line. The first line is not running the command at all.
+
+| Context | Bash default | Override |
+|---------|--------------|----------|
+| Local development | Allowed, gate active | Nothing to set |
+| Server mode | Denied | `SWARM_ALLOW_BASH=1` |
+| Production | Denied | `SWARM_ALLOW_BASH=1` |
+
+Server and production modes deny Bash outright unless you explicitly enable it. The important design detail is that the deny keys off `SWARM_SERVER_MODE`, which the API container image sets and the server re-asserts at import. It does not depend on you remembering to set an environment variable during a stressful deploy. It fails closed in the container by construction.
+
+If you do enable Bash on a server, the gate is still there, and human approval sits behind it.
+
+## Approvals for what survives the gate
+
+A policy gate answers "is this command shaped like a known disaster?" It cannot answer "did the operator intend this?" That question needs a person.
+
+`ApprovalGate` handles it, with `SWARM_HITL_BASH` controlling the requirement. The approval record is durable, so it survives a restart, and the control plane is available from both the CLI and the HTTP API.
+
+```bash
+swarm approve <id>
+swarm reject <id>
+```
+
+Timeouts reject rather than approve. That is the only correct default: a request nobody looked at is not a request somebody agreed to. HITL approvals are Beta, tracked on the [status page](/docs/resources/status), and covered in [human-in-the-loop approvals](/docs/guides/hitl-approvals).
+
+## Filesystem confinement, which is the one people forget
+
+Not every dangerous operation goes through Bash. Read and Write tools touch the filesystem directly, and an agent that can write anywhere can write to your shell profile and get execution later.
+
+So Read and Write are confined to the current working directory or `SWARM_WORKSPACE_ROOT`. The escape hatch is `SWARM_UNSAFE_FS=1`, named the way it is so that nobody sets it by accident and everybody notices it in a config review. Details in [filesystem confinement](/docs/security/filesystem).
+
+## Three things the gate will not stop
+
+I would rather you know the limits than trust the feature further than it goes.
+
+**A command that is dangerous only in context.** `git push --force` is routine on a feature branch and a bad afternoon on main. The gate sees the same argv either way. Branch protection is the control for that, not a shell policy.
+
+**Data exfiltration through allowed tools.** If an agent can read files and make network calls, it can move data without ever touching a shell. That is a tool permission question, and the answer is to not give both capabilities to the same role unless the role needs both.
+
+**A compromised model provider.** Every control here assumes the instructions reaching the gate came from your prompt chain. Prompt injection through retrieved content is a real path, and the mitigation is the approval gate plus narrow tool grants, not better patterns.
+
+## When you do not need any of this
+
+If your agents have no shell tool, no filesystem write, and no network egress, skip the gate. A read-only summarisation agent does not need a policy engine, and adding one gives you the feeling of security without the substance of it.
+
+The moment you grant one write capability, turn all of it on.
+
+## Set it up
+
+```bash
+pip install techtide-swarm
+swarm init
+swarm demo
+```
+
+Then read [bash security gate](/docs/guides/bash-security-gate) for the policy reference, [BashSecurityGate](/docs/sdk/bash-security-gate) for the API, and the [security model](/docs/security/security-model) for how the gate, confinement, approvals, and authentication fit together. If you are deploying this rather than running it locally, [deploying a Claude agent runtime on Railway](/blog/deploying-claude-agent-runtime-railway) covers the production posture end to end.

@@ -1,18 +1,100 @@
 ---
 title: "Portable agent memory with Memvid"
-description: "Single-file .mv2 recall across runs and layers."
-date: "2026-07-15"
+description: "Flat-file topics for the memory you read, a single-file .mv2 archive for the memory you search. How the Memvid bridge gives agents recall you can copy, diff, and delete."
+date: "2026-02-24"
+updated: "2026-07-26"
 slug: "portable-agent-memory-with-memvid"
+cover: "/art/blog/memvid-memory.jpg"
+coverAlt: "Faceted black crystal glowing gold at its core, surrounded by a lattice of light"
+author: "Alex Cinovoj"
+keyword: "portable agent memory"
+tags: ["Memory", "Architecture", "Operations"]
+faq:
+  - question: "What is portable agent memory?"
+    answer: "Memory an agent can carry between runs and machines as ordinary files, rather than rows locked inside a hosted vector service. In Swarm 357 that means flat-file topics plus an optional single-file .mv2 archive."
+  - question: "Do I need the Memvid bridge to use memory?"
+    answer: "No. Flat-file topics are Stable and work with no extra binary. The bridge adds searchable .mv2 archives and is Beta, requiring the memvid-swarm-bridge executable."
+  - question: "How do I delete what an agent remembered?"
+    answer: "Delete the topic file, or the .mv2 archive. Because memory is files on disk, removal is a filesystem operation you can verify, not a support ticket."
 ---
 
-Single-file .mv2 recall across runs and layers.
+Portable agent memory means an agent's recall lives in files you own: copyable, diffable, greppable, and deletable without asking a vendor. Swarm 357 splits it into two tiers. Flat-file topics hold the memory you read. A single-file `.mv2` archive holds the memory you search.
 
-Swarm 357 ships open-core orchestration with honest maturity labels. Read the [documentation](/docs) for installation, API reference, and eval methodology.
+I did not start there. I started with a hosted vector database, like everyone does, and it worked until the day I needed to answer a simple question: what exactly does this agent know about this customer? The answer required an API call, a dashboard, and a support conversation. That is when memory stopped being an infrastructure choice and became a governance problem.
 
-## Key takeaways
+## The two tiers, and why there are two
 
-- Operators own API keys, budgets, and side-effect approvals
-- Security defaults: Bash gate, filesystem confinement, HITL in production
-- Eval baselines report single-agent and swarm metrics separately
+| Tier | Path | Status | Good at | Bad at |
+|------|------|--------|---------|--------|
+| Pointer index | `.swarm/MEMORY.md` | Stable | Orienting an agent fast, human review | Scale |
+| Flat-file topics | `.swarm/topics/` | Stable | Durable notes, git diffs, grep | Semantic search |
+| Memvid archive | single `.mv2` file | Beta | Lexical and vector search over history | Requires the bridge binary |
 
-[Get started](/docs/getting-started/quickstart) or view [latest eval baseline](/docs/evals/latest-baseline).
+The reason for the split is that agents need two different things. They need a small, always-loaded map of what exists, and they need the ability to go find a specific thing they half-remember. One structure cannot do both well. A vector index makes a terrible table of contents, and a markdown file makes a terrible search engine.
+
+`.swarm/MEMORY.md` is the map. It is a pointer index, deliberately small, and it is the first thing an agent reads. Topics under `.swarm/topics/` are the notes themselves, one file per subject.
+
+```
+.swarm/
+├── MEMORY.md          # pointer index, read first
+├── topics/            # flat-file knowledge, one file per subject
+├── checkpoints/       # durable run state
+└── traces.jsonl       # structured events
+```
+
+If you stop here you have a working memory system with zero extra dependencies, and `MemoryManager` flat files are marked Stable for exactly that reason. Most projects should stop here.
+
+## What the bridge adds
+
+The bridge wraps the crates.io `memvid-core` library and gives you a single-file `.mv2` archive with a write-ahead log plus lexical and vector indexes. One file. That is the entire point.
+
+```bash
+cd packages/memvid-swarm-bridge
+cargo build --release
+export MEMVID_SWARM_BRIDGE=/path/to/memvid-swarm-bridge
+```
+
+The runtime finds the binary through `MEMVID_SWARM_BRIDGE` or on `PATH`. If it is absent, memory falls back to flat files rather than failing, which is the behaviour you want in a laptop environment and the behaviour you should monitor for in production.
+
+What one file buys you in practice:
+
+- **Backup is `cp`.** No export job, no schema migration, no dump format that changes between versions.
+- **Retention is `rm`.** When a client asks you to delete everything you retained about them, you can do it and show them the directory afterwards.
+- **Environment parity is trivial.** Copy the archive to staging and the agent has the same recall it had in production.
+- **Diff is possible.** Not line-by-line, but you can hash it, size it, and version it alongside the code that wrote it.
+
+The bridge is Beta. The [status page](/docs/resources/status) says so, and the honest reason is that the integration surface is still moving, not that the archive format is fragile.
+
+## The failure I want you to avoid
+
+My worst memory bug was not corruption. It was accumulation.
+
+An agent wrote a topic file on every run. Nothing pruned it. Six weeks later the topic was large enough that loading it consumed a meaningful slice of the context window before the agent had read the actual task. Output quality degraded slowly, which is the worst way for anything to degrade, because there is no incident to investigate. It just gets a bit worse every week.
+
+Two things I do now:
+
+**Cap what gets loaded, not just what gets written.** The pointer index exists so the agent can decide what to open. If everything loads by default, you have not built memory, you have built a preamble.
+
+**Treat memory hygiene as a scheduled job, not an agent behaviour.** The `run_dream_cycle()` consolidation pass is Experimental, and it is labelled that way because consolidation quality is heuristic and not guaranteed. I use it, but I do not rely on it to prevent the accumulation problem. A boring cron job that archives topics older than N days is more trustworthy than a clever one.
+
+## When flat files are enough
+
+Skip the bridge when:
+
+- Your agent's working set fits comfortably in a handful of topic files. Search over twelve documents is called reading.
+- You cannot ship a Rust binary into your deployment. The fallback is fine, but then plan for the fallback rather than discovering it.
+- You need guaranteed semantic recall quality. Vector search is retrieval, not correctness, and no memory tier turns a wrong note into a right one.
+
+And skip persistent memory entirely for stateless tasks. If each run is independent, memory is a liability that will eventually leak context from one caller into another.
+
+## Try it
+
+```bash
+pip install techtide-swarm
+swarm init
+swarm demo
+```
+
+`swarm init` lays down the `.swarm/` structure so you can look at the memory layout before you decide how much of it you need.
+
+Then read [flat-file memory](/docs/guides/flat-file-memory) for the topic conventions, [Memvid bridge](/docs/guides/memvid-bridge) for the build and wiring, and [MemoryManager](/docs/sdk/memory-manager) for the API. If you are also thinking about run state rather than knowledge, [durable checkpoints, resume, cancel, and replay](/blog/durable-checkpoints-resume-cancel-replay) covers the other half of persistence.

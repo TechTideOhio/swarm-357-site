@@ -1,0 +1,102 @@
+---
+title: "Swarm 357 mid-year status: what is Stable, Beta, and not built"
+description: "The July 2026 maturity picture in plain language. What hardened this year, what is still Beta and why, and the four things that are explicitly not implemented."
+date: "2026-07-26"
+updated: "2026-07-26"
+slug: "swarm-357-mid-year-status"
+cover: "/art/blog/status-matrix.jpg"
+coverAlt: "A grid of black hexagonal tiles lit at varying gold intensities, a maturity matrix"
+author: "Alex Cinovoj"
+keyword: "swarm 357 status"
+tags: ["Status", "Roadmap", "Operations"]
+faq:
+  - question: "Is Swarm 357 production ready?"
+    answer: "Parts of it. The single-agent runner, flat-file memory, the Bash gate, and filesystem confinement are Stable. Swarm orchestration, the HTTP API, and HITL approvals are Beta. Read the maturity table before you commit."
+  - question: "What is explicitly not implemented in Swarm 357?"
+    answer: "A multi-tenant SaaS control plane with SSO, distributed rate limiting across replicas, guaranteed dream-cycle consolidation quality, and full Opik cloud observability."
+  - question: "What does Beta mean for this project?"
+    answer: "Working but evolving, with an API that may change. It does not mean untested. It means you should pin a version and read the changelog before upgrading."
+---
+
+Halfway through 2026, here is where Swarm 357 actually stands. Four maturity levels, no adjectives doing work that a table should do.
+
+I publish this because I have been on the buying side of an agent framework whose README implied everything worked. Finding the gaps during an integration is expensive. Finding them on a status page is free.
+
+## The levels
+
+**Stable.** Tested, documented, safe for production use under the stated constraints.
+**Beta.** Working but evolving. The API may change. Pin a version.
+**Experimental.** Functional but incomplete or opt-in. Do not build on it.
+**Not implemented.** Explicitly out of scope for this release. Not coming soon by default.
+
+## What is Stable
+
+| Component | Note |
+|-----------|------|
+| `Agent`, the single-agent runner | Live API when keyed; explicit `SWARM_SIMULATE` or `SWARM_ALLOW_STUB` otherwise, so a stub never passes as a live result |
+| `AgentConfig` | Pydantic v2 |
+| `MemoryManager` flat files | Topics share and recall |
+| `BashSecurityGate` and argv policy | Server and production deny Bash unless `SWARM_ALLOW_BASH=1` |
+| Read and Write workspace confinement | Server mode confines to the workspace root |
+| `swarm init` | Installs the bundled compact config and Support souls |
+| `swarm demo` | Explicit simulation, no key, no spend |
+
+The pattern across that list: the pieces that hardened first are the ones where getting it wrong is unrecoverable. Security controls and the refusal to fake success came before orchestration polish. That was deliberate.
+
+## What is Beta
+
+Swarm orchestration and `execute_layer()`, the atomic `BudgetLedger`, `CostController`, the Memvid `.mv2` bridge, the HTTP API, HITL approvals, the SSE event stream, structured traces, UltraPlan, and the CLI verbs `boot`, `run`, `inspect`, `resume`, `cancel`, `approve`, `reject`, `replay`, `fork`, `eval`, and `serve`.
+
+That is most of the interesting surface, and Beta here means the API may still move, not that it is untested. Concretely:
+
+- **Orchestration** does structured JSON routing with durable `RunState` and SQLite checkpoints. It works. The routing heuristics are still changing.
+- **The budget ledger** reserves and commits under an asyncio lock. The locking is sound; estimation accuracy varies by model and tool use, which is the honest reason for the label.
+- **The Memvid bridge** requires the `memvid-swarm-bridge` binary and wraps crates.io `memvid-core`. The integration surface is still moving.
+- **HITL approvals** carry a real Bash gate, durable records, and timeouts that reject.
+
+Pin a version. Read the changelog before upgrading.
+
+## What is Experimental
+
+`run_dream_cycle()`. It is heuristic memory consolidation, and consolidation quality is not guaranteed. I use it. I do not rely on it to prevent memory accumulation, and neither should you. A scheduled job that archives old topics is more trustworthy than a clever pass. See [portable agent memory with Memvid](/blog/portable-agent-memory-with-memvid).
+
+## What is not implemented
+
+Four things, stated plainly because vague roadmaps waste everybody's time.
+
+**Multi-tenant SaaS control plane and SSO.** There is no tenancy model. A shared API key is not one.
+
+**Distributed rate limiting across replicas.** The limiter ships single-process. Stacking per-process caps across replicas is not the same guarantee, and if you need a hard global quota, this is not it yet.
+
+**Guaranteed dream-cycle consolidation quality.** Covered above.
+
+**Full Opik cloud observability.** Local JSONL is the source of truth. Structured traces land in `.swarm/traces.jsonl`, with optional OpenTelemetry export behind `SWARM_OTEL_EXPORT=1`. Cloud observability is not wired.
+
+## What hardened this year
+
+Three areas moved most, and all three came from something going wrong first.
+
+**Cost.** The reserve-and-commit ledger replaced post-hoc accounting after parallel agents in one layer raced past a budget. The 80 percent downgrade to Haiku now emits a `model_downgrade` event, because a silent quality change is a debugging tax. Detail in [four token budgeting patterns for multi-agent systems](/blog/multi-agent-token-budgeting-patterns).
+
+**Security posture in the container.** Bash deny and HITL key off `SWARM_SERVER_MODE`, which the API image sets and the server re-asserts at import. The posture comes from the artifact rather than from a deploy checklist. The public demo forces simulation server-side, clamps the budget, caps the body, bounds the input, and rate limits per IP. Unauthenticated run reads are redacted rather than blocked.
+
+**Honesty about keyless runs.** An early build returned plausible output without a key. That is the worst failure in this category, because everything looks fine and nothing is real. Keyless runs now refuse unless you explicitly ask for simulation.
+
+## How to read any agent framework's status page
+
+Three questions I ask, including of this one.
+
+1. **Is there a level below Beta?** A project with only Stable and Coming Soon is not measuring itself.
+2. **Does "not implemented" have entries?** An empty list means nobody wrote down the boundary.
+3. **Do the published numbers have a committed artifact behind them?** Eval baselines here live in `evals/baselines/latest.json` and every published figure is rendered from that file. If a number cannot be traced to a run, it is marketing.
+
+## Check it yourself
+
+```bash
+pip install techtide-swarm
+swarm init
+swarm demo
+swarm eval
+```
+
+The maintained table is [status and maturity](/docs/resources/status). The [verification scorecard](/docs/resources/verification) lists what has been checked and how, [evals methodology](/docs/evals/methodology) covers scoring, and the [roadmap](/docs/resources/roadmap) covers what is next. Source on [GitHub](https://github.com/TechTideOhio/swarm-357), package on [PyPI](https://pypi.org/project/techtide-swarm/).

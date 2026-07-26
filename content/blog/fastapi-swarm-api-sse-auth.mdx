@@ -1,0 +1,99 @@
+---
+title: "A FastAPI agent API with SSE, fail-closed auth, and redacted reads"
+description: "Streaming agent events over server-sent events, authenticating writes without breaking the stream, and returning useful public telemetry without leaking task content."
+date: "2026-07-06"
+updated: "2026-07-26"
+slug: "fastapi-swarm-api-sse-auth"
+cover: "/art/blog/api-stream.jpg"
+coverAlt: "A black conduit carrying a stream of gold light packets past a faceted valve"
+author: "Alex Cinovoj"
+keyword: "fastapi agent api sse"
+tags: ["API", "Security", "Architecture"]
+faq:
+  - question: "Why use server-sent events instead of WebSockets for agent runs?"
+    answer: "Agent progress is one-directional. SSE is a plain HTTP response, so it passes proxies and load balancers without special handling, and reconnection is built into the browser client."
+  - question: "How should an agent API handle authentication failures in production?"
+    answer: "Fail closed. If the key is configured and the request does not carry it, refuse. Never fall back to an unauthenticated path because a check errored."
+  - question: "Can a public agent API expose run telemetry safely?"
+    answer: "Yes, if reads are redacted. Return run status, timing, and cost shape without task content or output, so the surface is useful for status displays and useless for extraction."
+---
+
+An agent run takes minutes and produces progress the caller wants to see. That makes the API design different from a normal request-response service in three ways: the response is a stream, the auth model has to work on that stream, and the public read surface leaks more than you expect unless you deliberately trim it.
+
+This is how the Swarm 357 FastAPI runtime handles all three.
+
+## SSE, because the traffic is one directional
+
+Agent progress flows one way. The client sends a task and then listens. WebSockets give you bidirectional messaging you do not need, at the cost of upgrade handling in every proxy between you and the user.
+
+Server-sent events are a plain HTTP response with a content type. Proxies, load balancers, and CDNs handle them as HTTP, and browser clients get reconnection for free.
+
+Two implementation details that matter more than the protocol choice:
+
+**The stream must end explicitly.** A stream that just stops leaves the client unsure whether the run finished or the connection dropped. Swarm 357 emits a `stream.end` event, and the event bus closes on terminal run state. A client that sees `stream.end` knows it has everything.
+
+**Cancellation must be observable on the stream.** When a run is cancelled, `cancel_requested` is persisted onto the checkpoint rather than held in memory, so the state is visible from any process. See [durable checkpoints, resume, cancel, and replay](/blog/durable-checkpoints-resume-cancel-replay).
+
+## Auth that fails closed
+
+The rule is short: if `SWARM_API_KEY` is set, SSE and write endpoints require it, and production auth is fail-closed.
+
+Fail-closed means an error in the authentication path is a refusal, not a fallback. The anti-pattern is a `try` around the auth check with an unauthenticated path in the `except`, which turns any transient failure into an open door. If the check cannot run, the answer is no.
+
+For a public endpoint that a browser reaches, put a backend-for-frontend on your own origin between the browser and the API. That is the only place a write key is read, and it never crosses into client code. The site does this, and the key never enters the build. See [deploying a Claude agent runtime on Railway](/blog/deploying-claude-agent-runtime-railway) for the build-time side of that.
+
+## Public reads, redacted
+
+`GET /api/swarm/runs` without authentication returns redacted telemetry. Not blocked, redacted, and the distinction is deliberate.
+
+| Field | Unauthenticated | Why |
+|-------|-----------------|-----|
+| Run id, status, timestamps | Returned | Useful for a status display, harmless |
+| Step count, duration | Returned | Shape of the work without its content |
+| Task text | Removed | The prompt frequently contains customer context |
+| Output | Removed | The whole point of the run |
+| Cost detail | Trimmed | Aggregate shape only |
+
+Blocking the endpoint entirely would be simpler and would also remove a legitimately useful public surface. Redaction keeps the health signal and drops the payload.
+
+The same instinct applies to `/api/health`. A public health endpoint should say the service is alive and which version is running. It should not enumerate configuration, dependency hosts, or feature flags, because that is a reconnaissance gift for the cost of a curl.
+
+## The interactive explorer is a choice, not an accident
+
+FastAPI serves `/docs`, `/redoc`, and `/openapi.json`. Leaving them public is intentional here: every route they list is already public in the repository, writes fail closed without the key, and reads are redacted. The explorer tells an attacker nothing the source does not.
+
+If route enumeration matters for your deployment, set `SWARM_DISABLE_API_DOCS=1` and all three return 404.
+
+That is the right shape for a security toggle. A default that is defensible, a documented reason, and one variable to change it.
+
+## Protecting an unauthenticated demo
+
+A public demo endpoint is an unauthenticated path that spends money. Every control has to be server-side, because a client-side limit is a suggestion.
+
+- **Force simulation.** Pin `simulate: true` in the backend-for-frontend regardless of the request body.
+- **Clamp the budget.** Whatever number arrives, clamp it to the demo cap.
+- **Cap the body.** Oversized requests get 413 before parsing.
+- **Bound the input.** A server-enforced character limit, mirrored in the UI so the two agree.
+- **Rate limit per IP.** A sliding window returning 429.
+
+Also set CORS to the origins you actually serve, and let it fail closed when the allowed-origins variable is missing. A permissive default that only tightens when configured is a default that ships wrong.
+
+## Status of the surface
+
+The HTTP API, SSE, and HITL approvals are all Beta on the [status page](/docs/resources/status). The Bash gate and filesystem confinement underneath are Stable. Distributed rate limiting across replicas is not implemented; the limiter is single-process, and stacking per-process limits is not the same guarantee.
+
+## When not to run the API
+
+- **Single-machine batch work.** Use the CLI. An HTTP surface is attack surface you are not using.
+- **You cannot own the auth story.** If nobody will rotate the key or watch the logs, do not expose it.
+- **You need multi-tenant isolation.** Not implemented, and a shared key is not a tenancy model.
+
+## Run it
+
+```bash
+pip install techtide-swarm
+swarm init
+swarm serve
+```
+
+Read [API overview](/docs/api/overview) for the routes, [authentication](/docs/api/authentication) for the key model, [SSE event stream](/docs/api/sse-events) for the event shapes, [rate limits](/docs/api/rate-limits) for the limiter, and [streaming events](/docs/guides/streaming-events) for the client side.

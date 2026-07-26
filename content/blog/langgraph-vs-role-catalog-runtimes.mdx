@@ -1,0 +1,107 @@
+---
+title: "LangGraph and role catalog runtimes solve different problems"
+description: "A state graph gives you explicit control flow. A role catalog gives you governed workers. When you need one, when you need both, and how to tell which problem you have."
+date: "2026-06-01"
+updated: "2026-07-26"
+slug: "langgraph-vs-role-catalog-runtimes"
+cover: "/art/blog/graph-vs-catalog.jpg"
+coverAlt: "An organic gold node graph flowing into an ordered grid of lit black tiles"
+author: "Alex Cinovoj"
+keyword: "langgraph alternative"
+tags: ["Comparison", "Architecture", "Orchestration"]
+faq:
+  - question: "Is a role catalog a LangGraph alternative?"
+    answer: "Partly. A graph runtime models control flow between steps. A role catalog models who the workers are and what they are allowed to do. They answer different questions and can be combined."
+  - question: "When should I choose an explicit state graph?"
+    answer: "When the control flow matters more than the worker identity, for example cyclic workflows, conditional branching, and retry topologies you want to see drawn out."
+  - question: "When is a role catalog the better fit?"
+    answer: "When the same functions recur across many tasks and you need per-role tool grants, budgets, and standards that a security or finance reviewer can audit."
+---
+
+LangGraph models control flow. A role catalog models workers. Framing them as competitors leads teams to pick the wrong one, because the real question is not "which framework" but "which of my two problems is currently the expensive one".
+
+## What each abstraction actually is
+
+A state graph is nodes, edges, and shared state. You draw the flow: this step, then that step, loop back on this condition, exit on that one. The value is that the control flow is explicit and inspectable. When behaviour surprises you, you look at the graph.
+
+A role catalog is a declared set of workers. Each role has a soul template carrying its standards, a tool grant, a model default, and a budget ceiling. A task routes to roles rather than instantiating them. The value is that capability and cost are declared before runtime. When spend surprises you, you look at the catalog.
+
+Neither replaces the other. A graph with unbounded worker capability is a well-documented way to spend money. A catalog with no control flow still needs something to decide sequencing.
+
+## Criteria table
+
+| Criterion | State graph | Role catalog |
+|-----------|-------------|--------------|
+| Primary abstraction | Nodes, edges, shared state | Roles, layers, tool grants |
+| Cycles and conditional branching | First class | Handled by routing, less explicit |
+| Per-worker tool permissions | Set where the node is defined | Declared once per role |
+| Cost attribution | Per graph run | Per role and per layer |
+| Onboarding artifact | The graph diagram | The catalog |
+| Fit for a security review | Shows the flow | Shows the capability surface |
+| Fit for recurring business functions | Adequate | Strong |
+| Fit for bespoke multi-step pipelines | Strong | Adequate |
+| Risk when it goes wrong | Hard-to-follow state mutation | Wrong role picked for the task |
+
+## The question that decides it
+
+Which of these has cost you more in the last quarter?
+
+**"I cannot follow what this pipeline does."** That is a control flow problem. You want an explicit graph, and you want it drawn.
+
+**"I cannot tell who spent this or what they were allowed to touch."** That is a governance problem. You want declared roles with declared grants and budgets.
+
+Most teams have both, in sequence. The control flow problem shows up first, during the build. The governance problem shows up second, after the thing is running and someone asks for an audit.
+
+## What the catalog side looks like
+
+In Swarm 357, capability is a config fact rather than a call-site decision.
+
+```python
+AgentConfig(
+    name="research-market-001",
+    layer=LayerType.RESEARCH,
+    role="market_researcher",
+    soul="templates/soul/research/market-analyst.md",
+    tools=["WebSearch", "Read", "Write"],
+    model="sonnet",
+    budget_limit_usd=1.00,
+)
+```
+
+Three properties fall out of that, and they are the whole argument for the approach:
+
+- **The tool list is reviewable.** One role, one grant, one diff when it changes. Not twelve copies across a codebase with the twelfth quietly holding an extra tool.
+- **The budget attributes to a function.** Not "this run cost forty dollars" but "market research costs forty dollars", which is a number you can act on.
+- **Standards are inherited.** Improve the soul template and every future market analysis improves.
+
+Underneath, the runtime defaults to one agent per selected role under a hard agent cap, with a reserve-and-commit budget ledger. Full fan-out is opt-in behind `full_fanout` or `SWARM_UNSAFE_FULL_FANOUT`.
+
+## Where a catalog is genuinely weaker
+
+**Explicit cycles.** If your workflow is "retry with a different strategy until the validator passes, up to four times", a graph expresses that directly. Routing expresses it awkwardly.
+
+**Novel problem shapes.** Selecting from a declared list is the wrong move when you do not yet know which roles the problem needs.
+
+**Fine-grained state.** Graph runtimes give you a shared state object with a defined update model. A role catalog moves knowledge through memory and handoffs, which is coarser.
+
+## Using both
+
+The combination that works: a graph for the pipeline, a catalog for the workers the graph invokes. The graph knows the order. The catalog knows who is allowed to do what and for how much.
+
+That works because the catalog is configuration, not runtime lock-in. Roles, tool grants, budget ceilings, and soul templates are declarative artifacts, and nothing stops them informing agent definitions in whichever runtime you already run.
+
+## When neither is worth it
+
+If your workflow is three sequential model calls with no branching, write three sequential model calls. A graph adds a dependency to express something a function already expresses, and a catalog adds configuration to govern three calls you can read in one screen.
+
+Both abstractions earn their keep at the point where you cannot hold the system in your head. Not before.
+
+## Look at the catalog
+
+```bash
+pip install techtide-swarm
+swarm init
+swarm demo
+```
+
+Then read the [roster overview](/docs/roster/overview) for the six layers, [layer routing](/docs/guides/layer-routing) for how tasks reach roles, the [comparison](/docs/resources/comparison) doc for the maintained matrix, and [CrewAI, AutoGen, and role ontologies](/blog/crewai-autogen-vs-role-ontology) for the crew-shaped version of this question.

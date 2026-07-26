@@ -1,18 +1,113 @@
 ---
 title: "Cost control for LLM agent fleets"
-description: "Layer budgets, model downgrade, and honest telemetry."
-date: "2026-07-18"
+description: "Layer budgets, an atomic ledger, and a logged model downgrade at 80 percent. The FinOps primitives that keep a multi-agent run from turning into a surprise invoice."
+date: "2026-02-10"
+updated: "2026-07-26"
 slug: "cost-control-for-llm-agent-fleets"
+cover: "/art/blog/cost-control.jpg"
+coverAlt: "Stacked glass vessels filled with glowing gold liquid at different levels, a budget meter"
+author: "Alex Cinovoj"
+keyword: "llm agent cost control"
+tags: ["Cost control", "FinOps", "Operations"]
+faq:
+  - question: "What is the cheapest way to cap agent spend?"
+    answer: "Set a per-layer budget and a per-agent budget_limit_usd, then let the ledger reserve before the call rather than accounting after it. Post-hoc accounting always overshoots on parallel runs."
+  - question: "Does automatic model downgrade hide cost problems?"
+    answer: "It would if it were silent. The downgrade at 80 percent of layer budget emits a model_downgrade event, so the trace shows exactly which step ran on the cheaper model and why."
+  - question: "Can I test orchestration without paying Anthropic prices?"
+    answer: "Yes. Point the runtime at OpenRouter with a cheap tool-capable model for iteration, and reserve premium models for the runs that matter."
 ---
 
-Layer budgets, model downgrade, and honest telemetry.
+Cost control for an LLM agent fleet means three things: a budget that exists before the call, an accounting primitive that survives concurrency, and a trace that tells you afterwards where the money went. Miss any one and you are estimating, not controlling.
 
-Swarm 357 ships open-core orchestration with honest maturity labels. Read the [documentation](/docs) for installation, API reference, and eval methodology.
+Most teams find this out in the same order I did. You start with a spend dashboard, which tells you what already happened. Then you add a per-run cap, which does not hold when eight agents run in parallel. Then you finally move the check in front of the call.
 
-## Key takeaways
+## Accounting after the fact does not cap anything
 
-- Operators own API keys, budgets, and side-effect approvals
-- Security defaults: Bash gate, filesystem confinement, HITL in production
-- Eval baselines report single-agent and swarm metrics separately
+Here is the bug that taught me. Two agents in the same layer both read the remaining budget, both saw room, and both proceeded. The layer had room for one. Nothing in the code was wrong in isolation. The read and the spend were not atomic, so the classic race condition applies to tokens just like it applies to bank balances.
 
-[Get started](/docs/getting-started/quickstart) or view [latest eval baseline](/docs/evals/latest-baseline).
+The fix is a reserve-and-commit ledger under a lock.
+
+| Step | What happens | Why it matters |
+|------|--------------|----------------|
+| Reserve | The estimated cost is deducted before the request goes out | A concurrent agent now sees the reduced balance |
+| Call | The model request runs | Failure here releases the reservation |
+| Commit | Actual cost replaces the estimate | Estimation drift gets corrected, not compounded |
+
+`BudgetLedger` in Swarm 357 does exactly this, reserving and committing under an asyncio lock. It is marked Beta on the [status page](/docs/resources/status), and the honest reason is that estimation accuracy varies by model and tool use, not that the locking is shaky.
+
+## Three budget scopes, not one
+
+A single global cap is too blunt. You want limits at the level where you make decisions.
+
+**Per agent.** `budget_limit_usd` on `AgentConfig` bounds one worker. Use it to keep an experimental role from eating a layer.
+
+```python
+from techtide_swarm import AgentConfig, LayerType
+
+config = AgentConfig(
+    name="research-market-001",
+    layer=LayerType.RESEARCH,
+    role="market_researcher",
+    soul="templates/soul/research/market-analyst.md",
+    tools=["WebSearch", "Read", "Write"],
+    model="sonnet",
+    budget_limit_usd=1.00,
+)
+```
+
+**Per layer.** `CostController` tracks spend by layer, which maps to how you think about the work. Research is allowed to be expensive. Support triage is not.
+
+**Per run.** The outer bound. This is the number you quote to whoever signs off.
+
+## The downgrade has to be loud
+
+At 80 percent of a layer budget, `CostController` downgrades the model to Haiku. That is a useful behaviour and a dangerous one, because a silent downgrade produces a mystery: output quality drops on the last few steps of a long run and nobody knows why.
+
+So it is logged. The downgrade emits a `model_downgrade` event into the trace. When someone asks why the final section of a report reads thinner than the rest, the answer is in `.swarm/traces.jsonl` with a timestamp, not in a guess.
+
+That is the rule I would apply to any cost control you build: an automatic action that changes output quality must leave a record. Otherwise you have not saved money, you have moved the cost into debugging time.
+
+## Cheap models for the loop, premium models for the run
+
+Most of the money in agent development is spent on iteration, not production. You run the same task forty times while you fix a soul template.
+
+For that loop, point the runtime at OpenRouter and use a cheap tool-capable model.
+
+```bash
+export ANTHROPIC_BASE_URL=https://openrouter.ai/api
+export OPENROUTER_API_KEY=sk-or-...
+```
+
+One warning from experience: free models frequently fail tool calling. They will happily produce text that looks like a tool call and never invoke anything, which sends you debugging your orchestration when the model is the problem. Pay the fraction of a cent for a model that actually supports tools.
+
+Note that OpenRouter does not silently remap to Haiku. That only happens if you set `SWARM_OPENROUTER_CHEAP=1`, which is opt-in for the same reason the fan-out flag is opt-in.
+
+## Read the bill the system already wrote
+
+Two surfaces matter after a run.
+
+```bash
+swarm cost
+```
+
+That gives you the layer breakdown. For step-level detail, `.swarm/traces.jsonl` carries structured events including the downgrade markers, and OpenTelemetry export is available behind `SWARM_OTEL_EXPORT=1` if you want it in your existing observability stack. Full details in [telemetry and traces](/docs/guides/telemetry-traces).
+
+To be clear about what is not here: Opik cloud observability is not implemented. Local JSONL is the source of truth. I would rather say that plainly than let you discover it during an incident.
+
+## When these controls are the wrong tool
+
+- **Single short tasks.** If your whole workload is one Haiku call, budget machinery is overhead. Set a provider-level spend limit and move on.
+- **You need hard multi-tenant quotas.** The limiter is single-process. Distributed rate limiting across replicas is explicitly not implemented, and stacking per-process caps is not the same guarantee.
+- **You want cost prediction before the run.** Estimation gets you an order of magnitude, not a quote. Reserve-and-commit is a safety mechanism, not a forecasting one.
+
+## Wire it up
+
+```bash
+pip install techtide-swarm
+swarm init
+swarm demo          # explicit simulation, no key, no spend
+swarm cost          # see the reporting surface before you use it live
+```
+
+Then read [cost control and budgets](/docs/guides/cost-control) for the configuration reference, [CostController](/docs/sdk/cost-controller) for the API, and [multi-agent orchestration without the headcount fantasy](/blog/multi-agent-orchestration-without-headcount-fantasy) for why the agent cap matters as much as the budget. The package is on [PyPI](https://pypi.org/project/techtide-swarm/).

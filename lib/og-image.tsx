@@ -3,8 +3,11 @@
 // reference: lib/site-url.ts, app/opengraph-image.tsx
 
 import { ImageResponse } from "next/og";
+import { SITE_URL } from "@/lib/site-url";
 
 export const og_size = { width: 1200, height: 630 };
+
+const OG_FOOTER_HOST = SITE_URL.replace(/^https?:\/\//, "");
 
 export function build_og_image(title: string, subtitle?: string): ImageResponse {
   return new ImageResponse(
@@ -28,7 +31,7 @@ export function build_og_image(title: string, subtitle?: string): ImageResponse 
               width: 48,
               height: 48,
               borderRadius: 12,
-              background: "#f5f5f5",
+              background: "#ffd900",
               color: "#0a0a0a",
               display: "flex",
               alignItems: "center",
@@ -49,7 +52,7 @@ export function build_og_image(title: string, subtitle?: string): ImageResponse 
             <div style={{ fontSize: 28, lineHeight: 1.4, color: "#d4d4d4" }}>{subtitle}</div>
           ) : null}
         </div>
-        <div style={{ fontSize: 22, color: "#a3a3a3" }}>swarm357fe.up.railway.app</div>
+        <div style={{ fontSize: 22, color: "#a3a3a3" }}>{OG_FOOTER_HOST}</div>
       </div>
     ),
     { ...og_size }

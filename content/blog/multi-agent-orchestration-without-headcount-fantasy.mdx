@@ -1,18 +1,109 @@
 ---
 title: "Multi-agent orchestration without the headcount fantasy"
-description: "Why 357 roles is an ontology, not a billing disaster."
-date: "2026-07-20"
+description: "357 roles is an org chart for agents, not 357 models running at once. Here is how role catalogs, layer routing, and hard agent caps keep a multi-agent system solvent."
+date: "2026-01-13"
+updated: "2026-07-26"
 slug: "multi-agent-orchestration-without-headcount-fantasy"
+cover: "/art/blog/role-ontology.jpg"
+coverAlt: "Ordered gold lattice tower rising out of darkness, the shape of a role catalog"
+author: "Alex Cinovoj"
+keyword: "multi agent orchestration"
+tags: ["Orchestration", "Architecture", "Cost control"]
+faq:
+  - question: "Does a 357-role catalog mean 357 agents run at the same time?"
+    answer: "No. The catalog is an ontology of roles. At runtime a layer executes one agent per selected role by default, under a hard agent cap, and most tasks touch a handful of roles."
+  - question: "How many agents actually run for a typical task?"
+    answer: "Usually between one and a dozen. Layer routing picks the roles that match the task, and the cap plus the budget ledger stop the fan-out before it becomes expensive."
+  - question: "Is multi-agent orchestration worth it over one large prompt?"
+    answer: "Only when the work genuinely decomposes and you need separate budgets, separate tool permissions, or separate memory per role. If a single prompt already gets the answer, use the single prompt."
 ---
 
-Why 357 roles is an ontology, not a billing disaster.
+Multi-agent orchestration is the practice of splitting work across several model-backed workers with defined roles, tools, and budgets, then coordinating their output. The hard part is not spawning agents. The hard part is stopping them.
 
-Swarm 357 ships open-core orchestration with honest maturity labels. Read the [documentation](/docs) for installation, API reference, and eval methodology.
+I learned that the expensive way. My first serious agent fan-out ran a layer of researchers in parallel because the code made it easy, and the run cost more than the deliverable was worth. Nothing crashed. No alarm fired. I just got a bill and a folder of near-duplicate summaries. That is the failure mode nobody writes blog posts about, so this is that post.
 
-## Key takeaways
+## The headcount fantasy
 
-- Operators own API keys, budgets, and side-effect approvals
-- Security defaults: Bash gate, filesystem confinement, HITL in production
-- Eval baselines report single-agent and swarm metrics separately
+The pitch you see everywhere goes like this: give every business function an AI agent, wire them together, and you have replaced a department. It reads well on a slide. It falls apart on the first invoice, for three reasons.
 
-[Get started](/docs/getting-started/quickstart) or view [latest eval baseline](/docs/evals/latest-baseline).
+**Parallel agents multiply cost, not throughput.** Ten agents on one question give you ten opinions to reconcile, and you pay for all ten. Reconciliation is human work, so you traded token spend for review time.
+
+**Roles without routing are just prompts.** If nothing decides which role handles which task, every task hits every role. Fan-out becomes the default instead of the exception.
+
+**Autonomy without a gate is a liability.** An agent with shell access and no policy is one clever prompt away from doing something you cannot undo.
+
+Swarm 357 ships 357 roles across six business layers plus ten management meta-agents. That number is deliberately an org chart, not a concurrency target. It is closer to a job architecture document than to a thread pool.
+
+## A role catalog is an ontology, not a thread pool
+
+The catalog answers one question: when this kind of work arrives, who owns it? Six layers carry the load.
+
+| Layer | Roles | Owns |
+|-------|-------|------|
+| Sales | 62 | Pipeline research, outreach drafts, CRM handoff notes |
+| Support | 55 | Triage, macro drafting, escalation summaries |
+| Marketing | 68 | Briefs, positioning drafts, campaign structure |
+| SEO | 47 | Cluster planning, on-page audits, internal link maps |
+| Research | 58 | Market scans, competitor teardowns, source collection |
+| Operations | 57 | Runbooks, checklists, process documentation |
+| Management | 10 | Routing, planning, review of the layers above |
+
+Naming a role costs nothing at runtime. It is a YAML entry and a soul template. Running a role costs money. Keeping those two facts separate is the whole design.
+
+That separation buys you something real. When a task arrives, routing selects roles by fit instead of firing the whole layer. You get a named owner for the output, a soul template that already carries the standards for that job, and a budget line you can attribute afterwards.
+
+## What actually runs
+
+At execution time the runtime defaults to one agent per selected role, under a hard agent cap. Full fan-out exists, but it is opt-in through `full_fanout` or `SWARM_UNSAFE_FULL_FANOUT`, and the environment variable is named that way on purpose. If you have to type `UNSAFE` to spend the money, you will think about it first.
+
+```python
+from techtide_swarm import AgentConfig, LayerType, Swarm
+
+swarm = Swarm.from_config("config/swarm-compact.yaml")
+result = await swarm.execute("Draft a competitive teardown of two rival onboarding flows")
+```
+
+A run like that touches the research layer, picks the roles that match, and stops. It does not wake up all 58 research roles to vote.
+
+Three controls keep it that way:
+
+- **Layer routing** selects roles instead of broadcasting. Details in [layer routing](/docs/guides/layer-routing).
+- **The agent cap** bounds concurrency regardless of how many roles matched.
+- **The budget ledger** reserves and commits spend under an asyncio lock, so parallel agents cannot race past a layer budget. See [cost control and budgets](/docs/guides/cost-control).
+
+`Swarm` orchestration and `execute_layer()` are both Beta today. The [status page](/docs/resources/status) tracks that honestly, and I would rather you read the maturity table before you wire this into a customer-facing path.
+
+## The three failures that cost me real money
+
+**Silent success.** An early build returned plausible output when no API key was present. It looked like the system worked. It had simply made things up. Swarm 357 now requires an explicit `SWARM_SIMULATE` or `SWARM_ALLOW_STUB` for keyless runs, so a stub never masquerades as a live result.
+
+**Unbounded fan-out.** Covered above. The fix was the cap plus the ledger, not discipline. Discipline fails at 2am.
+
+**Shell access without a policy.** An agent that can run commands can delete things. The [bash security gate](/docs/guides/bash-security-gate) validates commands against a pattern policy, server and production modes deny Bash unless you set `SWARM_ALLOW_BASH=1`, and [human-in-the-loop approvals](/docs/guides/hitl-approvals) put a person in front of anything that survives the gate.
+
+None of those three fixes are glamorous. All three are the difference between a demo and a system.
+
+## When not to orchestrate
+
+Skip multi-agent entirely when any of these is true.
+
+- One prompt already answers the question. Orchestration adds latency and coordination cost for nothing.
+- The task does not decompose. Two agents on an indivisible problem produce two partial answers and an argument.
+- You cannot attribute cost per step. If you cannot see where the money went, you cannot control it, and you will find out from the invoice.
+- You need a guaranteed outcome with no review. Nothing here removes the human from the approval seat, and I would not trust a vendor who claims otherwise.
+
+A single well-scoped agent with good tools beats a badly routed swarm every day of the week. Orchestration earns its keep when you need separate budgets, separate tool permissions, or separate memory per role, and not before.
+
+## Start here
+
+Install the package and run the simulated demo before you spend a cent on tokens.
+
+```bash
+pip install techtide-swarm
+swarm init
+swarm demo
+```
+
+`swarm demo` runs explicit simulation without a key, which means you can see the routing and the shape of the output before you decide whether the architecture fits your problem.
+
+From there, read [core concepts](/docs/getting-started/core-concepts) for the vocabulary, [cost control and budgets](/docs/guides/cost-control) for the spend model, and the [status and maturity](/docs/resources/status) table for what is Stable versus Beta. The package is on [PyPI](https://pypi.org/project/techtide-swarm/) and the source is on [GitHub](https://github.com/TechTideOhio/swarm-357).

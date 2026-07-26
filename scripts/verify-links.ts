@@ -9,6 +9,7 @@ import { get_flat_nav_items } from "../lib/content/nav";
 
 const ROOT = process.cwd();
 const DOCS_DIR = path.join(ROOT, "content/docs");
+const BLOG_DIR = path.join(ROOT, "content/blog");
 const errors: string[] = [];
 
 const known_routes = new Set([
@@ -34,17 +35,18 @@ function walk_mdx(dir: string, files: string[] = []): string[] {
 }
 
 function check_internal_links(file: string, content: string) {
-  const link_pattern = /\]\((\/docs\/[^)#?]+)\)/g;
+  const link_pattern = /\]\((\/(?:docs|blog)\/[^)#?]+)\)/g;
   let match: RegExpExecArray | null;
   while ((match = link_pattern.exec(content)) !== null) {
     const href = match[1];
     if (href.startsWith("/docs/raw/")) continue;
-    if (!known_routes.has(href)) {
-      const slug = href.replace(/^\/docs\/?/, "");
-      const mdx_path = path.join(DOCS_DIR, `${slug}.mdx`);
-      if (!fs.existsSync(mdx_path)) {
-        errors.push(`${file}: unresolved internal link ${href}`);
-      }
+    if (known_routes.has(href)) continue;
+
+    const is_blog = href.startsWith("/blog/");
+    const base = is_blog ? BLOG_DIR : DOCS_DIR;
+    const slug = href.replace(/^\/(?:docs|blog)\/?/, "");
+    if (!fs.existsSync(path.join(base, `${slug}.mdx`))) {
+      errors.push(`${file}: unresolved internal link ${href}`);
     }
   }
 }
@@ -53,7 +55,7 @@ for (const file of walk_mdx(DOCS_DIR)) {
   check_internal_links(file, fs.readFileSync(file, "utf8"));
 }
 
-for (const file of walk_mdx(path.join(ROOT, "content/blog"))) {
+for (const file of walk_mdx(BLOG_DIR)) {
   check_internal_links(file, fs.readFileSync(file, "utf8"));
 }
 

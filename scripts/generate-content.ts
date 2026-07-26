@@ -250,7 +250,7 @@ Visit \`http://localhost:8000/docs\` for the interactive OpenAPI UI.
 
 ## Try it live
 
-Use the [live demo](https://swarm357fe.up.railway.app/#try-it-live) on the landing page (simulated runs via same-origin BFF).
+Use the [live demo](https://swarm357.techtideai.io/#try-it-live) on the landing page (simulated runs via same-origin BFF).
 `);
 
   write_mdx("getting-started/installation", {
@@ -1125,32 +1125,26 @@ The full persona, workflows, tool usage, and output schemas for this role live i
   walk_souls(soul_dir);
 }
 
+/**
+ * Blog posts are hand authored. This generator only scaffolds a slug that does
+ * not exist yet, so re-running the sync never destroys editorial work.
+ * See content/data/blog-keyword-owners.json for the keyword map.
+ */
 function generate_blog() {
-  const posts = [
-    ["multi-agent-orchestration-without-headcount-fantasy", "2026-07-20", "Multi-agent orchestration without the headcount fantasy", "Why 357 roles is an ontology, not a billing disaster."],
-    ["cost-control-for-llm-agent-fleets", "2026-07-18", "Cost control for LLM agent fleets", "Layer budgets, model downgrade, and honest telemetry."],
-    ["portable-agent-memory-with-memvid", "2026-07-15", "Portable agent memory with Memvid", "Single-file .mv2 recall across runs and layers."],
-    ["why-your-agent-needs-a-bash-policy-gate", "2026-07-12", "Why your agent needs a bash policy gate", "Pattern-based defense before autonomous shell access."],
-    ["human-in-the-loop-approvals-for-agents", "2026-07-10", "Human-in-the-loop approvals for autonomous agents", "Durable ApprovalRecord workflow for Bash commands."],
-    ["how-to-evaluate-an-agent-swarm", "2026-07-08", "How to actually evaluate an agent swarm", "Separate single-agent and swarm metrics with budget caps."],
-    ["crewai-autogen-vs-role-ontology", "2026-07-05", "CrewAI, AutoGen, and role ontologies", "When a 357-role catalog beats ad-hoc crews."],
-    ["deploying-claude-agent-runtime-railway", "2026-07-01", "Deploying a Claude agent runtime on Railway", "API + landing split, BFF auth, and health probes."],
-  ];
+  const seeds: Array<[slug: string, date: string, title: string, description: string]> = [];
 
-  for (const [slug, date, title, description] of posts) {
-    write_blog(slug, { title, description, date, slug }, `
-${description}
+  for (const [slug, date, title, description] of seeds) {
+    const file_path = path.join(BLOG, `${slug}.mdx`);
+    if (fs.existsSync(file_path)) {
+      console.log(`  skip ${slug}.mdx (hand authored, already present)`);
+      continue;
+    }
 
-Swarm 357 ships open-core orchestration with honest maturity labels. Read the [documentation](/docs) for installation, API reference, and eval methodology.
-
-## Key takeaways
-
-- Operators own API keys, budgets, and side-effect approvals
-- Security defaults: Bash gate, filesystem confinement, HITL in production
-- Eval baselines report single-agent and swarm metrics separately
-
-[Get started](/docs/getting-started/quickstart) or view [latest eval baseline](/docs/evals/latest-baseline).
-`);
+    write_blog(
+      slug,
+      { title, description, date, slug },
+      `${description}\n\nDraft scaffold. Replace this body before publishing.\n`
+    );
   }
 }
 
@@ -1167,6 +1161,6 @@ console.log("Generating config, deploy, security, evals, resources...");
 generate_config_deploy_security_evals_resources();
 console.log("Generating roster pages...");
 generate_roster_pages();
-console.log("Generating blog posts...");
+console.log("Checking blog scaffolds (hand authored MDX is source of truth)...");
 generate_blog();
 console.log("Done.");

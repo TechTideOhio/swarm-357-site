@@ -7,7 +7,13 @@ import path from "node:path";
 import matter from "gray-matter";
 import { get_flat_nav_items } from "./nav";
 import { extract_headings } from "./toc";
-import type { BlogFrontmatter, BlogPost, DocFrontmatter, DocPage } from "./types";
+import type {
+  BlogFaqEntry,
+  BlogFrontmatter,
+  BlogPost,
+  DocFrontmatter,
+  DocPage,
+} from "./types";
 
 const CONTENT_ROOT = path.join(process.cwd(), "content");
 const DOCS_DIR = path.join(CONTENT_ROOT, "docs");
@@ -81,7 +87,42 @@ export function load_all_docs(): DocPage[] {
   return pages;
 }
 
-export function load_blog_by_slug(slug: string): BlogPost | null {
+/**
+ * Slugs become route hrefs, so they are restricted to the shape a filename is
+ * allowed to have rather than trusted because they came off disk.
+ */
+const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
+/** Covers become `src` attributes, so only a bundled image path is accepted. */
+const COVER_PATTERN = /^\/art\/blog\/[a-z0-9-]+\.(?:jpg|jpeg|png|webp)$/;
+
+function safe_slug(value: string): string | null {
+  return SLUG_PATTERN.test(value) ? value : null;
+}
+
+function safe_cover(value: unknown): string | undefined {
+  if (typeof value !== "string") return undefined;
+  return COVER_PATTERN.test(value) ? value : undefined;
+}
+
+function parse_faq(value: unknown): BlogFaqEntry[] | undefined {
+  if (!Array.isArray(value)) return undefined;
+
+  const entries = value.flatMap((raw) => {
+    if (typeof raw !== "object" || raw === null) return [];
+    const record = raw as Record<string, unknown>;
+    const question = String(record.question ?? "").trim();
+    const answer = String(record.answer ?? "").trim();
+    return question && answer ? [{ question, answer }] : [];
+  });
+
+  return entries.length > 0 ? entries : undefined;
+}
+
+export function load_blog_by_slug(raw_slug: string): BlogPost | null {
+  const slug = safe_slug(raw_slug);
+  if (!slug) return null;
+
   const file_path = path.join(BLOG_DIR, `${slug}.mdx`);
   if (!fs.existsSync(file_path)) return null;
 
@@ -91,7 +132,13 @@ export function load_blog_by_slug(slug: string): BlogPost | null {
     description: String(data.description ?? ""),
     date: String(data.date ?? ""),
     slug,
+    updated: data.updated ? String(data.updated) : undefined,
+    cover: safe_cover(data.cover),
+    coverAlt: data.coverAlt ? String(data.coverAlt) : undefined,
+    author: data.author ? String(data.author) : undefined,
+    keyword: data.keyword ? String(data.keyword) : undefined,
     tags: Array.isArray(data.tags) ? data.tags.map(String) : [],
+    faq: parse_faq(data.faq),
     draft: Boolean(data.draft),
   };
 
@@ -113,6 +160,24 @@ export function load_all_blog_posts(): BlogPost[] {
     .map((name) => load_blog_by_slug(name.replace(/\.mdx$/, "")))
     .filter((post): post is BlogPost => post !== null && !post.frontmatter.draft)
     .sort((a, b) => b.frontmatter.date.localeCompare(a.frontmatter.date));
+}
+
+/**
+ * Neighbours in reverse-chronological order. `newer` is the post published
+ * after this one, `older` the post before it, so the pager reads as a timeline.
+ */
+export function get_adjacent_blog_posts(slug: string): {
+  newer: BlogPost | null;
+  older: BlogPost | null;
+} {
+  const posts = load_all_blog_posts();
+  const index = posts.findIndex((post) => post.slug === slug);
+  if (index === -1) return { newer: null, older: null };
+
+  return {
+    newer: posts[index - 1] ?? null,
+    older: posts[index + 1] ?? null,
+  };
 }
 
 export function load_data_json<T>(name: string): T | null {

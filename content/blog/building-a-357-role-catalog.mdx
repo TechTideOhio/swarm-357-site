@@ -1,0 +1,111 @@
+---
+title: "Building a 357 role catalog for AI agents"
+description: "How six business layers and 357 roles were drawn, what a soul template holds, and the three mistakes that make a role catalog useless. Including why the number is not the point."
+date: "2026-07-13"
+updated: "2026-07-26"
+slug: "building-a-357-role-catalog"
+cover: "/art/blog/role-catalog.jpg"
+coverAlt: "Ordered research packs rendered as gold-lit black forms in a dark studio"
+author: "Alex Cinovoj"
+keyword: "ai agent role catalog"
+tags: ["Architecture", "Roster", "Orchestration"]
+faq:
+  - question: "What is an AI agent role catalog?"
+    answer: "A pre-declared set of agent roles, each with standards, a tool grant, a model default, and a budget ceiling, that tasks route to instead of defining agents at call time."
+  - question: "Why 357 roles instead of a handful?"
+    answer: "Because business work decomposes further than most agent systems admit, and naming a role costs nothing at runtime. The catalog is granular so routing can be specific; concurrency stays bounded separately."
+  - question: "What is a soul template?"
+    answer: "A markdown file holding how a role does its job: standards, output shape, refusals, and the questions it should ask. It is the reusable part of a role, separate from the task."
+---
+
+A role catalog is a set of agent roles declared before any task exists. Each carries standards, a tool grant, a model default, and a budget ceiling. Tasks route to roles rather than defining agents at call time.
+
+Swarm 357 has 357 of them across six business layers plus ten management meta-agents. People assume that number is a marketing decision. It is the result of a decomposition exercise, and this is how it went.
+
+## The decomposition
+
+Start with the functions a small company actually performs, then keep splitting until a role has one recognisable output.
+
+| Layer | Roles | The test a role has to pass |
+|-------|-------|-----------------------------|
+| Sales | 62 | Produces one artifact a salesperson would recognise |
+| Support | 55 | Produces one artifact a support lead would recognise |
+| Marketing | 68 | Produces one artifact a marketer would recognise |
+| SEO | 47 | Produces one artifact an SEO would recognise |
+| Research | 58 | Produces one artifact an analyst would recognise |
+| Operations | 57 | Produces one artifact an ops lead would recognise |
+| Management | 10 | Routes, plans, or reviews the layers above |
+
+"One recognisable output" is the whole discipline. If you cannot name the deliverable, it is not a role, it is a mood. A role that produces "insights" gets deleted. A role that produces "a competitor pricing table with sources" stays.
+
+The counts are uneven because the work is uneven. Marketing splits further than SEO. That asymmetry is a feature; forcing every layer to the same count would be tidying the map instead of the territory.
+
+## Naming is free, running is not
+
+The number scares people because they read it as concurrency. It is not.
+
+Naming a role costs a YAML entry and a soul template. Running one costs money. The runtime defaults to one agent per selected role, under a hard agent cap, with full fan-out behind `full_fanout` or `SWARM_UNSAFE_FULL_FANOUT`. A typical task touches a handful of roles.
+
+Keeping those two facts separate is what lets the catalog be granular. If naming a role had a runtime cost, you would be forced into coarse roles, and coarse roles route badly. More on that in [multi-agent orchestration without the headcount fantasy](/blog/multi-agent-orchestration-without-headcount-fantasy).
+
+## What a role is made of
+
+Four things, and only one of them is a prompt.
+
+```python
+AgentConfig(
+    name="research-market-001",
+    layer=LayerType.RESEARCH,
+    role="market_researcher",
+    soul="templates/soul/research/market-analyst.md",
+    tools=["WebSearch", "Read", "Write"],
+    model="sonnet",
+    budget_limit_usd=1.00,
+)
+```
+
+**The soul template** holds how the role works: standards, output shape, what it refuses, what it asks before starting. It lives in markdown under `templates/soul/`, organised by layer, and it is the reusable part.
+
+**The tool grant** is the security boundary. A role that cannot reach the network cannot exfiltrate, regardless of what any prompt tells it. Capability enforced by absence beats capability restrained by instruction.
+
+**The model default** sets the cost and quality floor for the role, not for the run.
+
+**The budget ceiling** bounds one worker so an experimental role cannot eat a layer.
+
+## Three mistakes that make a catalog useless
+
+**Roles without deliverables.** The "insights" problem. Every vague role becomes a dumping ground, routing gets ambiguous, and two roles start competing for the same task. Delete anything you cannot name the output of.
+
+**Tool grants that drift.** The failure here is social, not technical. Somebody needs one extra tool for one task, adds it to the role, and never removes it. Six months later the researcher can write outside the workspace. The defence is that the grant is a reviewable diff in one file, and that you actually review it.
+
+**A catalog nobody reads.** If the roster is not the onboarding document, it becomes stale configuration. The [roster overview](/docs/roster/overview) is published for exactly this reason: a catalog you can browse is a catalog people correct.
+
+## The management layer is small on purpose
+
+Ten meta-agents against 347 workers. That ratio is deliberate.
+
+Management roles route, plan, and review. They do not do the work, and every management role you add is a coordination step you pay for on every run. Coordination is the cost of orchestration, not the benefit, and it grows faster than the value it adds.
+
+If you build your own catalog, keep this layer thin. The temptation to add a supervisor for the supervisors is real and it is always wrong.
+
+## When to build your own instead
+
+The 357-role catalog is an opinion about how business work decomposes. If your work decomposes differently, do not fight it. The structure transfers even when the roles do not:
+
+- One recognisable deliverable per role
+- Tool grant declared with the role, not at the call site
+- Budget ceiling per role, and a separate budget per layer
+- Standards in a template, so improving the role improves every future run
+- A thin management layer
+
+And skip the catalog entirely if your tasks are all bespoke. Declaring roles pays off through reuse. Without reuse it is configuration you maintain for nothing. See [CrewAI, AutoGen, and role ontologies](/blog/crewai-autogen-vs-role-ontology) for that tradeoff in detail.
+
+## Browse the catalog
+
+```bash
+pip install techtide-swarm
+swarm init
+swarm demo
+```
+
+`swarm init` installs the bundled compact roster plus the Support soul templates, so you can read a real one rather than a description of one. Then see the [roster overview](/docs/roster/overview), the [management layer](/docs/roster/management), and [roster YAML](/docs/configuration/roster-yaml) for the config format.

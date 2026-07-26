@@ -1,18 +1,98 @@
 ---
 title: "How to actually evaluate an agent swarm"
-description: "Separate single-agent and swarm metrics with budget caps."
-date: "2026-07-08"
+description: "Single-agent and swarm metrics measure different systems and must be reported separately. A working eval methodology with budget caps, baselines in version control, and the numbers that lie."
+date: "2026-04-28"
+updated: "2026-07-26"
 slug: "how-to-evaluate-an-agent-swarm"
+cover: "/art/blog/eval-traces.jpg"
+coverAlt: "Streams of gold light traced across a dark reflective plane, run telemetry made visible"
+author: "Alex Cinovoj"
+keyword: "agent swarm evaluation"
+tags: ["Evals", "Operations", "Cost control"]
+faq:
+  - question: "Why report single-agent and swarm metrics separately?"
+    answer: "They measure different systems. A single-agent score tests the prompt, tools, and model. A swarm score tests routing, handoffs, and budget behaviour. Averaging them hides which half regressed."
+  - question: "What should an agent eval measure besides task success?"
+    answer: "Cost per task, tokens per task, wall-clock latency, and the rate at which runs hit budget or agent caps. Success rate alone rewards a system that succeeds expensively."
+  - question: "How do I stop eval numbers from drifting out of date?"
+    answer: "Store the baseline as a committed JSON artifact and render every published number from that file. If the file has not changed, the claim on the website has not changed either."
 ---
 
-Separate single-agent and swarm metrics with budget caps.
+Evaluating an agent swarm means measuring two systems, not one. A single-agent eval tests a prompt, its tools, and the model behind it. A swarm eval tests routing, handoffs, budget behaviour, and whether the coordination overhead bought anything. Report them together as one average and you have built a number that cannot tell you what broke.
 
-Swarm 357 ships open-core orchestration with honest maturity labels. Read the [documentation](/docs) for installation, API reference, and eval methodology.
+I write this down because I got it wrong first. I had a suite that mixed both and reported a single success rate. It went from 82 percent to 74 percent one week. I spent two days on prompts before finding the real cause, which was a routing change sending a task class to the wrong layer. The prompts were fine. The average had hidden that.
 
-## Key takeaways
+## Split the report
 
-- Operators own API keys, budgets, and side-effect approvals
-- Security defaults: Bash gate, filesystem confinement, HITL in production
-- Eval baselines report single-agent and swarm metrics separately
+`swarm eval` reports single-agent and swarm results separately, and that separation is the most useful thing about it.
 
-[Get started](/docs/getting-started/quickstart) or view [latest eval baseline](/docs/evals/latest-baseline).
+| Dimension | Single-agent eval | Swarm eval |
+|-----------|-------------------|------------|
+| What it tests | Prompt, tools, model, soul template | Routing, layer selection, handoff, budget |
+| Typical failure | Wrong answer, malformed tool call | Right roles, wrong order; budget exhausted mid-run |
+| Fix lives in | The soul template or tool grant | The roster config or routing rules |
+| Runs in | Seconds | Minutes |
+| Cost | Low | Meaningful, cap it |
+
+When single-agent scores hold and swarm scores drop, the problem is coordination. When single-agent scores drop, no amount of routing work will save you. That diagnostic is the entire return on keeping them apart.
+
+## Measure four things, not one
+
+Success rate on its own rewards a system that succeeds expensively and slowly.
+
+**Task success.** Did the output meet the criterion. Define the criterion before the run, in the task file, not after you have read the output.
+
+**Cost per task.** Dollars, from the same ledger the runtime uses to enforce budgets. Not an estimate computed separately, or you are grading your own estimator.
+
+**Tokens per task.** Correlates with cost but drifts from it as model prices change, so keep both. Token counts let you compare a run from March against a run from July.
+
+**Cap-hit rate.** How often runs hit the budget ceiling or the agent cap. A rising cap-hit rate means your tasks are outgrowing their budgets, and it shows up here before it shows up as a quality regression.
+
+## Cap the eval itself
+
+An eval suite is a fan-out. It will happily spend real money proving that your fan-out controls work.
+
+Every eval run goes through the same reserve-and-commit budget ledger as production, with the same per-agent `budget_limit_usd` and per-layer caps. Two practices on top of that:
+
+- Iterate against cheap tool-capable models through OpenRouter, and reserve premium models for the baseline runs you intend to publish. Free models tend to fail tool calling, which produces failures that are about the model rather than your system.
+- Keep the suite small enough to run often. A 500-task suite nobody runs is worth less than a 40-task suite that runs on every change.
+
+## Baselines belong in version control
+
+The rule I hold to: no published number without a committed artifact behind it.
+
+Baselines live in `evals/baselines/latest.json` in the core repo, and published assets are rendered from that file rather than typed by hand. That gives you three properties.
+
+**Numbers cannot drift silently.** If the site claims a figure, the file says the same figure, because the file generated it.
+
+**Regressions are diffable.** A baseline change is a pull request with a visible delta, reviewed like code.
+
+**Claims have a date.** Every number carries the run that produced it, so nobody has to guess whether a figure is from March or from a demo two years ago.
+
+The [latest baseline](/docs/evals/latest-baseline) page is that render. [Reproducing](/docs/evals/reproducing) has the steps to run it yourself, which is the only real check on anyone's eval numbers, including mine.
+
+## Numbers I do not trust, including my own
+
+**Any success rate without a task catalog.** If I cannot see the tasks, the number tells me the vendor chose the tasks well. The [task catalog](/docs/evals/task-catalog) exists so you can judge the difficulty yourself.
+
+**Comparisons across different task sets.** Framework A at 91 percent and framework B at 84 percent on different suites is not a comparison, it is two facts placed near each other.
+
+**Anything without cost attached.** A system that hits 95 percent at ten dollars a task is not better than one that hits 88 percent at forty cents, unless your task is worth more than ten dollars.
+
+**Single-run results.** Model outputs vary. One run is an anecdote. Report the spread or say you did not measure it.
+
+## When formal evals are not worth it
+
+- **Fewer than ten recurring tasks.** Read the output. You will learn more, faster.
+- **The criterion is subjective.** If you cannot write down what success means, an eval harness will measure something adjacent to what you care about and give you false confidence.
+- **The system is changing daily.** Baselines are for detecting regression against a stable target. Against a moving one they generate noise and you will start ignoring them, which is worse than not having them.
+
+## Run it
+
+```bash
+pip install techtide-swarm
+swarm init
+swarm eval
+```
+
+`swarm eval` is Beta, tracked on the [status page](/docs/resources/status) along with everything else. Read [methodology](/docs/evals/methodology) for how tasks are scored, [task catalog](/docs/evals/task-catalog) for what is in the suite, and [cost control for LLM agent fleets](/blog/cost-control-for-llm-agent-fleets) for the budget primitives the eval harness reuses.

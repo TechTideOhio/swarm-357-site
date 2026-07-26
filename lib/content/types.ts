@@ -11,13 +11,27 @@ export interface DocFrontmatter {
   draft?: boolean;
 }
 
+export interface BlogFaqEntry {
+  question: string;
+  answer: string;
+}
+
 export interface BlogFrontmatter {
   title: string;
   description: string;
   date: string;
   slug: string;
-  tags?: string[];
-  draft?: boolean;
+  /** Date of the last substantive edit. Feeds schema.org dateModified. */
+  updated?: string | undefined;
+  /** Path under /public to the cover image, for example /art/blog/foo.png. */
+  cover?: string | undefined;
+  coverAlt?: string | undefined;
+  author?: string | undefined;
+  /** Search phrase this post owns. Enforced unique by scripts/check-content.ts. */
+  keyword?: string | undefined;
+  tags?: string[] | undefined;
+  faq?: BlogFaqEntry[] | undefined;
+  draft?: boolean | undefined;
 }
 
 export interface TocHeading {

@@ -1,0 +1,125 @@
+---
+title: "pip install techtide-swarm: your first run, start to finish"
+description: "Install the package, run the simulated demo with no API key, then make one live call on a cheap model. A first-run walkthrough with the four errors people actually hit."
+date: "2026-01-27"
+updated: "2026-07-26"
+slug: "pip-install-techtide-swarm-first-run"
+cover: "/art/blog/first-run-install.jpg"
+coverAlt: "Black monolith showing a glowing gold command prompt, standing on a lattice of light"
+author: "Alex Cinovoj"
+keyword: "pip install techtide-swarm"
+tags: ["Getting started", "Install", "CLI"]
+faq:
+  - question: "Can I try Swarm 357 without an API key?"
+    answer: "Yes. swarm demo runs explicit simulation with no key and no spend. Simulation is opt-in rather than a silent fallback, so a stubbed run is never mistaken for a live one."
+  - question: "Which Python version does techtide-swarm need?"
+    answer: "Python 3.10 or newer. CI runs 3.10 through 3.13."
+  - question: "Why does my run fail with no API key instead of returning a result?"
+    answer: "That is intentional. Without a key the runtime refuses rather than inventing output. Set SWARM_SIMULATE or SWARM_ALLOW_STUB to run keyless on purpose."
+---
+
+The fastest honest path from nothing to a working agent run is three commands, and the second one costs nothing.
+
+```bash
+pip install techtide-swarm
+swarm init
+swarm demo
+```
+
+`swarm demo` runs explicit simulation. No API key, no spend, real routing. You see the shape of the system before you decide whether to pay for it. That ordering is deliberate, and it is how I would want to evaluate somebody else's agent framework.
+
+## What the three commands do
+
+**`pip install techtide-swarm`** pulls the package from [PyPI](https://pypi.org/project/techtide-swarm/). Python 3.10 or newer; CI covers 3.10 through 3.13. Use a virtual environment, because agent frameworks pull a lot of transitive dependencies and you will want to throw the environment away at some point.
+
+```bash
+python -m venv .venv
+source .venv/bin/activate      # Windows: .venv\Scripts\activate
+pip install techtide-swarm
+```
+
+**`swarm init`** writes the bundled compact roster config and the Support soul templates into your project, then creates the `.swarm/` runtime directory.
+
+```
+.swarm/
+├── MEMORY.md          # pointer index the agent reads first
+├── topics/            # flat-file knowledge
+├── checkpoints/       # durable run state
+└── traces.jsonl       # structured events
+```
+
+Open `MEMORY.md` and the roster YAML before you go further. Two minutes there saves an hour later, because most confusion about agent frameworks is confusion about where configuration lives.
+
+**`swarm demo`** runs a simulated task end to end. Watch the routing: which layer picked it up, which roles were selected, what the handoff looked like. That is the part you are actually evaluating.
+
+## Then one live call, cheaply
+
+When you are ready to spend money, spend a little.
+
+```bash
+export ANTHROPIC_API_KEY=sk-ant-...
+swarm run "Summarise the three biggest risks in this repository README"
+```
+
+If you would rather not point at Anthropic directly while you are experimenting, route through OpenRouter with a cheap tool-capable model.
+
+```bash
+export ANTHROPIC_BASE_URL=https://openrouter.ai/api
+export OPENROUTER_API_KEY=sk-or-...
+```
+
+One caveat worth more than it sounds: free models routinely fail tool calling. They emit text shaped like a tool call and never invoke anything, and you will spend an evening debugging your orchestration for a model problem. Pay the fraction of a cent.
+
+Keep keys in a gitignored `.env.local`. Never paste one into a chat, an issue, or a commit.
+
+## The four errors people actually hit
+
+**"No API key" instead of a result.** This is correct behaviour, not a bug. An early build of this project returned plausible output with no key, and that is the worst failure mode in the category, because everything looks like it works while nothing is real. Now a keyless run refuses unless you set `SWARM_SIMULATE` or `SWARM_ALLOW_STUB`. If you want a keyless run, ask for one.
+
+**`swarm: command not found`.** The console script landed somewhere not on `PATH`, usually because the install went to a user site directory outside the virtual environment. `python -m techtide_swarm --help` confirms the package is importable, then fix the environment rather than the invocation.
+
+**Config not found on a wheel install.** `swarm boot` and `swarm run` resolve the bundled config from the wheel. If you moved or renamed the config after `swarm init`, pass the path explicitly rather than relying on discovery.
+
+**Bash tool refuses to run.** Also correct. Server and production modes deny Bash unless `SWARM_ALLOW_BASH=1`, and the deny keys off server mode set by the runtime rather than off a variable you have to remember. Locally, Bash runs through the policy gate. See [why your agent needs a bash policy gate](/blog/why-your-agent-needs-a-bash-policy-gate).
+
+## Your first real agent
+
+Once the demo makes sense, define a single agent rather than a whole layer. One agent, one job, one budget.
+
+```python
+from techtide_swarm import Agent, AgentConfig, LayerType
+
+config = AgentConfig(
+    name="research-market-001",
+    layer=LayerType.RESEARCH,
+    role="market_researcher",
+    soul="templates/soul/research/market-analyst.md",
+    tools=["WebSearch", "Read", "Write"],
+    model="sonnet",
+    budget_limit_usd=1.00,
+)
+
+agent = Agent(config)
+result = await agent.run("Compare two competing onboarding flows and name the tradeoffs")
+```
+
+`budget_limit_usd` is not decoration. It is enforced by a reserve-and-commit ledger before the call, not reconciled afterwards. Set it low for your first live run.
+
+## What to check after the run
+
+```bash
+swarm cost        # layer spend breakdown
+swarm inspect     # run state, and anything waiting on approval
+```
+
+`.swarm/traces.jsonl` carries structured events, including a `model_downgrade` marker if a layer crossed 80 percent of its budget and dropped to a cheaper model. When output quality changes partway through a long run, that file has the answer.
+
+## When not to install this
+
+- **You need one prompt answered.** Call the model API. Orchestration is overhead you will not recover.
+- **You cannot bring your own key.** This is open-core, and it assumes your Anthropic or OpenRouter account and your hosting.
+- **You need a hosted multi-tenant control plane.** Not implemented, and listed as such on the [status page](/docs/resources/status).
+
+## Next steps
+
+[Installation](/docs/getting-started/installation) has the full environment matrix, [quickstart](/docs/getting-started/quickstart) walks the same path with more detail, [your first run](/docs/getting-started/first-run) covers reading the output, and [core concepts](/docs/getting-started/core-concepts) gives you the vocabulary. When you are ready to think about architecture rather than commands, start with [multi-agent orchestration without the headcount fantasy](/blog/multi-agent-orchestration-without-headcount-fantasy).
