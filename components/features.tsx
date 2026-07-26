@@ -1,5 +1,10 @@
+// file: components/features.tsx
+// description: Feature cards with hero-style interactive art panels on hover
+// reference: components/interactive-art-panel.tsx, lib/config.ts
+
 "use client";
 
+import { InteractiveArtPanel } from "@/components/interactive-art-panel";
 import { featuresConfig } from "@/lib/config";
 import { easeOut } from "@/lib/motion";
 import { ChevronRightIcon } from "lucide-react";
@@ -11,6 +16,8 @@ interface Feature {
   number: string;
   title: string;
   description: string;
+  image: string;
+  image_label: string;
 }
 
 const features: Feature[] = [
@@ -19,18 +26,24 @@ const features: Feature[] = [
     title: "Layered orchestration",
     description:
       "Six business layers -- Sales, Support, Marketing, SEO, Research, Operations -- plus Management meta-agents. Pre-defined roles, not blank-slate prompts.",
+    image: "/art/hero/layer-health.png",
+    image_label: "Layer health",
   },
   {
     number: "02",
     title: "Durable .mv2 memory",
     description:
       "Flat-file topics ship Stable by default. Optional Memvid bridge (Beta) adds portable .mv2 capsules with WAL crash safety, search, and verify. No database server required.",
+    image: "/art/hero/memvid-recall.png",
+    image_label: "Memvid recall",
   },
   {
     number: "03",
     title: "Honest cost surfaces",
     description:
       "Per-agent budget caps enforced at runtime, per-layer cost controllers, and a swarm cost CLI. Know what you spend before production reviewers ask.",
+    image: "/art/hero/budget-caps.png",
+    image_label: "Budget caps",
   },
 ];
 
@@ -43,7 +56,7 @@ function FeatureCard({
 }): ReactNode {
   return (
     <motion.div
-      className="bg-muted grid grid-cols-1 gap-2 overflow-hidden rounded-2xl border border-neutral-200/10 p-2 shadow-2xl/20 transition-colors duration-300 ease-out hover:bg-muted/80 md:grid-cols-2"
+      className="group bg-muted grid grid-cols-1 gap-2 overflow-hidden rounded-2xl border border-neutral-200/10 p-2 shadow-2xl/20 transition-colors duration-300 ease-out hover:bg-muted/80 md:grid-cols-2"
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.5 }}
@@ -53,8 +66,8 @@ function FeatureCard({
         ease: easeOut,
       }}
     >
-      <div className="px-4 py-28">
-        <span className="text-muted-foreground bg-foreground/5 mb-4 block w-fit rounded-[3.5px] px-2 py-1 text-sm font-medium tracking-tight transition-colors duration-300 ease-out">
+      <div className="px-4 py-16 md:py-28">
+        <span className="text-muted-foreground bg-foreground/5 mb-4 block w-fit rounded-[3.5px] px-2 py-1 text-sm font-medium tracking-tight transition-colors duration-300 ease-out group-hover:bg-foreground/10">
           {feature.number}
         </span>
         <h3 className="mb-4 text-2xl font-medium tracking-tight md:text-3xl">
@@ -64,6 +77,12 @@ function FeatureCard({
           {feature.description}
         </p>
       </div>
+
+      <InteractiveArtPanel
+        image={feature.image}
+        label={feature.image_label}
+        className="order-first md:order-none"
+      />
     </motion.div>
   );
 }
