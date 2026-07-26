@@ -135,12 +135,16 @@ export function TryItLive(): ReactNode {
       </h2>
       <p className="text-muted-foreground mb-6 text-center text-base">
         Type a business task and watch a simulated route through the swarm. Demo
-        writes go through a same-origin BFF — the write key stays server-side, never
+        writes go through a same-origin BFF. The write key stays server-side, never
         in the browser bundle.
       </p>
 
       <form onSubmit={handleSubmit} className="mb-6 flex gap-3">
+        <label htmlFor="try-it-live-task" className="sr-only">
+          Business task
+        </label>
         <input
+          id="try-it-live-task"
           type="text"
           value={task}
           onChange={(e) => setTask(e.target.value)}
@@ -163,6 +167,8 @@ export function TryItLive(): ReactNode {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: easeOut }}
+          aria-live="polite"
+          aria-atomic="true"
         >
           <p className="text-muted-foreground mb-3 text-xs font-medium tracking-wider uppercase">
             Agent pipeline

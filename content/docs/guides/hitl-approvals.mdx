@@ -1,0 +1,18 @@
+---
+title: "Human-in-the-loop approvals"
+description: "Approve or reject Bash commands before execution."
+section: "Guides"
+order: "7"
+slug: "guides/hitl-approvals"
+---
+
+When `SWARM_HITL_BASH=1`, Bash tool calls create an `ApprovalRecord` and block until resolved.
+
+```bash
+swarm approve <approval_id>
+swarm reject <approval_id> --reason "Not allowed"
+```
+
+HTTP: `POST /api/swarm/approvals/{id}/approve` and `/reject`.
+
+Timeout defaults to 300s (`SWARM_HITL_TIMEOUT_SEC`).

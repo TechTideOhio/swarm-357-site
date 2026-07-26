@@ -1,0 +1,31 @@
+---
+title: "Running a task"
+description: "Execute tasks via CLI and HTTP API with budgets and layer selection."
+section: "Guides"
+order: "1"
+slug: "guides/running-a-task"
+---
+
+Use `swarm run` or `POST /api/swarm/run` to execute work.
+
+```bash
+swarm run "Research competitor pricing" --layer research --budget 10
+```
+
+## Options
+
+| Flag | Default | Description |
+|------|---------|-------------|
+| `--layer` | auto | Target business layer |
+| `--budget` | 25.0 | Max USD for the run |
+| `--simulate` | off | Stub execution without API |
+| `--full-fanout` | off | All role clones (dangerous) |
+
+## HTTP
+
+```bash
+curl -X POST http://localhost:8000/api/swarm/run \
+  -H "X-SWARM-API-KEY: $SWARM_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"task":"Hello","budget_usd":5,"simulate":true}'
+```

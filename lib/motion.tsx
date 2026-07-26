@@ -100,7 +100,7 @@ export const defaultTransition = {
 
 export const springTransition = spring;
 
-/** Footer whileInView preset — use as spread on motion.* elements. */
+/** Footer whileInView preset. Use as spread on motion.* elements. */
 export const fadeInUpView = {
   initial: { opacity: 0, y: 30 },
   whileInView: { opacity: 1, y: 0 },

@@ -1,0 +1,15 @@
+---
+title: "Swarm"
+description: "Full swarm orchestration from YAML config."
+section: "Python SDK"
+order: "3"
+slug: "sdk/swarm"
+---
+
+```python
+from techtide_swarm import Swarm
+
+swarm = Swarm.from_config("config/swarm-compact.yaml")
+await swarm.boot()
+result = await swarm.execute("Research Q2 trends", budget_usd=25)
+```

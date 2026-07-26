@@ -212,7 +212,7 @@ export function AgentRoster(): ReactNode {
                         Model
                       </span>
                     </div>
-                    <ul className="max-h-80 overflow-y-auto overscroll-contain">
+                    <ul className="scrollbar-fluid max-h-80 overflow-y-auto overscroll-contain">
                       {visible.map((agent) => (
                         <AgentRow key={agent.name} agent={agent} />
                       ))}

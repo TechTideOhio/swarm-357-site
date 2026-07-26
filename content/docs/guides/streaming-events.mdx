@@ -1,0 +1,16 @@
+---
+title: "Streaming events"
+description: "SSE event types, auth, and stream.end semantics."
+section: "Guides"
+order: "10"
+slug: "guides/streaming-events"
+---
+
+```bash
+curl -N -H "X-SWARM-API-KEY: $SWARM_API_KEY" \
+  http://localhost:8000/api/swarm/runs/<run_id>/events
+```
+
+Event types: `run.started`, `step.completed`, `approval.required`, `cost.update`, `stream.end`.
+
+Auth required when `SWARM_API_KEY` is set.

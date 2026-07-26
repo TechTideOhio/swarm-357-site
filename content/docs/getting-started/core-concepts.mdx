@@ -1,0 +1,41 @@
+---
+title: "Core concepts"
+description: "Layers, roles, souls, checkpoints, memory, and cost control fundamentals."
+section: "Getting started"
+order: "5"
+slug: "getting-started/core-concepts"
+---
+
+## 357 roles, not 357 sessions
+
+The roster defines **357 distinct agent identities**. The Conductor routes work to the right layer and role. Default execution does not spawn 357 parallel LLM calls.
+
+## Layers
+
+| Layer | Agents | Purpose |
+|-------|-------:|---------|
+| Management | 10 | Conductor, memory curator, cost controller, QA |
+| Sales | 62 | CRM, outreach, SDR, deal closing |
+| Support | 55 | Tier 1/2, KB, escalation |
+| Marketing | 68 | Content, social, campaigns |
+| SEO | 47 | Keywords, technical SEO, links |
+| Research | 58 | Market, competitor, product research |
+| Operations | 57 | Projects, finance, infra, automation |
+
+## SOUL templates
+
+Each role has a markdown SOUL file with mission, workflows, and output schemas. See [Roster overview](/docs/roster/overview).
+
+## Memory
+
+1. `.swarm/MEMORY.md` pointer index
+2. `.swarm/topics/` flat JSON entries
+3. Optional Memvid `.mv2` per layer via the Rust bridge
+
+## Cost control
+
+`CostController` tracks layer spend. At 80% of a layer budget, the runtime may downgrade to Haiku and logs `model_downgrade` telemetry.
+
+## Checkpoints
+
+`RunState` is persisted to SQLite (`.swarm/checkpoints.db`) for inspect, resume, replay, and fork.

@@ -1,0 +1,13 @@
+{
+  "total_agents": 357,
+  "layers": {
+    "management": 10,
+    "sales": 62,
+    "support": 55,
+    "marketing": 68,
+    "seo": 47,
+    "research": 58,
+    "operations": 57
+  },
+  "version": "0.2.2"
+}

@@ -129,7 +129,7 @@ export function getRuns(limit = 10): Promise<RunsResponse> {
   return apiFetch<RunsResponse>(`/api/swarm/runs?limit=${limit}`);
 }
 
-/** Public health JSON — safe to link from the landing page. */
+/** Public health JSON. Safe to link from the landing page. */
 export function getHealth(): Promise<{
   status: string;
   version: string;
@@ -141,7 +141,7 @@ export function getHealth(): Promise<{
 
 /**
  * Runs the swarm pipeline via same-origin BFF (`/api/swarm/run`).
- * The browser never sees SWARM_API_KEY — only the Next.js route holds it.
+ * The browser never sees SWARM_API_KEY. Only the Next.js route holds it.
  */
 export async function postRun(
   task: string,

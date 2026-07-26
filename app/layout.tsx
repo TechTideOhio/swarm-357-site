@@ -4,6 +4,7 @@ import { Providers } from "@/components/providers";
 import { SkipToContent } from "@/components/skip-to-content";
 import { ThemeSwitch } from "@/components/theme-switch";
 import { baseMetadata } from "@/lib/metadata";
+import { SITE_URL } from "@/lib/site-url";
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import type { ReactNode } from "react";
@@ -33,6 +34,26 @@ export const viewport: Viewport = {
   maximumScale: 5,
 };
 
+const organization_json_ld = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "TechTide AI",
+  url: SITE_URL,
+  logo: `${SITE_URL}/icon-512.png`,
+};
+
+const website_json_ld = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "Swarm 357",
+  url: SITE_URL,
+  potentialAction: {
+    "@type": "SearchAction",
+    target: `${SITE_URL}/docs?q={search_term_string}`,
+    "query-input": "required name=search_term_string",
+  },
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -40,8 +61,18 @@ export default function RootLayout({
 }>): ReactNode {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organization_json_ld) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(website_json_ld) }}
+        />
+      </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} relative min-h-screen bg-background font-sans text-foreground antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} bg-background text-foreground relative min-h-screen font-sans antialiased`}
       >
         <Providers>
           <SkipToContent />

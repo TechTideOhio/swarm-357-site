@@ -1,0 +1,14 @@
+---
+title: "Reproducing evals"
+description: "Commands to run and compare eval baselines."
+section: "Evals"
+order: "4"
+slug: "evals/reproducing"
+---
+
+```bash
+pip install -e "packages/techtide-swarm[dev]"
+export OPENROUTER_API_KEY=...
+export SWARM_EVAL_BUDGET_USD=5.0
+swarm eval --save-baseline --compare
+```

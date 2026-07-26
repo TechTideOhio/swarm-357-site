@@ -1,0 +1,17 @@
+---
+title: "Flat-file memory"
+description: "Share and recall knowledge via .swarm/topics/."
+section: "Guides"
+order: "4"
+slug: "guides/flat-file-memory"
+---
+
+```python
+from techtide_swarm import MemoryManager
+
+mem = MemoryManager()
+mem.share(from_agent="a", to_agent="b", key="lead/acme", content="Notes...")
+hits = mem.recall(agent_name="b", query="acme")
+```
+
+Topics are JSON files under `.swarm/topics/`. `.swarm/MEMORY.md` is the pointer index.

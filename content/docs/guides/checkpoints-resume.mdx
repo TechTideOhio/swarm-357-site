@@ -1,0 +1,16 @@
+---
+title: "Checkpoints and resume"
+description: "Durable RunState in SQLite for inspect and resume."
+section: "Guides"
+order: "8"
+slug: "guides/checkpoints-resume"
+---
+
+Checkpoints store full `RunState` JSON in `.swarm/checkpoints.db`.
+
+```bash
+swarm inspect <run_id>
+swarm resume <run_id>
+```
+
+`cancel_requested` persists across processes.

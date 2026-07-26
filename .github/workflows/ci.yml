@@ -23,6 +23,12 @@ jobs:
         run: bun install --frozen-lockfile || bun install
       - name: Typecheck
         run: bun run typecheck
+      - name: Content guard
+        run: bun run check:content
+      - name: Link verification
+        run: bun run verify:links
+      - name: Lint
+        run: bun run lint
       - name: Build
         run: bun run build
         env:

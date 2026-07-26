@@ -1,0 +1,54 @@
+---
+title: "Quickstart"
+description: "Install techtide-swarm and run your first swarm task in five minutes."
+section: "Getting started"
+order: "2"
+slug: "getting-started/quickstart"
+---
+
+## Prerequisites
+
+- Python 3.10+
+- An Anthropic API key or OpenRouter key with tool-capable models
+
+## Install
+
+```bash
+pip install techtide-swarm==0.2.2
+```
+
+## Initialize a project
+
+```bash
+swarm init
+```
+
+This creates `.swarm/` with memory index, topics directory, and installs the bundled compact roster.
+
+## Run a demo
+
+```bash
+swarm demo
+```
+
+Runs a 60-second simulation without API keys.
+
+## Run a real task
+
+```bash
+export ANTHROPIC_API_KEY=sk-ant-...
+swarm run "Summarize our Q2 pipeline risks" --layer research --budget 5
+```
+
+## Start the HTTP API
+
+```bash
+export SWARM_API_KEY=your-secret
+swarm serve --port 8000
+```
+
+Visit `http://localhost:8000/docs` for the interactive OpenAPI UI.
+
+## Try it live
+
+Use the [live demo](https://swarm357fe.up.railway.app/#try-it-live) on the landing page (simulated runs via same-origin BFF).

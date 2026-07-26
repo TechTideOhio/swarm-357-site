@@ -1,38 +1,13 @@
 "use client";
 
 import { faqConfig } from "@/lib/config";
+import { landing_faqs } from "@/lib/faq-data";
 import { easeOut } from "@/lib/motion";
 import { ChevronDown, ChevronRightIcon } from "lucide-react";
 import { AnimatePresence, motion, useInView } from "motion/react";
 import { useRef, useState, type ReactNode } from "react";
 
-const faqs = [
-  {
-    question: "Do I need all 357 agents running at once?",
-    answer:
-      "No. The 357 roles are a template catalog. You boot only the layers and agents your task needs. A typical swarm run uses 3-8 agents across 2-3 layers. Budget caps prevent runaway costs.",
-  },
-  {
-    question: "What happens if the Memvid bridge is not installed?",
-    answer:
-      "MemoryManager gracefully falls back to flat .swarm/topics/ JSON files. The bridge is optional. Install it when you want portable, searchable .mv2 memory with integrity verification.",
-  },
-  {
-    question: "Does this work without an Anthropic API key?",
-    answer:
-      "Yes. The CLI runs in simulation mode without a key. swarm demo shows the full architecture and pipeline with stub outputs. For live runs set ANTHROPIC_API_KEY, or use OpenRouter via OPENROUTER_API_KEY and ANTHROPIC_BASE_URL.",
-  },
-  {
-    question: "How does the security gate work?",
-    answer:
-      "BashSecurityGate validates every shell command against 13 pattern rules before execution. It blocks destructive operations, secret exfiltration, elevated commands, and remote code injection. Every rule has a corresponding test.",
-  },
-  {
-    question: "Can I use models other than Claude?",
-    answer:
-      "Short names (opus, sonnet, haiku) resolve to Claude model IDs. Live calls go through the Anthropic Messages API shape — directly with ANTHROPIC_API_KEY, or via OpenRouter (OPENROUTER_API_KEY + ANTHROPIC_BASE_URL). Cheap OpenRouter remaps are opt-in only (SWARM_OPENROUTER_CHEAP=1).",
-  },
-];
+const faqs = landing_faqs;
 
 function FAQItem({
   faq,
@@ -54,8 +29,11 @@ function FAQItem({
       transition={{ duration: 0.8, delay: index * 0.05, ease: easeOut }}
     >
       <button
+        type="button"
         onClick={onToggle}
-        className="group flex w-full items-center justify-between py-6 text-left"
+        aria-expanded={isOpen}
+        aria-controls={`faq-panel-${index}`}
+        className="group focus-ring flex w-full items-center justify-between py-6 text-left"
       >
         <span className="text-foreground text-lg font-medium pr-8 md:text-xl">
           {faq.question}
@@ -71,6 +49,7 @@ function FAQItem({
       <AnimatePresence initial={false}>
         {isOpen && (
           <motion.div
+            id={`faq-panel-${index}`}
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}

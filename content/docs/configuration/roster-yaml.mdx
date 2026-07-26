@@ -1,0 +1,19 @@
+---
+title: "Roster YAML"
+description: "Compact roster format and layer role definitions."
+section: "Configuration"
+order: "1"
+slug: "configuration/roster-yaml"
+---
+
+`config/swarm-compact.yaml` defines roles with `count`, expanded at runtime.
+
+```yaml
+layers:
+  sales:
+    roles:
+      outreach_specialist: { count: 15, model: sonnet, budget_usd: 1.0, tools: [WebSearch, Read, Write] }
+    soul: templates/soul/sales/outreach-specialist.md
+```
+
+Validate: `python scripts/generate_roster.py --compact --fix-counts`

@@ -30,7 +30,7 @@ const testimonials: Testimonial[] = [
   {
     title: "Security review",
     description:
-      "BashSecurityGate, HITL for Bash, budget caps, and Memvid verify give reviewers concrete controls — not a blank-slate agent sandbox.",
+      "BashSecurityGate, HITL for Bash, budget caps, and Memvid verify give reviewers concrete controls, not a blank-slate agent sandbox.",
     scenario: "Use-case scenario",
     image: "/art/testimonials/security.png",
   },
@@ -44,7 +44,7 @@ const testimonials: Testimonial[] = [
   {
     title: "UltraPlan planning",
     description:
-      "Feed quarterly goals into swarm plan for a phased rollout with budget estimates — useful as a planning artifact, not a substitute for human sign-off.",
+      "Feed quarterly goals into swarm plan for a phased rollout with budget estimates. Useful as a planning artifact, not a substitute for human sign-off.",
     scenario: "Use-case scenario",
     image: "/art/testimonials/ultraplan.png",
   },
@@ -152,7 +152,7 @@ export function Testimonials() {
         <div className="relative -mx-6 md:mx-0">
           <div
             ref={scrollRef}
-            className="scrollbar-hide flex snap-x snap-mandatory gap-6 overflow-x-auto px-6 pb-4 md:px-0"
+            className="scrollbar-fluid flex snap-x snap-mandatory gap-6 overflow-x-auto px-6 pb-4 md:px-0"
             style={{ scrollPaddingInline: "1.5rem" }}
           >
             {testimonials.map((item) => (
@@ -164,7 +164,7 @@ export function Testimonials() {
                   className="relative h-40 w-full shrink-0 bg-cover bg-center md:h-48"
                   style={{ backgroundImage: `url(${item.image})` }}
                   role="img"
-                  aria-label=""
+                  aria-label={`${item.title} scenario illustration`}
                 >
                   <div className="absolute inset-0 bg-gradient-to-t from-muted via-transparent to-transparent" />
                 </div>

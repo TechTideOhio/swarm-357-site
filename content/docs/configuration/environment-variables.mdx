@@ -1,0 +1,34 @@
+---
+title: "Environment variables"
+description: "Complete environment variable reference for Swarm 357."
+section: "Configuration"
+order: "2"
+slug: "configuration/environment-variables"
+---
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| ANTHROPIC_API_KEY | - | Anthropic API key |
+| OPENROUTER_API_KEY | - | OpenRouter key (preferred when set) |
+| ANTHROPIC_BASE_URL | - | Provider base URL |
+| SWARM_API_KEY | - | HTTP write auth secret |
+| SWARM_REQUIRE_AUTH | off | Force auth in all environments |
+| SWARM_ENV | - | Set to production for fail-closed |
+| SWARM_ALLOW_BASH | off | Enable Bash tool |
+| SWARM_HITL_BASH | on in server | Bash approval gate |
+| SWARM_UNSAFE_FS | off | Disable Read/Write confinement |
+| SWARM_WORKSPACE_ROOT | CWD | Filesystem safe root |
+| SWARM_CONFIG_PATH | search order | Roster YAML path |
+| SWARM_CHECKPOINT_DIR | .swarm | Checkpoint SQLite dir |
+| SWARM_LAYER_MAX_AGENTS | 16 | Layer fan-out cap |
+| SWARM_MAX_RUN_BUDGET_USD | 500 | HTTP budget cap |
+| SWARM_RATE_LIMIT_PER_MINUTE | 120 | Per-IP rate limit |
+| SWARM_MODEL_OPUS | claude-opus-4-6 | Opus model ID |
+| SWARM_MODEL_SONNET | claude-sonnet-4-6 | Sonnet model ID |
+| SWARM_MODEL_HAIKU | claude-haiku-4-5 | Haiku model ID |
+| SWARM_OPENROUTER_CHEAP | off | Explicit Haiku remap on OpenRouter |
+| MEMVID_SWARM_BRIDGE | PATH | Memvid binary path |
+| SWARM_OTEL_EXPORT | off | OpenTelemetry export |
+| SWARM_EVAL_BUDGET_USD | 5.0 | Eval spend cap |
+| SUPABASE_URL | - | Optional persistence |
+| SUPABASE_SERVICE_KEY | - | Supabase service role |

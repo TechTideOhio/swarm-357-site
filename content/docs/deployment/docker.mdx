@@ -1,0 +1,37 @@
+---
+title: "Docker"
+description: "Container build and run for the API server."
+section: "Deployment"
+order: "1"
+slug: "deployment/docker"
+---
+
+## Build
+
+```bash
+docker build -t swarm357-api .
+```
+
+The multi-stage Dockerfile installs `techtide-swarm[supabase]`, copies `config/` and `templates/`, and runs as a non-root `swarm` user.
+
+## Run locally
+
+```bash
+docker run --rm -p 8000:8000 \
+  -e SWARM_API_KEY=dev \
+  -e SWARM_REQUIRE_AUTH=1 \
+  swarm357-api
+```
+
+## Health check
+
+The image defines a `HEALTHCHECK` against `/api/health`. Railway and other platforms should use the same probe.
+
+## Environment
+
+| Variable | Purpose |
+|----------|---------|
+| PORT | HTTP port (default 8000) |
+| SWARM_CONFIG_PATH | Roster YAML path |
+| SWARM_SERVER_MODE | Disables destructive local tools |
+| SWARM_CHECKPOINT_DIR | Writable checkpoint directory |

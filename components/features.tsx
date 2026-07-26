@@ -1,9 +1,10 @@
 "use client";
 
-import { featuresConfig, siteConfig } from "@/lib/config";
+import { featuresConfig } from "@/lib/config";
 import { easeOut } from "@/lib/motion";
 import { ChevronRightIcon } from "lucide-react";
 import { motion } from "motion/react";
+import Link from "next/link";
 import type { ReactNode } from "react";
 
 interface Feature {
@@ -23,7 +24,7 @@ const features: Feature[] = [
     number: "02",
     title: "Durable .mv2 memory",
     description:
-      "Flat-file topics ship Stable by default. Optional Memvid bridge (Beta) adds portable .mv2 capsules with WAL crash safety, search, and verify — no database server required.",
+      "Flat-file topics ship Stable by default. Optional Memvid bridge (Beta) adds portable .mv2 capsules with WAL crash safety, search, and verify. No database server required.",
   },
   {
     number: "03",
@@ -84,15 +85,15 @@ export function Features(): ReactNode {
           <p className="text-muted-foreground mb-6 max-w-sm text-base md:mb-8 md:text-lg">
             {featuresConfig.description}
           </p>
-          <a
-            href={siteConfig.social.github}
+          <Link
+            href="/docs"
             className="group bg-accent inline-flex w-full items-center justify-center gap-3 rounded-[3.5px] py-3 pr-3 pl-4 font-medium tracking-tight text-black transition-all duration-500 ease-out hover:rounded-[50px] sm:w-auto"
           >
-            <span>View on GitHub</span>
+            <span>Read the docs</span>
             <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-black transition-all duration-300 ease-out group-hover:scale-110">
               <ChevronRightIcon className="relative left-px h-4 w-4" />
             </span>
-          </a>
+          </Link>
         </motion.div>
 
         <div className="flex min-w-0 flex-1 flex-col gap-6 md:gap-32">

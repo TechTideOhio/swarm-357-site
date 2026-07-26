@@ -1,0 +1,15 @@
+---
+title: "API overview"
+description: "FastAPI HTTP surface for swarm orchestration."
+section: "API reference"
+order: "1"
+slug: "api/overview"
+---
+
+Base URL: `http://localhost:8000` (or your deployment). Interactive docs: `/docs`, schema: `/openapi.json`.
+
+## Route groups
+
+- Health and status (no auth)
+- Agents and runs (read mostly open; writes require key)
+- Approvals and execution (write key)
