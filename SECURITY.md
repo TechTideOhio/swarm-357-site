@@ -22,6 +22,10 @@ We aim to acknowledge a report within 72 hours and to share a remediation timeli
 | Response headers | Content Security Policy, `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`, and HSTS in production. |
 | Raw docs export | `/docs/raw/...` serves committed content only. Role slugs are allowlisted and resolved paths are confined to the SOUL template directory. |
 
+## Automated checks
+
+Every pull request runs typecheck, lint, unit tests, a production build, a gitleaks scan of the full git history, and CodeQL for TypeScript and GitHub Actions.
+
 ## Limitations
 
 - The demo endpoint is anonymous by design, so its protection is a spend ceiling plus rate limiting rather than identity.

@@ -1,0 +1,37 @@
+# file: .github/workflows/codeql.yml
+# description: CodeQL analysis for the site's TypeScript and GitHub Actions
+# reference: .github/workflows/ci.yml, SECURITY.md
+name: codeql
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: "41 4 * * 1"
+
+permissions:
+  contents: read
+  security-events: write
+
+concurrency:
+  group: codeql-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [javascript-typescript, actions]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: github/codeql-action/init@615d2593c6a3a11f63fddff1723e85d5553dc1f5 # v3.29.9
+        with:
+          languages: ${{ matrix.language }}
+          queries: security-extended
+      - uses: github/codeql-action/analyze@615d2593c6a3a11f63fddff1723e85d5553dc1f5 # v3.29.9
+        with:
+          category: "/language:${{ matrix.language }}"

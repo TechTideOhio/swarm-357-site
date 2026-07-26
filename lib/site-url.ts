@@ -3,7 +3,7 @@
 // reference: lib/config.ts, lib/metadata.ts
 
 export const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://swarm357fe.up.railway.app";
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://swarm357.techtideai.io";
 
 export const GITHUB_URL = "https://github.com/TechTideOhio/swarm-357";
 
