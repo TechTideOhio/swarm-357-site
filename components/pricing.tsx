@@ -58,7 +58,7 @@ const plans: Plan[] = [
 function PlanCard({ plan }: { plan: Plan }): ReactNode {
   return (
     <motion.div
-      className={`interactive-card rounded-2xl border p-6 shadow-2xl/20 md:p-8 ${
+      className={`rounded-2xl border p-6 shadow-2xl/20 md:p-8 ${
         plan.highlighted
           ? "glow-accent-subtle border-accent bg-background hover:bg-background/80"
           : "border-neutral-200/10 bg-background hover:border-accent/30 hover:bg-background/80"

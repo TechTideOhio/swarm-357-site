@@ -8,6 +8,7 @@ import { siteConfig } from "@/lib/config";
 import { github_social, header_menu_cards } from "@/lib/navigation";
 import { easeInOut, easeOut, overlayFade, overlayFadeTransition, spring, useReducedMotion } from "@/lib/motion";
 import {
+  chrome_icon_circle,
   chrome_overlay,
   chrome_primary_cta,
   chrome_secondary_cta,
@@ -103,7 +104,7 @@ function MenuCard({ card }: { card: (typeof header_menu_cards)[number] }): React
               href={github_social.href}
               target="_blank"
               rel="noopener noreferrer"
-              className={`${touch_target} bg-background/10 text-background hover:bg-background/20 focus-ring rounded-full transition-all duration-300 hover:scale-110 active:scale-105`}
+              className={`${chrome_icon_circle} bg-background/10 text-background hover:bg-background/20`}
               aria-label={github_social.ariaLabel}
             >
               <GitHubIcon className="h-5 w-5" />
@@ -319,7 +320,7 @@ export function Header(): ReactNode {
             <button
               ref={menu_button_ref}
               type="button"
-              className={`${touch_target} text-background/80 hover:text-background focus-ring cursor-pointer gap-2 rounded-[3.5px] px-3 transition-colors hover:bg-white/10 active:bg-white/15`}
+              className={`${touch_target} text-background/80 hover:text-background focus-ring cursor-pointer gap-2 rounded-[3.5px] px-3 hover:bg-white/10 active:bg-white/15`}
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               aria-expanded={isMenuOpen}
               aria-controls="site-mega-menu"
