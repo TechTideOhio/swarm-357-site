@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" role="img" aria-label="Swarm 357">
+  <rect width="180" height="180" rx="40" fill="#0a0a0a"/>
+  <g fill="none" stroke="#ffd900" stroke-width="5" stroke-linecap="round">
+    <path d="M34 52h112" opacity="0.35"/>
+    <path d="M40 72h100" opacity="0.5"/>
+    <path d="M46 92h88" opacity="0.7"/>
+    <path d="M52 112h76" opacity="0.85"/>
+    <path d="M58 132h64"/>
+  </g>
+  <g fill="#ffd900">
+    <circle cx="50" cy="52" r="6"/>
+    <circle cx="130" cy="52" r="6"/>
+    <circle cx="78" cy="92" r="6.5"/>
+    <circle cx="102" cy="92" r="6.5"/>
+    <circle cx="90" cy="112" r="8"/>
+  </g>
+  <g stroke="#ffd900" stroke-width="3.5" opacity="0.75">
+    <line x1="50" y1="52" x2="78" y2="92"/>
+    <line x1="130" y1="52" x2="102" y2="92"/>
+    <line x1="78" y1="92" x2="90" y2="112"/>
+    <line x1="102" y1="92" x2="90" y2="112"/>
+  </g>
+</svg>

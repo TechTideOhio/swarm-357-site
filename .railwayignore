@@ -1,0 +1,23 @@
+# Local ignore for `railway up`.
+# Use with: railway up --service frontend --detach --no-gitignore
+# so parent monorepo `*.png` does not drop landing assets, while this file
+# still excludes heavy/local build artifacts (especially tsconfig.tsbuildinfo,
+# which breaks Nixpacks cache mounts if uploaded as a file).
+
+node_modules
+.next
+.git
+.turbo
+coverage
+*.log
+.env
+.env.*
+!.env.example
+out
+build
+dist
+.DS_Store
+*.pem
+*.tsbuildinfo
+tsconfig.tsbuildinfo
+next-env.d.ts
