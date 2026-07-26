@@ -5,7 +5,7 @@ import { useState, type ReactNode } from "react";
 import { postRun, type AgentResult, type SwarmRunResult } from "@/lib/api";
 import { easeOut } from "@/lib/motion";
 
-type DemoState = "idle" | "running" | "done" | "error";
+type DemoState = "idle" | "running" | "done" | "error" | "auth_required";
 
 interface RunStep {
   agentName: string;
@@ -44,8 +44,8 @@ function AgentStepRow({ step }: { step: RunStep }): ReactNode {
         <div className="flex items-center gap-3">
           <StatusDot status={step.status} />
           <span className="text-sm font-medium">{step.agentName}</span>
-          <span className="text-muted-foreground text-xs">
-            {step.latencyMs}ms \u00b7 ${step.costUsd.toFixed(4)}
+          <span className="text-muted-foreground text-xs tracking-tight">
+            {`${step.latencyMs}ms · $${step.costUsd.toFixed(4)}`}
           </span>
         </div>
         <span className="text-muted-foreground text-xs">
@@ -107,7 +107,17 @@ export function TryItLive(): ReactNode {
       setTotalCost(result.total_cost_usd);
       setState("done");
     } catch (err: unknown) {
-      setErrorMsg(err instanceof Error ? err.message : "Request failed");
+      const code =
+        err instanceof Error && "code" in err
+          ? String((err as Error & { code?: string }).code ?? "")
+          : "";
+      const msg = err instanceof Error ? err.message : "Request failed";
+      if (code === "auth_required" || /auth required|401|403|503/i.test(msg)) {
+        setErrorMsg(msg);
+        setState("auth_required");
+        return;
+      }
+      setErrorMsg(msg);
       setState("error");
     }
   }
@@ -124,11 +134,9 @@ export function TryItLive(): ReactNode {
         Try it live
       </h2>
       <p className="text-muted-foreground mb-6 text-center text-base">
-        Type a business task and watch agents route and execute it. If the API has{" "}
-        <code className="text-foreground/90">SWARM_API_KEY</code> set, add{" "}
-        <code className="text-foreground/90">NEXT_PUBLIC_SWARM_WRITE_KEY</code> in the
-        Next.js env (same value) so the browser can send{" "}
-        <code className="text-foreground/90">X-SWARM-API-KEY</code>.
+        Type a business task and watch a simulated route through the swarm. Demo
+        writes go through a same-origin BFF — the write key stays server-side, never
+        in the browser bundle.
       </p>
 
       <form onSubmit={handleSubmit} className="mb-6 flex gap-3">
@@ -151,11 +159,12 @@ export function TryItLive(): ReactNode {
 
       {steps.length > 0 && (
         <motion.div
-          className="bg-muted border border-neutral-200/10 shadow-2xl/20 rounded-2xl p-4"
+          className="bg-muted rounded-2xl border border-neutral-200/10 p-4 shadow-2xl/20"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: easeOut }}
         >
-          <p className="text-muted-foreground mb-3 text-xs font-medium uppercase tracking-wider">
+          <p className="text-muted-foreground mb-3 text-xs font-medium tracking-wider uppercase">
             Agent pipeline
           </p>
           {steps.map((s, i) => (
@@ -163,7 +172,7 @@ export function TryItLive(): ReactNode {
           ))}
           {state === "running" && (
             <p className="text-muted-foreground mt-3 animate-pulse text-xs">
-              Running\u2026
+              Running{"\u2026"}
             </p>
           )}
         </motion.div>
@@ -171,12 +180,13 @@ export function TryItLive(): ReactNode {
 
       {state === "done" && finalOutput && (
         <motion.div
-          className="bg-muted border border-neutral-200/10 shadow-2xl/20 mt-4 rounded-2xl p-4"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
+          className="bg-muted mt-4 rounded-2xl border border-neutral-200/10 p-4 shadow-2xl/20"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: easeOut }}
         >
-          <p className="text-muted-foreground mb-2 text-xs font-medium uppercase tracking-wider">
-            Final output \u00b7 ${totalCost.toFixed(4)} total
+          <p className="text-muted-foreground mb-2 text-xs font-medium tracking-wider uppercase">
+            {`Final output · $${totalCost.toFixed(4)} total`}
           </p>
           <p className="text-foreground text-sm leading-relaxed">
             {finalOutput.slice(0, 1000)}
@@ -185,12 +195,29 @@ export function TryItLive(): ReactNode {
         </motion.div>
       )}
 
+      {state === "auth_required" && (
+        <motion.div
+          className="bg-muted mt-4 rounded-2xl border border-neutral-200/10 p-4 shadow-2xl/20"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: easeOut }}
+        >
+          <p className="text-foreground mb-1 text-sm font-medium">Auth required</p>
+          <p className="text-muted-foreground text-sm">
+            {errorMsg ||
+              "Set server-only SWARM_API_KEY on the site deploy (Railway). This is not a successful run."}
+          </p>
+        </motion.div>
+      )}
+
       {state === "error" && (
         <motion.div
-          className="bg-muted border border-neutral-200/10 shadow-2xl/20 mt-4 rounded-2xl p-4"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
+          className="bg-muted mt-4 rounded-2xl border border-neutral-200/10 p-4 shadow-2xl/20"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: easeOut }}
         >
+          <p className="text-foreground mb-1 text-sm font-medium">Error</p>
           <p className="text-muted-foreground text-sm">{errorMsg}</p>
         </motion.div>
       )}

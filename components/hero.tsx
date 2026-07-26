@@ -14,12 +14,31 @@ const headlineText = [
   heroConfig.headline.suffix,
 ].join(" ");
 
+const CAROUSEL_ART: Record<string, string> = {
+  "Sales plays": "/art/hero/sales-plays.png",
+  "Support macros": "/art/hero/support-macros.png",
+  "Campaign briefs": "/art/hero/campaign-briefs.png",
+  "SEO clusters": "/art/hero/seo-clusters.png",
+  "Research packs": "/art/hero/research-packs.png",
+  "Ops runbooks": "/art/hero/ops-runbooks.png",
+  "Memvid recall": "/art/hero/memvid-recall.png",
+  "Local traces": "/art/hero/opik-traces.png",
+  "Budget caps": "/art/hero/budget-caps.png",
+  "Bash policy gate": "/art/hero/bash-policy-gate.png",
+  "Layer health": "/art/hero/layer-health.png",
+  UltraPlan: "/art/hero/ultraplan.png",
+};
+
 const carouselCards: Card[] = heroConfig.carousel.map((label, index) => ({
   id: index + 1,
+  image: CAROUSEL_ART[label] ?? "/art/hero/sales-plays.png",
   content: (
-    <div className="flex h-full flex-col items-center justify-center p-4">
-      <div className="px-1 pt-3 text-center">
-        <span className="text-sm font-medium">{label}</span>
+    <div className="relative flex h-full flex-col justify-end">
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent" />
+      <div className="relative z-10 px-4 pb-5 pt-3">
+        <span className="inline-block rounded-[3.5px] bg-black/55 px-3 py-1.5 text-sm font-medium tracking-tight text-white backdrop-blur-sm">
+          {label}
+        </span>
       </div>
     </div>
   ),
@@ -137,7 +156,6 @@ export function Hero(): ReactNode {
         </motion.p>
       </div>
 
-      {/* Carousel */}
       <div
         className="relative -mx-6 mt-2 h-100 w-screen overflow-hidden sm:h-125 md:h-137.5 lg:h-150 xl:h-175"
         style={{
@@ -152,7 +170,7 @@ export function Hero(): ReactNode {
             <RotatingCards
               cards={carouselCards}
               radius={1000}
-              cardClassName="rounded-md"
+              cardClassName="rounded-md border-neutral-200/10"
               cardWidth={350}
               cardHeight={275}
               duration={100}

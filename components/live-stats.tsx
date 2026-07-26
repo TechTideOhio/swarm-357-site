@@ -2,7 +2,7 @@
 
 import { getStatus, getCost, getAgents } from "@/lib/api";
 import { apiConfig } from "@/lib/config";
-import { easeOut } from "@/lib/motion";
+import { easeOut, spring as springConfig } from "@/lib/motion";
 import { motion, useInView, useSpring, useTransform } from "motion/react";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 
@@ -24,14 +24,19 @@ function AnimatedNumber({
 }): ReactNode {
   const ref = useRef<HTMLSpanElement>(null);
   const isInView = useInView(ref, { once: true, amount: 0.5 });
-  const spring = useSpring(0, { stiffness: 50, damping: 30, restDelta: 0.001 });
-  const display = useTransform(spring, (v) =>
+  const numberSpring = useSpring(0, {
+    stiffness: springConfig.stiffness,
+    damping: springConfig.damping,
+    mass: springConfig.mass,
+    restDelta: 0.001,
+  });
+  const display = useTransform(numberSpring, (v) =>
     decimals > 0 ? v.toFixed(decimals) : Math.floor(v).toString()
   );
 
   useEffect(() => {
-    if (isInView) spring.set(value);
-  }, [isInView, spring, value]);
+    if (isInView) numberSpring.set(value);
+  }, [isInView, numberSpring, value]);
 
   useEffect(() => {
     const unsub = display.on("change", (latest) => {
@@ -131,7 +136,7 @@ export function LiveStats(): ReactNode {
             Live Numbers
           </h2>
           <p className="text-muted-foreground mt-3 text-base">
-            Real-time from public GET endpoints — refreshed on each visit.
+            Real-time from public GET endpoints. Refreshed on each visit.
           </p>
           <p className="text-muted-foreground mt-2 text-sm">
             <a

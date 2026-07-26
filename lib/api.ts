@@ -102,8 +102,19 @@ async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
 
 // -- Public API -------------------------------------------------------------
 
+/** In-flight / resolved cache so multiple sections share one agents fetch. */
+let agentsCache: Promise<AgentsResponse> | null = null;
+
 export function getAgents(): Promise<AgentsResponse> {
-  return apiFetch<AgentsResponse>("/api/swarm/agents");
+  if (!agentsCache) {
+    agentsCache = apiFetch<AgentsResponse>("/api/swarm/agents").catch(
+      (err: unknown) => {
+        agentsCache = null;
+        throw err;
+      }
+    );
+  }
+  return agentsCache;
 }
 
 export function getStatus(): Promise<SwarmStatus> {
@@ -129,21 +140,39 @@ export function getHealth(): Promise<{
 }
 
 /**
- * Runs the swarm pipeline. When the API has SWARM_API_KEY set, pass the same
- * value from NEXT_PUBLIC_SWARM_WRITE_KEY so the browser can send X-SWARM-API-KEY.
+ * Runs the swarm pipeline via same-origin BFF (`/api/swarm/run`).
+ * The browser never sees SWARM_API_KEY — only the Next.js route holds it.
  */
-export function postRun(
+export async function postRun(
   task: string,
   budgetUsd = 5.0
 ): Promise<SwarmRunResult> {
-  const writeKey = process.env.NEXT_PUBLIC_SWARM_WRITE_KEY ?? "";
-  const headers: Record<string, string> = {};
-  if (writeKey) {
-    headers["X-SWARM-API-KEY"] = writeKey;
-  }
-  return apiFetch<SwarmRunResult>("/api/swarm/run", {
+  const res = await fetch("/api/swarm/run", {
     method: "POST",
-    body: JSON.stringify({ task, budget_usd: budgetUsd }),
-    headers,
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ task, budget_usd: budgetUsd, simulate: true }),
   });
+  let payload: SwarmRunResult & { detail?: string; status?: string } = {
+    pipeline_id: "",
+    status: "error",
+    total_cost_usd: 0,
+    final_output: "",
+    agent_results: [],
+  };
+  try {
+    payload = (await res.json()) as typeof payload;
+  } catch {
+    /* ignore */
+  }
+  if (res.status === 401 || res.status === 403 || res.status === 503) {
+    const err = new Error(
+      payload.detail ?? `Auth required (${res.status})`
+    ) as Error & { code?: string };
+    err.code = "auth_required";
+    throw err;
+  }
+  if (!res.ok) {
+    throw new Error(payload.detail ?? `API /api/swarm/run returned ${res.status}`);
+  }
+  return payload;
 }

@@ -1,19 +1,11 @@
 "use client";
 
 import { footerConfig, siteConfig } from "@/lib/config";
+import { fadeInUpView } from "@/lib/motion";
 import { ChevronRightIcon } from "lucide-react";
 import { motion } from "motion/react";
 import Link from "next/link";
 import type { ReactNode } from "react";
-
-const easeOut = [0.16, 1, 0.3, 1] as const;
-
-const fadeInUp = {
-  initial: { opacity: 0, y: 30 },
-  whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true, amount: 0.5 },
-  transition: { duration: 0.8, ease: easeOut },
-};
 
 const socialLinks = [
   { label: "Twitter", icon: TwitterIcon, href: `https://twitter.com/${siteConfig.social.twitter.replace("@", "")}` },
@@ -41,7 +33,7 @@ export function Footer(): ReactNode {
     <footer className="bg-accent px-6 py-16 text-black md:px-12 lg:px-20 rounded-tr-4xl rounded-tl-4xl">
       <div className="mx-auto max-w-6xl">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-20">
-          <motion.div className="max-w-md" {...fadeInUp}>
+          <motion.div className="max-w-md" {...fadeInUpView}>
             <p className="text-lg leading-relaxed text-black/80">
               {footerConfig.description}
             </p>
@@ -57,7 +49,7 @@ export function Footer(): ReactNode {
           </motion.div>
 
           <div className="grid grid-cols-2 gap-8 lg:justify-items-end">
-            <motion.div {...fadeInUp} transition={{ ...fadeInUp.transition, delay: 0.1 }}>
+            <motion.div {...fadeInUpView} transition={{ ...fadeInUpView.transition, delay: 0.1 }}>
               <h4 className="mb-4 text-sm font-semibold uppercase tracking-wider text-black/50">
                 Product
               </h4>
@@ -74,7 +66,7 @@ export function Footer(): ReactNode {
                 ))}
               </ul>
             </motion.div>
-            <motion.div {...fadeInUp} transition={{ ...fadeInUp.transition, delay: 0.2 }}>
+            <motion.div {...fadeInUpView} transition={{ ...fadeInUpView.transition, delay: 0.2 }}>
               <h4 className="mb-4 text-sm font-semibold uppercase tracking-wider text-black/50">
                 Company
               </h4>
@@ -97,7 +89,7 @@ export function Footer(): ReactNode {
         <div className="my-16 h-px bg-black/10" />
 
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-20">
-          <motion.div {...fadeInUp}>
+          <motion.div {...fadeInUpView}>
             <h2 className="text-5xl font-medium leading-none tracking-tight md:text-6xl lg:text-7xl">
               Build with
               <br />
@@ -107,7 +99,7 @@ export function Footer(): ReactNode {
           </motion.div>
 
           <div className="flex flex-col justify-between gap-8 lg:items-end lg:text-right">
-            <motion.div className="space-y-6" {...fadeInUp} transition={{ ...fadeInUp.transition, delay: 0.1 }}>
+            <motion.div className="space-y-6" {...fadeInUpView} transition={{ ...fadeInUpView.transition, delay: 0.1 }}>
               <div>
                 <h4 className="mb-1 font-semibold">{footerConfig.contact.location}</h4>
                 <p className="text-black/70">TechTide AI · open source Apache-2.0</p>
@@ -120,7 +112,7 @@ export function Footer(): ReactNode {
               </a>
             </motion.div>
 
-            <motion.div className="flex items-center gap-4 lg:justify-end" {...fadeInUp} transition={{ ...fadeInUp.transition, delay: 0.2 }}>
+            <motion.div className="flex items-center gap-4 lg:justify-end" {...fadeInUpView} transition={{ ...fadeInUpView.transition, delay: 0.2 }}>
               {socialLinks.map(({ label, icon: Icon, href }) => (
                 <a
                   key={label}

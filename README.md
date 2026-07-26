@@ -24,10 +24,18 @@ bun run lint
 ## Environment
 
 ```bash
-NEXT_PUBLIC_API_URL=https://your-swarm-api.example.com
-# Optional: demo POSTs when the API requires X-SWARM-API-KEY
-NEXT_PUBLIC_SWARM_WRITE_KEY=
+# Production API: https://swarm357be.up.railway.app
+NEXT_PUBLIC_API_URL=https://swarm357be.up.railway.app
+# Server-only (BFF /api/swarm/run) — never NEXT_PUBLIC_*
+SWARM_API_KEY=
 ```
+
+## Production URLs
+
+| Surface | URL |
+|--------|-----|
+| Frontend | https://swarm357fe.up.railway.app |
+| Backend API | https://swarm357be.up.railway.app |
 
 ## Related
 

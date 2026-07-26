@@ -1,5 +1,6 @@
 "use client";
 
+import { faqConfig } from "@/lib/config";
 import { easeOut } from "@/lib/motion";
 import { ChevronDown, ChevronRightIcon } from "lucide-react";
 import { AnimatePresence, motion, useInView } from "motion/react";
@@ -14,12 +15,12 @@ const faqs = [
   {
     question: "What happens if the Memvid bridge is not installed?",
     answer:
-      "MemoryManager gracefully falls back to flat .swarm/topics/ JSON files. The bridge is optional — install it when you want portable, searchable .mv2 memory with integrity verification.",
+      "MemoryManager gracefully falls back to flat .swarm/topics/ JSON files. The bridge is optional. Install it when you want portable, searchable .mv2 memory with integrity verification.",
   },
   {
     question: "Does this work without an Anthropic API key?",
     answer:
-      "Yes. The CLI runs in simulation mode without a key — swarm demo shows the full architecture and pipeline with stub outputs. Set ANTHROPIC_API_KEY for live Claude execution.",
+      "Yes. The CLI runs in simulation mode without a key. swarm demo shows the full architecture and pipeline with stub outputs. Set ANTHROPIC_API_KEY for live Claude execution.",
   },
   {
     question: "How does the security gate work?",
@@ -29,7 +30,7 @@ const faqs = [
   {
     question: "Can I use models other than Claude?",
     answer:
-      "Currently the Agent class targets Claude (opus, sonnet, haiku) via the Anthropic API. The architecture is model-agnostic at the config level — AgentConfig.model is a string — but the runtime adapter only implements Anthropic today.",
+      "Currently the Agent class targets Claude (opus, sonnet, haiku) via the Anthropic API. The architecture is model-agnostic at the config level (AgentConfig.model is a string), but the runtime adapter only implements Anthropic today.",
   },
 ];
 
@@ -106,12 +107,12 @@ export function FAQ(): ReactNode {
           transition={{ duration: 0.8, ease: easeOut }}
         >
           <h2 className="text-background text-3xl font-medium tracking-tight md:text-4xl lg:text-5xl">
-            Common Questions
+            {faqConfig.title}
           </h2>
         </motion.div>
 
         <motion.div
-          className="bg-background border border-neutral-200/10 shadow-2xl/20 rounded-2xl px-6 py-2 md:px-10"
+          className="bg-background rounded-2xl border border-neutral-200/10 px-6 py-2 shadow-2xl/20 md:px-10"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.5 }}
@@ -136,14 +137,14 @@ export function FAQ(): ReactNode {
           transition={{ duration: 0.8, delay: 0.2, ease: easeOut }}
         >
           <p className="text-background/60 mb-6 text-base">
-            Still have questions? Open an issue on GitHub.
+            {faqConfig.contact.text}
           </p>
           <a
-            href="https://github.com/TechTideOhio/swarm-357/issues"
-            className="group inline-flex items-center gap-3 rounded-md bg-background py-3 pr-3 pl-4 font-medium text-foreground shadow-lg shadow-black/10 transition-all duration-500 ease-out hover:rounded-[50px] hover:bg-background/90 hover:shadow-xl hover:shadow-black/20"
+            href={faqConfig.contact.cta.href}
+            className="group bg-accent inline-flex items-center gap-3 rounded-[3.5px] py-3 pr-3 pl-4 font-medium tracking-tight text-black transition-all duration-500 ease-out hover:rounded-[50px]"
           >
-            <span>Open an issue</span>
-            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-foreground text-background transition-all duration-300 group-hover:scale-110">
+            <span>{faqConfig.contact.cta.text}</span>
+            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-black transition-all duration-300 ease-out group-hover:scale-110">
               <ChevronRightIcon className="relative left-px h-4 w-4" />
             </span>
           </a>

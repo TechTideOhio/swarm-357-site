@@ -21,3 +21,6 @@ dist
 *.tsbuildinfo
 tsconfig.tsbuildinfo
 next-env.d.ts
+# Nixpacks picks Bun when bun.lock is present; Railway image has npm only.
+bun.lock
+bun.lockb
