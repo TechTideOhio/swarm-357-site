@@ -4,7 +4,7 @@ import { Providers } from "@/components/providers";
 import { SkipToContent } from "@/components/skip-to-content";
 import { ThemeSwitch } from "@/components/theme-switch";
 import { baseMetadata } from "@/lib/metadata";
-import { SITE_URL } from "@/lib/site-url";
+import { GITHUB_URL, PYPI_URL, SITE_URL } from "@/lib/site-url";
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import type { ReactNode } from "react";
@@ -40,6 +40,7 @@ const organization_json_ld = {
   name: "TechTide AI",
   url: SITE_URL,
   logo: `${SITE_URL}/icon-512.png`,
+  sameAs: [GITHUB_URL, PYPI_URL],
 };
 
 const website_json_ld = {
@@ -47,11 +48,9 @@ const website_json_ld = {
   "@type": "WebSite",
   name: "Swarm 357",
   url: SITE_URL,
-  potentialAction: {
-    "@type": "SearchAction",
-    target: `${SITE_URL}/docs?q={search_term_string}`,
-    "query-input": "required name=search_term_string",
-  },
+  // No SearchAction: search is a client-side dialog with no query URL, and
+  // declaring an action the site cannot serve is a claim we would have to walk back.
+  publisher: { "@type": "Organization", name: "TechTide AI", url: SITE_URL },
 };
 
 export default function RootLayout({
