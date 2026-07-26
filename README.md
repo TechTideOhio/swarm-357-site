@@ -157,7 +157,11 @@ Before writing UI:
 
 ## Deployment
 
-Railway builds this repository from its root with Nixpacks and Bun, per `nixpacks.toml` and `railway.toml`. Deploys run `bun run build` and then `bun run start`. Set `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_API_URL`, and `SWARM_API_KEY` in the Railway service before the first build, because the public values are needed at build time.
+Railway builds this repository from its root with Nixpacks and Bun, per `nixpacks.toml` and `railway.toml`. Deploys run `bun run build` and then `bun run start`.
+
+Set `NEXT_PUBLIC_SITE_URL` and `NEXT_PUBLIC_API_URL` in the Railway service before the first build, because those public values are inlined into the client bundle at build time.
+
+Set `SWARM_API_KEY` as a **runtime-only** variable. The server route reads it on each request, so it must never be present during the build, where it could leak into build logs or bundled output. If your platform injects every service variable into the build environment by default, mark this one as excluded from builds.
 
 ## Editorial standards
 

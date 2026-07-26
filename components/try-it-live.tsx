@@ -92,7 +92,7 @@ export function TryItLive(): ReactNode {
     setErrorMsg("");
 
     try {
-      const result: SwarmRunResult = await postRun(task.trim(), 5.0);
+      const result: SwarmRunResult = await postRun(task.trim());
 
       if (result.status === "error") {
         const message = result.error ?? "Unknown error";
@@ -162,6 +162,7 @@ export function TryItLive(): ReactNode {
           id="try-it-live-task"
           type="text"
           value={task}
+          maxLength={500}
           onChange={(e) => setTask(e.target.value)}
           placeholder="e.g. Research the AI market"
           disabled={state === "running"}
