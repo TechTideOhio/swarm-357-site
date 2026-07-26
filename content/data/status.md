@@ -1,4 +1,4 @@
-# TechTide Swarm 357 - Feature Status
+# TechTide Swarm 357: Feature Status
 
 Maturity levels:
 - **Stable** - tested, documented, safe for production use under stated constraints
@@ -48,7 +48,7 @@ Swarm 357 is a **357-role catalog plus orchestration runtime**, not a production
 |---------|--------|-------|
 | CI | **Stable** | `.github/workflows/ci.yml` - Python 3.10-3.13, roster, wheel smoke, Docker auth, Rust, docs ban check |
 | PyPI publish | **Beta** | `publish.yml` with attestations; CI gate before publish |
-| Landing site | **Beta** | Docs at https://swarm357fe.up.railway.app/docs; source in [TechTideOhio/swarm-357-site](https:///docs) |
+| Landing site | **Beta** | Docs at https://swarm357fe.up.railway.app/docs; source in [TechTideOhio/swarm-357-site](https://github.com/TechTideOhio/swarm-357-site) |
 | Branch protection / scanning | **Beta** | Operator-applied on GitHub (see RELEASE.md) |
 
 ## Not implemented

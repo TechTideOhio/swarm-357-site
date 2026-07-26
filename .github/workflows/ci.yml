@@ -1,5 +1,5 @@
 # file: .github/workflows/ci.yml
-# description: Landing site CI — typecheck and production build
+# description: Landing site CI, typecheck and production build
 # reference: package.json, README.md
 name: ci
 

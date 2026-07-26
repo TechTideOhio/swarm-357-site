@@ -30,7 +30,7 @@ This document is the **mechanical** gate list for releases. Every check must be 
 | **Security tools** | Pytest | Bash denied in server mode; Read/Write confined to CWD/workspace (`SWARM_UNSAFE_FS=1` opt-out) |
 | **Bridge** | CI rust job | `cargo fmt/clippy/build` + bridge integration tests with `MEMVID_SWARM_BRIDGE` |
 | **Evals** | Baseline artifacts | Single-agent and swarm metrics reported **separately** in `evals/baselines/latest.json`; README numbers regenerated via `scripts/render_eval_assets.py` |
-| **Landing** | Split repo | [TechTideOhio/swarm-357-site](https:///docs) CI build green; not shipped inside this core repo |
+| **Landing** | Split repo | [TechTideOhio/swarm-357-site](https://github.com/TechTideOhio/swarm-357-site) CI build green; not shipped inside this core repo |
 | **Supply chain** | Publish workflow | Tagged release builds wheel/sdist, attestations, PyPI publish after CI |
 
 ## Commands
@@ -58,4 +58,4 @@ curl -sf http://127.0.0.1:8000/api/health
 
 ## Maturity honesty
 
-See [STATUS.md](../STATUS.md). Stable ≠ complete agent platform. Durable checkpoints, SSE (auth + terminal close), and Bash HITL are **Beta**; dream write-back remains **Experimental**; Opik cloud is **Not implemented**.
+See [STATUS.md](/docs/resources/status). Stable ≠ complete agent platform. Durable checkpoints, SSE (auth + terminal close), and Bash HITL are **Beta**; dream write-back remains **Experimental**; Opik cloud is **Not implemented**.

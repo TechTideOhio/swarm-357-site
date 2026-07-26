@@ -1,15 +1,16 @@
 #!/usr/bin/env bun
 // file: scripts/check-content.ts
-// description: CI guard for em dashes, GitHub link policy, and MDX frontmatter
+// description: CI guard for em dashes, GitHub link policy, malformed URLs, and MDX frontmatter
 // reference: lib/site-url.ts, lib/content/nav.ts
 
 import fs from "node:fs";
 import path from "node:path";
 import { get_flat_nav_items } from "../lib/content/nav";
-import { GITHUB_URL } from "../lib/site-url";
+import { GITHUB_SITE_URL, GITHUB_URL } from "../lib/site-url";
 
 const ROOT = path.join(process.cwd());
 const ALLOWED_GITHUB = GITHUB_URL;
+const ALLOWED_GITHUB_URLS = new Set([GITHUB_URL, GITHUB_SITE_URL]);
 
 const SCAN_DIRS = ["app", "components", "lib", "content/docs", "content/blog"];
 const SCAN_EXTENSIONS = [".ts", ".tsx", ".mdx"];
@@ -43,10 +44,21 @@ function check_github_links(file: string, content: string) {
   if (!matches) return;
 
   for (const match of matches) {
-    if (match !== ALLOWED_GITHUB) {
-      errors.push(`${file}: disallowed GitHub URL "${match}" (only ${ALLOWED_GITHUB} allowed)`);
+    if (!ALLOWED_GITHUB_URLS.has(match)) {
+      errors.push(
+        `${file}: disallowed GitHub URL "${match}" (only ${[...ALLOWED_GITHUB_URLS].join(" or ")} allowed)`
+      );
     }
   }
+}
+
+function check_malformed_urls(file: string, content: string) {
+  const lines = content.split("\n");
+  lines.forEach((line, index) => {
+    if (/https?:\/\/\//.test(line)) {
+      errors.push(`${file}:${index + 1} contains a malformed URL with an empty host`);
+    }
+  });
 }
 
 function check_frontmatter() {
@@ -108,16 +120,35 @@ for (const dir of SCAN_DIRS) {
     const content = fs.readFileSync(file, "utf8");
     check_dashes(file, content);
     check_github_links(file, content);
+    check_malformed_urls(file, content);
   }
 }
 
-// site-url.ts is allowed to define the canonical URL
+// site-url.ts is allowed to define the canonical URLs, exactly once each
 const site_url_file = path.join(ROOT, "lib/site-url.ts");
 if (fs.existsSync(site_url_file)) {
   const content = fs.readFileSync(site_url_file, "utf8");
   const matches = content.match(/https:\/\/github\.com\/TechTideOhio\/swarm-357[^\s)"']*/g) ?? [];
-  if (matches.length !== 1 || matches[0] !== ALLOWED_GITHUB) {
-    errors.push("lib/site-url.ts must define exactly one canonical GITHUB_URL");
+  for (const allowed of ALLOWED_GITHUB_URLS) {
+    if (matches.filter((match) => match === allowed).length !== 1) {
+      errors.push(`lib/site-url.ts must define ${allowed} exactly once`);
+    }
+  }
+  if (matches.length !== ALLOWED_GITHUB_URLS.size) {
+    errors.push("lib/site-url.ts must not define GitHub URL variants");
+  }
+}
+
+// Rendered markdown snapshots synced from the core repo
+const data_dir = path.join(ROOT, "content/data");
+if (fs.existsSync(data_dir)) {
+  for (const entry of fs.readdirSync(data_dir)) {
+    if (!entry.endsWith(".md")) continue;
+    const file = path.join(data_dir, entry);
+    const content = fs.readFileSync(file, "utf8");
+    check_dashes(file, content);
+    check_github_links(file, content);
+    check_malformed_urls(file, content);
   }
 }
 
@@ -166,9 +197,122 @@ function check_nav_external_links() {
   }
 }
 
+const UI_SCAN_DIRS = ["app", "components"];
+const UI_EXEMPT_FILES = new Set([
+  "components/skip-to-content.tsx",
+  "components/dither-cursor.tsx",
+  "components/rotating-cards.tsx",
+  "components/interactive-art-panel.tsx",
+  "components/smooth-scroll.tsx",
+  "components/providers.tsx",
+  "components/toast-provider.tsx",
+]);
+
+function check_ui_consistency() {
+  for (const dir of UI_SCAN_DIRS) {
+    const full_dir = path.join(ROOT, dir);
+    for (const file of walk(full_dir)) {
+      if (!file.endsWith(".tsx")) continue;
+      const rel = path.relative(ROOT, file).replace(/\\/g, "/");
+      if (UI_EXEMPT_FILES.has(rel)) continue;
+
+      const content = fs.readFileSync(file, "utf8");
+      const uses_ui_classes =
+        content.includes("@/lib/ui-classes") || content.includes("lib/ui-classes");
+
+      const lines = content.split("\n");
+      lines.forEach((line, index) => {
+        const line_no = index + 1;
+
+        if (
+          line.includes("focus:outline-none") &&
+          !line.includes("focus-ring") &&
+          !line.includes("focus-visible:")
+        ) {
+          errors.push(`${rel}:${line_no} uses focus:outline-none without focus-ring`);
+        }
+
+        if (
+          (line.includes("rounded-md") && line.includes("px-5") && line.includes("py-3")) ||
+          (line.includes("rounded-md") && line.includes("bg-accent") && line.includes("py-3"))
+        ) {
+          errors.push(`${rel}:${line_no} uses legacy rounded-md CTA base (use rounded-[3.5px])`);
+        }
+
+        if (
+          (line.includes("<input") || line.includes("<select")) &&
+          line.includes("shadow-2xl/20")
+        ) {
+          errors.push(`${rel}:${line_no} uses shadow-2xl/20 on a form control`);
+        }
+
+        if (
+          line.includes("<button") &&
+          line.includes("h-10 w-10") &&
+          !line.includes("min-h-11")
+        ) {
+          errors.push(`${rel}:${line_no} button uses h-10 w-10 without min-h-11 touch target`);
+        }
+
+        if (
+          line.includes("<button") &&
+          line.includes("className=") &&
+          !line.includes("focus-ring") &&
+          !line.includes("chrome_") &&
+          !line.includes("content_") &&
+          !line.includes("touch_target") &&
+          !line.includes("interactive_") &&
+          !line.includes("skip-to-content")
+        ) {
+          const string_match = line.match(/className="([^"]+)"/);
+          if (string_match && !string_match[1].includes("focus-ring")) {
+            errors.push(`${rel}:${line_no} button missing focus-ring or ui-classes interaction`);
+          }
+        }
+
+        if (
+          (line.includes("<input") || line.includes("<textarea")) &&
+          line.includes("text-sm") &&
+          !line.includes("text-base") &&
+          !line.includes("chrome_form_control") &&
+          !line.includes("content_form_control")
+        ) {
+          errors.push(`${rel}:${line_no} input uses text-sm without mobile text-base override`);
+        }
+
+        const is_interactive =
+          line.includes("<button") ||
+          line.includes("<Link") ||
+          (line.includes("<a ") && line.includes("href"));
+
+        if (!is_interactive || !line.includes("className=")) return;
+
+        const is_ui_class_ref =
+          uses_ui_classes &&
+          (line.includes("className={chrome_") ||
+            line.includes("className={content_") ||
+            line.includes("className={`${chrome_") ||
+            line.includes("className={`${content_") ||
+            line.includes("className={`${touch_") ||
+            line.includes("className={`${interactive_") ||
+            line.includes("className={content_breadcrumb_link"));
+
+        if (is_ui_class_ref) return;
+        if (line.includes("skip-to-content")) return;
+
+        const string_match = line.match(/className="([^"]+)"/);
+        if (string_match && !string_match[1].includes("focus-ring")) {
+          errors.push(`${rel}:${line_no} interactive element missing focus-ring in class string`);
+        }
+      });
+    }
+  }
+}
+
 check_frontmatter();
 check_internal_links();
 check_nav_external_links();
+check_ui_consistency();
 
 if (errors.length > 0) {
   console.error("Content check failed:\n");

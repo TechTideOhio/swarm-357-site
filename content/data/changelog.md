@@ -2,7 +2,7 @@
 
 All notable changes to TechTide Swarm 357 are documented here.
 
-## [0.2.2] - 2026-07-26
+## [0.2.2]: 2026-07-26
 
 ### Correction (v0.2.1 gaps)
 
@@ -28,7 +28,7 @@ v0.2.1 labeled HITL as Beta while approve/reject APIs never produced waiting Bas
 - Package version **0.2.1 → 0.2.2**.
 - Site demo writes move to same-origin BFF (server-only `SWARM_API_KEY`); no client write key.
 
-## [0.2.1] - 2026-07-25
+## [0.2.1]: 2026-07-25
 
 ### Correction (v0.2.0)
 
@@ -41,7 +41,7 @@ v0.2.0 public docs/CI badges still referenced scrubbed paths (`.github` workflow
 - Atomic `BudgetLedger`, structured routing JSON, resilience helpers, workspace-confined Read/Write, argv Bash policy.
 - `resolve_config_path()` + `swarm init` installs bundled compact config and all Support souls.
 - Structured traces (`.swarm/traces.jsonl`) with optional OTel export (`SWARM_OTEL_EXPORT=1`).
-- Split landing to [TechTideOhio/swarm-357-site](https:///docs).
+- Split landing to [TechTideOhio/swarm-357-site](https://github.com/TechTideOhio/swarm-357-site).
 - Memvid bridge depends on crates.io `memvid-core` 2.x; `Cargo.lock` committed.
 
 ### Fixed
@@ -57,19 +57,19 @@ v0.2.0 public docs/CI badges still referenced scrubbed paths (`.github` workflow
 - Package version **0.2.0 → 0.2.1**.
 - Docs/STATUS/VERIFY rewritten as executable acceptance criteria (no “10/10” marketing).
 
-## [0.2.0] - 2026-07-24
+## [0.2.0]: 2026-07-24
 
 ### Added
 
-- OpenRouter provider support via [`llm.py`](packages/techtide-swarm/src/techtide_swarm/llm.py) (`OPENROUTER_API_KEY`, `ANTHROPIC_BASE_URL`).
-- Tool input normalization ([`tools/input_normalize.py`](packages/techtide-swarm/src/techtide_swarm/tools/input_normalize.py)) - alias coercion (`file_path` → `path`), JSON string inputs, unknown-kwarg filtering.
-- Eval harness v2: LLM judge, `$5` hard budget, checkpoint/resume, burn passes, baseline compare ([`evals/run_evals.py`](evals/run_evals.py)).
-- Generated eval reporting: [`scripts/render_eval_assets.py`](scripts/render_eval_assets.py), [`docs/EVALS.md`](docs/EVALS.md), [`docs/assets/eval-results.svg`](docs/assets/eval-results.svg).
-- Brand + architecture assets under [`docs/assets/`](docs/assets/) (logo, banner, architecture, request lifecycle).
+- OpenRouter provider support via [`llm.py`](https://github.com/TechTideOhio/swarm-357) (`OPENROUTER_API_KEY`, `ANTHROPIC_BASE_URL`).
+- Tool input normalization ([`tools/input_normalize.py`](https://github.com/TechTideOhio/swarm-357)) - alias coercion (`file_path` → `path`), JSON string inputs, unknown-kwarg filtering.
+- Eval harness v2: LLM judge, `$5` hard budget, checkpoint/resume, burn passes, baseline compare ([`evals/run_evals.py`](https://github.com/TechTideOhio/swarm-357)).
+- Generated eval reporting: [`scripts/render_eval_assets.py`](https://github.com/TechTideOhio/swarm-357), [`docs/EVALS.md`](/docs/evals/methodology), [`docs/assets/eval-results.svg`](https://github.com/TechTideOhio/swarm-357).
+- Brand + architecture assets under [`docs/assets/`](https://github.com/TechTideOhio/swarm-357) (logo, banner, architecture, request lifecycle).
 - Landing `/about` route; OG image + PWA icons; TLDR template chrome removed.
 - Wheel bundles `config/swarm-compact.yaml` + `templates/soul/` for self-contained `pip install techtide-swarm`.
 - `__version__` on package; `/api/health` reports dynamic version.
-- Community docs: [`SECURITY.md`](SECURITY.md), [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md), [`RELEASE.md`](RELEASE.md).
+- Community docs: [`SECURITY.md`](/docs/security/security-model), [`CODE_OF_CONDUCT.md`](https://github.com/TechTideOhio/swarm-357), [`RELEASE.md`](/docs/resources/release).
 - CI: Docker `/api/health` agents==357 smoke; Next.js typecheck + build; GitHub Release on `v*` tags.
 
 ### Fixed
@@ -87,20 +87,20 @@ v0.2.0 public docs/CI badges still referenced scrubbed paths (`.github` workflow
 - Root README rewritten with badges, diagrams, and generated eval numbers (25-task catalog; not “5 tasks”).
 - Package README expanded for PyPI (API, CLI, HTTP routes, env vars).
 
-## [0.1.0] - 2026-07-24
+## [0.1.0]: 2026-07-24
 
 ### Added
 
 - `CostController.record_spend()` - layer spend now accumulates from `Swarm.execute` and `execute_layer`, enabling the 80% model-downgrade path.
-- Structured HTTP request logging (JSON) and `X-Correlation-ID` via ASGI middleware ([`structured_logging`](packages/techtide-swarm/src/techtide_swarm/structured_logging.py)).
+- Structured HTTP request logging (JSON) and `X-Correlation-ID` via ASGI middleware ([`structured_logging`](https://github.com/TechTideOhio/swarm-357)).
 - Optional eval LLM judge (`SWARM_EVAL_LLM_JUDGE`) and optional dream-cycle Haiku notes (`SWARM_DREAM_USE_LLM`) in eval harness and `MemoryManager.run_dream_cycle`.
-- Docs: [docs/BASELINE_MATRIX.md](docs/BASELINE_MATRIX.md), [docs/DATA_PLANE.md](docs/DATA_PLANE.md), [docs/COMPARISON.md](docs/COMPARISON.md); extended [docs/DEPLOY_RAILWAY.md](docs/DEPLOY_RAILWAY.md) checklist and troubleshooting.
-- [CONTRIBUTING.md](CONTRIBUTING.md) for contributors.
-- Objective verification scorecard: [docs/VERIFY.md](docs/VERIFY.md).
+- Docs: [docs/BASELINE_MATRIX.md](https://github.com/TechTideOhio/swarm-357), [docs/DATA_PLANE.md](/docs/deployment/supabase), [docs/COMPARISON.md](/docs/resources/comparison); extended [docs/DEPLOY_RAILWAY.md](/docs/deployment/railway) checklist and troubleshooting.
+- [CONTRIBUTING.md](/docs/resources/contributing) for contributors.
+- Objective verification scorecard: [docs/VERIFY.md](/docs/resources/verification).
 - `scripts/generate_roster.py --compact` to validate `config/swarm-compact.yaml` expansion to 357 agents.
 - HTTP API protections: optional `SWARM_API_KEY` / `X-SWARM-API-KEY` on POST routes; per-IP rate limiting (`SWARM_RATE_LIMIT_PER_MINUTE`); hard cap on `budget_usd` via `SWARM_MAX_RUN_BUDGET_USD`.
 - Docker-friendly config resolution: `SWARM_CONFIG_PATH` or `/app/config/swarm-compact.yaml`.
-- Railway deployment notes: [docs/DEPLOY_RAILWAY.md](docs/DEPLOY_RAILWAY.md).
+- Railway deployment notes: [docs/DEPLOY_RAILWAY.md](/docs/deployment/railway).
 
 ### Fixed
 
