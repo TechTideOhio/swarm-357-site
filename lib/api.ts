@@ -129,12 +129,16 @@ export function getRuns(limit = 10): Promise<RunsResponse> {
   return apiFetch<RunsResponse>(`/api/swarm/runs?limit=${limit}`);
 }
 
-/** Public health JSON. Safe to link from the landing page. */
+/**
+ * Public health JSON. Safe to link from the landing page. Provider and
+ * filesystem detail are only returned to authenticated callers, so this shape
+ * is intentionally narrow.
+ */
 export function getHealth(): Promise<{
   status: string;
   version: string;
   agents: number;
-  api_key_set: boolean;
+  auth_required: boolean;
 }> {
   return apiFetch("/api/health");
 }
@@ -142,15 +146,14 @@ export function getHealth(): Promise<{
 /**
  * Runs the swarm pipeline via same-origin BFF (`/api/swarm/run`).
  * The browser never sees SWARM_API_KEY. Only the Next.js route holds it.
+ * Simulate mode and the spend cap are pinned server-side, so the client
+ * cannot widen them.
  */
-export async function postRun(
-  task: string,
-  budgetUsd = 5.0
-): Promise<SwarmRunResult> {
+export async function postRun(task: string): Promise<SwarmRunResult> {
   const res = await fetch("/api/swarm/run", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ task, budget_usd: budgetUsd, simulate: true }),
+    body: JSON.stringify({ task }),
   });
   let payload: SwarmRunResult & { detail?: string; status?: string } = {
     pipeline_id: "",
