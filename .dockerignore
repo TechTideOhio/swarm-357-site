@@ -1,0 +1,25 @@
+# file: .dockerignore
+# description: Keeps local secrets and build artifacts out of the Docker build context
+# reference: Dockerfile
+
+.git
+.github
+node_modules
+.next
+.turbo
+coverage
+out
+build
+dist
+
+# Never ship local credentials into a build context.
+.env
+.env.*
+!.env.example
+
+*.log
+*.pem
+*.tsbuildinfo
+tsconfig.tsbuildinfo
+next-env.d.ts
+.DS_Store

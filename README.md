@@ -157,11 +157,21 @@ Before writing UI:
 
 ## Deployment
 
-Railway builds this repository from its root with Nixpacks and Bun, per `nixpacks.toml` and `railway.toml`. Deploys run `bun run build` and then `bun run start`.
+Railway builds this repository from its root with the `Dockerfile`, per `railway.toml`. The image installs with Bun, runs `bun run build`, and starts with `bun run start`.
 
-Set `NEXT_PUBLIC_SITE_URL` and `NEXT_PUBLIC_API_URL` in the Railway service before the first build, because those public values are inlined into the client bundle at build time.
+The Dockerfile is deliberate, not a preference. Nixpacks injects every service variable into the build environment, which put `SWARM_API_KEY` into build arguments and into the image configuration. A Dockerfile build only receives the arguments it declares, so the build stage sees `NEXT_PUBLIC_API_URL` and `NEXT_PUBLIC_SITE_URL` and nothing else.
 
-Set `SWARM_API_KEY` as a **runtime-only** variable. The server route reads it on each request, so it must never be present during the build, where it could leak into build logs or bundled output. If your platform injects every service variable into the build environment by default, mark this one as excluded from builds.
+| Variable | Availability | Reason |
+|----------|--------------|--------|
+| `NEXT_PUBLIC_API_URL` | Build and runtime | Inlined into the client bundle. Public value. |
+| `NEXT_PUBLIC_SITE_URL` | Build and runtime | Inlined into the client bundle. Public value. |
+| `SWARM_API_KEY` | Runtime only | Read per request by the server route. Never declared as a build `ARG`. |
+
+Verify after a deploy that the write key is absent from the image configuration:
+
+```bash
+docker image inspect <image> --format '{{json .Config.Env}}'
+```
 
 ## Editorial standards
 
