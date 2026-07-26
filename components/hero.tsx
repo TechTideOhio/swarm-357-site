@@ -137,7 +137,7 @@ export function Hero(): ReactNode {
   }, [isVisible]);
 
   return (
-    <section className="relative flex min-h-dvh flex-col items-center justify-start overflow-hidden px-6 pt-32 sm:pt-40 md:pt-44">
+    <section className="relative flex flex-col items-center justify-start overflow-hidden px-6 pt-28 sm:pt-32 md:pt-36">
       {!isMobile && shouldRender && <DitherCursor opacity={opacity} />}
 
       <div
@@ -183,15 +183,15 @@ export function Hero(): ReactNode {
       </div>
 
       <div
-        className="relative -mx-6 mt-10 h-72 w-full max-w-[100vw] overflow-hidden sm:mt-14 sm:h-96 md:h-[28rem] lg:h-[32rem]"
+        className="relative -mx-6 mt-4 h-56 w-full max-w-[100vw] overflow-hidden sm:mt-6 sm:h-72 md:h-80 lg:h-96 xl:h-[26rem]"
         style={{
           maskImage:
-            "linear-gradient(to bottom, black 0%, black 70%, transparent 100%)",
+            "linear-gradient(to bottom, black 0%, black 62%, transparent 100%)",
           WebkitMaskImage:
-            "linear-gradient(to bottom, black 0%, black 70%, transparent 100%)",
+            "linear-gradient(to bottom, black 0%, black 62%, transparent 100%)",
         }}
       >
-        <div className="absolute left-1/2 top-16 -translate-x-1/2 sm:top-20 lg:top-24">
+        <div className="absolute left-1/2 top-0 -translate-x-1/2">
           <div className="origin-top scale-[0.55] sm:scale-[0.65] lg:scale-[0.8] xl:scale-100">
             <RotatingCards
               cards={carouselCards}
