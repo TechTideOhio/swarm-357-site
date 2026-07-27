@@ -320,6 +320,9 @@ const BLOG_REQUIRED_FIELDS = [
   "keyword",
 ] as const;
 
+/** Google truncates the snippet around here, so anything longer is written for nobody. */
+const MAX_DESCRIPTION_LENGTH = 160;
+
 function check_blog_frontmatter() {
   const blog_dir = path.join(ROOT, "content/blog");
   if (!fs.existsSync(blog_dir)) return;
@@ -363,6 +366,13 @@ function check_blog_frontmatter() {
     const declared_slug = read_field("slug");
     if (declared_slug && declared_slug !== slug) {
       errors.push(`${rel}: slug "${declared_slug}" does not match the filename`);
+    }
+
+    const description = read_field("description");
+    if (description && description.length > MAX_DESCRIPTION_LENGTH) {
+      errors.push(
+        `${rel}: description is ${description.length} characters, over the ${MAX_DESCRIPTION_LENGTH} a search result shows`
+      );
     }
 
     const date = read_field("date");

@@ -4,7 +4,7 @@ import { Providers } from "@/components/providers";
 import { SkipToContent } from "@/components/skip-to-content";
 import { ThemeSwitch } from "@/components/theme-switch";
 import { baseMetadata } from "@/lib/metadata";
-import { GITHUB_URL, PYPI_URL, SITE_URL } from "@/lib/site-url";
+import { GITHUB_URL, LINKEDIN_URL, PYPI_URL, SITE_URL } from "@/lib/site-url";
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import type { ReactNode } from "react";
@@ -40,7 +40,7 @@ const organization_json_ld = {
   name: "TechTide AI",
   url: SITE_URL,
   logo: `${SITE_URL}/icon-512.png`,
-  sameAs: [GITHUB_URL, PYPI_URL],
+  sameAs: [GITHUB_URL, PYPI_URL, LINKEDIN_URL],
 };
 
 const website_json_ld = {

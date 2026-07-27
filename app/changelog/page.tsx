@@ -13,7 +13,8 @@ import type { ReactNode } from "react";
 
 export const metadata: Metadata = createMetadata({
   title: "Changelog",
-  description: "Version history and release notes for techtide-swarm and Swarm 357.",
+  description:
+    "Version history and release notes for techtide-swarm and Swarm 357, covering runtime changes, security fixes, and maturity updates in each release.",
   path: "/changelog",
 });
 

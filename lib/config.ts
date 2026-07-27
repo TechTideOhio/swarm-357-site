@@ -18,7 +18,7 @@ export const siteConfig = {
   name: "Swarm 357",
   tagline: "Layered agents. Durable memory. Observable runs.",
   description:
-    "357 Claude agents across six business layers: sales, support, marketing, SEO, research, and operations, backed by portable Memvid memory and a Claude Code native workflow.",
+    "Python multi-agent orchestration for Claude. 357 agent roles across six business layers, with enforced cost caps, a Bash policy gate, and resumable runs.",
   siteVersion: SITE_VERSION,
   corePackageVersion: CORE_PACKAGE_VERSION,
   social: {
