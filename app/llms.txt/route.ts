@@ -3,10 +3,12 @@
 // reference: lib/content/loader.ts, lib/site-url.ts
 
 import { get_search_index } from "@/lib/content/loader";
+import { get_indexable_blog_tags } from "@/lib/content/tags";
 import { SITE_URL } from "@/lib/site-url";
 
 export function GET() {
   const entries = get_search_index();
+  const tags = get_indexable_blog_tags();
   const lines = [
     "# Swarm 357",
     "",
@@ -25,6 +27,13 @@ export function GET() {
     ...entries
       .filter((e) => e.type === "blog")
       .map((e) => `- [${e.title}](${SITE_URL}${e.href}): ${e.description}`),
+    "",
+    "## Blog topics",
+    "",
+    ...tags.map(
+      (tag) =>
+        `- [${tag.label}](${SITE_URL}/blog/tag/${tag.slug}): ${tag.posts.length} articles on ${tag.label.toLowerCase()}.`
+    ),
     "",
     "## Pages",
     "",

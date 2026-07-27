@@ -95,6 +95,10 @@ export const content_form_control =
 export const content_dialog_panel =
   "bg-background w-full max-w-xl rounded-xl border border-border shadow-2xl/20";
 
+/** Tier B - linked topic chip on blog and tag hub pages. */
+export const content_tag_chip =
+  "border-border text-muted-foreground interactive-base hover:border-accent/30 hover:text-foreground focus-ring block rounded-[3.5px] border px-3 py-1 text-sm no-underline";
+
 /** Tier B - breadcrumb link. */
 export const content_breadcrumb_link =
   "nav-link-underline transition-opacity duration-200 ease-out hover:opacity-70 focus-ring active:opacity-80";

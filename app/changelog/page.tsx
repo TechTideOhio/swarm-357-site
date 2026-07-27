@@ -59,6 +59,7 @@ export default function ChangelogPage(): ReactNode {
 
   return (
     <PageShell
+      parent={null}
       title="Changelog"
       description={
         <>

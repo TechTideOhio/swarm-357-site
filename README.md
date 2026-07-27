@@ -4,7 +4,7 @@
 [![CI](https://github.com/TechTideOhio/swarm-357-site/actions/workflows/ci.yml/badge.svg)](https://github.com/TechTideOhio/swarm-357-site/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 
-Public product surface and documentation library for [TechTide Swarm 357](https://github.com/TechTideOhio/swarm-357). Built with Next.js 16, React 19, and Tailwind CSS v4, deployed on Railway.
+Marketing site, documentation library, and engineering blog for [TechTide Swarm 357](https://github.com/TechTideOhio/swarm-357), a Python multi-agent orchestration framework for Claude agents. Publishes 124 documentation pages and long-form writing on agent architecture, LLM cost control, agent memory, and human-in-the-loop approvals. Built with Next.js 16, React 19, and Tailwind CSS v4, deployed on Railway.
 
 **Landing 0.2.2**, compatible with [`techtide-swarm` 0.2.2](https://pypi.org/project/techtide-swarm/0.2.2/).
 

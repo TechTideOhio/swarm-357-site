@@ -138,10 +138,12 @@ export function createMetadata({
       description: page_description,
       images: [og_image],
     },
+    // Thin pages stay out of the index but keep passing link equity onward,
+    // so follow stays on.
     ...(noIndex && {
       robots: {
         index: false,
-        follow: false,
+        follow: true,
       },
     }),
   };

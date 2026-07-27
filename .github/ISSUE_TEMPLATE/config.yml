@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Runtime, CLI, or HTTP API bug
+    url: https://github.com/TechTideOhio/swarm-357/issues/new/choose
+    about: This repository is the website only. Product behaviour belongs in the core repository.
+  - name: Documentation
+    url: https://swarm357.techtideai.io/docs
+    about: Guides, CLI reference, HTTP API, and the security model.
+  - name: Security vulnerability
+    url: https://github.com/TechTideOhio/swarm-357/security/advisories/new
+    about: Report privately. Do not open a public issue for a vulnerability.
