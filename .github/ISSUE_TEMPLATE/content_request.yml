@@ -1,0 +1,26 @@
+name: Content request
+description: Ask for a doc page, a blog topic, or a clearer explanation.
+labels: ["content"]
+body:
+  - type: textarea
+    id: gap
+    attributes:
+      label: What you could not find
+      description: The question you came with, and where you looked for the answer.
+    validations:
+      required: true
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Where it belongs
+      options:
+        - Documentation
+        - Blog
+        - Not sure
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Anything else
+      description: Links, prior art, or the workaround you settled on.

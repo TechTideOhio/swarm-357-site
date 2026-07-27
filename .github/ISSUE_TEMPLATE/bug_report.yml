@@ -1,0 +1,42 @@
+name: Site bug
+description: Something on the website is broken, wrong, or unreadable.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This repository is the website. For runtime, CLI, or HTTP API behaviour, file in
+        [TechTideOhio/swarm-357](https://github.com/TechTideOhio/swarm-357/issues/new/choose) instead.
+  - type: input
+    id: url
+    attributes:
+      label: Page
+      description: The URL where you saw it.
+      placeholder: https://swarm357.techtideai.io/docs/getting-started/quickstart
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What is wrong
+      description: What you expected, and what the page did instead.
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Kind
+      options:
+        - Incorrect or outdated content
+        - Broken link or 404
+        - Layout or styling
+        - Accessibility
+        - Search
+        - Performance
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Browser and device
+      placeholder: Safari 18, iPhone 15
