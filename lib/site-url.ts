@@ -12,3 +12,6 @@ export const GITHUB_SITE_URL = "https://github.com/TechTideOhio/swarm-357-site";
 
 /** Published core package. */
 export const PYPI_URL = "https://pypi.org/project/techtide-swarm/";
+
+/** Publisher profile. Feeds Organization.sameAs so the entity resolves to one owner. */
+export const LINKEDIN_URL = "https://www.linkedin.com/company/techtide-ai/";
