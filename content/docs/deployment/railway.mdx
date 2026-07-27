@@ -80,3 +80,7 @@ See [VERIFY.md](/docs/resources/verification) for the full scorecard.
 | POST returns 401 | `SWARM_API_KEY` set | Send header `X-SWARM-API-KEY` with the same secret. |
 | POST returns 429 | Rate limit | Raise `SWARM_RATE_LIMIT_PER_MINUTE` or set to `0` for internal testing only. |
 | CORS blocked from browser | Origin not allowed | Add site URL to `ALLOWED_ORIGINS` and redeploy. |
+
+## Related reading
+
+- [Deploying a Claude agent runtime on Railway](/blog/deploying-claude-agent-runtime-railway)

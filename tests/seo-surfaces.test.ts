@@ -8,6 +8,13 @@ import sitemap from "../app/sitemap";
 import { GET as feed_get } from "../app/feed.xml/route";
 import { GET as llms_get } from "../app/llms.txt/route";
 import { load_all_blog_posts, load_blog_by_slug } from "../lib/content/loader";
+import {
+  MIN_POSTS_FOR_INDEXED_HUB,
+  get_all_blog_tags,
+  get_blog_tag,
+  get_indexable_blog_tags,
+  tag_to_slug,
+} from "../lib/content/tags";
 import { SITE_URL } from "../lib/site-url";
 
 const posts = load_all_blog_posts();
@@ -107,6 +114,60 @@ describe("sitemap", () => {
 
   test("every URL is absolute on the canonical origin", () => {
     for (const url of urls) expect(url.startsWith(SITE_URL)).toBe(true);
+  });
+
+  test("advertises indexable tag hubs and withholds the noindex ones", () => {
+    expect(urls).toContain(`${SITE_URL}/blog/tags`);
+    for (const tag of get_all_blog_tags()) {
+      const url = `${SITE_URL}/blog/tag/${tag.slug}`;
+      if (tag.indexable) expect(urls).toContain(url);
+      else expect(urls).not.toContain(url);
+    }
+    expect(get_indexable_blog_tags().length).toBeGreaterThan(0);
+  });
+
+  test("blog entries carry their cover image for image search", () => {
+    for (const post of posts) {
+      const entry = entries.find((candidate) => candidate.url === `${SITE_URL}${post.href}`);
+      expect(entry?.images).toEqual([`${SITE_URL}${post.frontmatter.cover}`]);
+    }
+  });
+});
+
+describe("blog tag hubs", () => {
+  const tags = get_all_blog_tags();
+
+  test("every tag on a post resolves to a hub", () => {
+    for (const post of posts) {
+      for (const label of post.frontmatter.tags ?? []) {
+        const tag = get_blog_tag(tag_to_slug(label));
+        expect(tag).not.toBeNull();
+        expect(tag?.posts.some((entry) => entry.slug === post.slug)).toBe(true);
+      }
+    }
+  });
+
+  test("slugs are url safe and unique", () => {
+    const slugs = tags.map((tag) => tag.slug);
+    expect(new Set(slugs).size).toBe(slugs.length);
+    for (const slug of slugs) expect(slug).toMatch(/^[a-z0-9]+(?:-[a-z0-9]+)*$/);
+  });
+
+  test("an unknown slug resolves to nothing rather than an empty hub", () => {
+    for (const slug of ["../secrets", "not-a-tag", "", "javascript:alert(1)"]) {
+      expect(get_blog_tag(slug)).toBeNull();
+    }
+  });
+
+  test("only multi-post hubs are marked indexable", () => {
+    for (const tag of tags) {
+      expect(tag.indexable).toBe(tag.posts.length >= MIN_POSTS_FOR_INDEXED_HUB);
+    }
+  });
+
+  test("hubs are ordered densest first", () => {
+    const counts = tags.map((tag) => tag.posts.length);
+    expect([...counts].sort((a, b) => b - a)).toEqual(counts);
   });
 });
 

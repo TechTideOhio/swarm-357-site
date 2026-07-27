@@ -8,12 +8,23 @@ import type { ReactNode } from "react";
 
 type PageShellWidth = "narrow" | "wide";
 
+interface BreadcrumbParent {
+  label: string;
+  href: string;
+}
+
 interface PageShellProps {
   title?: string;
   description?: ReactNode;
   maxWidth?: PageShellWidth;
   centered?: boolean;
   showHeading?: boolean;
+  /**
+   * Section this page sits under. Must match the BreadcrumbList JSON-LD on the
+   * page, because a visible trail that disagrees with the schema is a rich
+   * result violation. Pass null for pages that hang directly off the root.
+   */
+  parent?: BreadcrumbParent | null;
   children: ReactNode;
 }
 
@@ -22,12 +33,15 @@ const width_classes: Record<PageShellWidth, string> = {
   wide: "max-w-5xl",
 };
 
+const DOCS_PARENT: BreadcrumbParent = { label: "Docs", href: "/docs" };
+
 export function PageShell({
   title,
   description,
   maxWidth = "narrow",
   centered = false,
   showHeading = true,
+  parent = DOCS_PARENT,
   children,
 }: PageShellProps): ReactNode {
   const content = (
@@ -39,12 +53,16 @@ export function PageShell({
               Home
             </Link>
           </li>
-          <li aria-hidden="true">/</li>
-          <li>
-            <Link href="/docs" className={content_breadcrumb_link}>
-              Docs
-            </Link>
-          </li>
+          {parent ? (
+            <>
+              <li aria-hidden="true">/</li>
+              <li>
+                <Link href={parent.href} className={content_breadcrumb_link}>
+                  {parent.label}
+                </Link>
+              </li>
+            </>
+          ) : null}
           {title ? (
             <>
               <li aria-hidden="true">/</li>

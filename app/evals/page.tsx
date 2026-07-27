@@ -22,6 +22,7 @@ export default function EvalsPage(): ReactNode {
 
   return (
     <PageShell
+      parent={null}
       title="Evals"
       description="Budgeted evaluation suite with keyword, length, and LLM judge gates. Numbers from the latest committed baseline."
     >

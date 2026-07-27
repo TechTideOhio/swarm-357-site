@@ -5,6 +5,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { BlogCover } from "@/components/blog/blog-cover";
+import { PostToc } from "@/components/blog/post-toc";
+import { TagChips } from "@/components/blog/tag-chips";
 import { MdxContent, mdx_components } from "@/components/docs/mdx-components";
 import { PageShell } from "@/components/page-shell";
 import {
@@ -16,7 +18,7 @@ import { format_post_date } from "@/lib/format-date";
 import { compile_mdx } from "@/lib/content/mdx";
 import { createMetadata } from "@/lib/metadata";
 import { SITE_URL } from "@/lib/site-url";
-import { content_card, content_inline_link } from "@/lib/ui-classes";
+import { content_card } from "@/lib/ui-classes";
 import type { BlogPost } from "@/lib/content/types";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
@@ -29,6 +31,12 @@ const DEFAULT_AUTHOR = "Alex Cinovoj";
 
 export async function generateStaticParams() {
   return load_all_blog_posts().map((post) => ({ slug: post.slug }));
+}
+
+/** Prose word count for schema.org wordCount, ignoring fenced code blocks. */
+function count_words(markdown: string): number {
+  const prose = markdown.replace(/```[\s\S]*?```/g, " ");
+  return prose.split(/\s+/).filter(Boolean).length;
 }
 
 function og_card_url(post: BlogPost): string {
@@ -82,6 +90,10 @@ export default async function BlogPostPage({ params }: PageProps): Promise<React
     mainEntityOfPage: { "@type": "WebPage", "@id": url },
     image: [image],
     keywords: post.frontmatter.tags?.join(", "),
+    articleSection: post.frontmatter.tags?.[0],
+    wordCount: count_words(post.content),
+    inLanguage: "en-US",
+    isPartOf: { "@type": "Blog", name: "Swarm 357 blog", url: `${SITE_URL}/blog` },
     author: {
       "@type": "Person",
       name: author,
@@ -120,7 +132,11 @@ export default async function BlogPostPage({ params }: PageProps): Promise<React
     : null;
 
   return (
-    <PageShell title={post.frontmatter.title} showHeading={false}>
+    <PageShell
+      parent={{ label: "Blog", href: "/blog" }}
+      title={post.frontmatter.title}
+      showHeading={false}
+    >
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(article_schema) }}
@@ -135,12 +151,6 @@ export default async function BlogPostPage({ params }: PageProps): Promise<React
           dangerouslySetInnerHTML={{ __html: JSON.stringify(faq_schema) }}
         />
       ) : null}
-
-      <p className="mb-4">
-        <Link href="/blog" className={`${content_inline_link} text-muted-foreground text-sm`}>
-          All posts
-        </Link>
-      </p>
 
       <h1 className="mb-4 text-4xl font-medium tracking-tight">{post.frontmatter.title}</h1>
 
@@ -167,6 +177,8 @@ export default async function BlogPostPage({ params }: PageProps): Promise<React
         </div>
       ) : null}
 
+      <PostToc headings={post.headings} />
+
       <MdxContent>
         <Content />
       </MdxContent>
@@ -186,16 +198,9 @@ export default async function BlogPostPage({ params }: PageProps): Promise<React
       ) : null}
 
       {post.frontmatter.tags && post.frontmatter.tags.length > 0 ? (
-        <ul className="mt-12 flex flex-wrap gap-2" aria-label="Topics">
-          {post.frontmatter.tags.map((tag) => (
-            <li
-              key={tag}
-              className="border-border text-muted-foreground rounded-[3.5px] border px-3 py-1 text-sm"
-            >
-              {tag}
-            </li>
-          ))}
-        </ul>
+        <div className="mt-12">
+          <TagChips tags={post.frontmatter.tags} />
+        </div>
       ) : null}
 
       {newer || older ? (

@@ -17,13 +17,89 @@ function ensure_dir(dir: string) {
   fs.mkdirSync(dir, { recursive: true });
 }
 
+/**
+ * Blog posts that expand on a doc page. Without this the link graph runs one
+ * way, because posts link into the docs but the docs never link back out.
+ */
+const DOC_RELATED_POSTS: Record<string, readonly string[]> = {
+  "api/authentication": ["fastapi-swarm-api-sse-auth"],
+  "api/sse-events": ["fastapi-swarm-api-sse-auth"],
+  "configuration/models": ["openrouter-cheap-models-for-swarm-tests"],
+  "deployment/production-checklist": ["deploying-claude-agent-runtime-railway"],
+  "deployment/railway": ["deploying-claude-agent-runtime-railway"],
+  "evals/methodology": ["how-to-evaluate-an-agent-swarm"],
+  "evals/reproducing": ["how-to-evaluate-an-agent-swarm"],
+  "getting-started/architecture": ["building-a-357-role-catalog"],
+  "getting-started/core-concepts": ["what-agent-swarm-means-in-production"],
+  "getting-started/first-run": ["pip-install-techtide-swarm-first-run"],
+  "getting-started/installation": ["pip-install-techtide-swarm-first-run"],
+  "getting-started/introduction": [
+    "what-agent-swarm-means-in-production",
+    "multi-agent-orchestration-without-headcount-fantasy",
+  ],
+  "guides/bash-security-gate": [
+    "why-your-agent-needs-a-bash-policy-gate",
+    "scenario-support-bash-denied-until-hitl",
+  ],
+  "guides/checkpoints-resume": ["durable-checkpoints-resume-cancel-replay"],
+  "guides/cost-control": [
+    "cost-control-for-llm-agent-fleets",
+    "multi-agent-token-budgeting-patterns",
+  ],
+  "guides/flat-file-memory": ["portable-agent-memory-with-memvid"],
+  "guides/hitl-approvals": [
+    "human-in-the-loop-approvals-for-agents",
+    "scenario-support-bash-denied-until-hitl",
+  ],
+  "guides/layer-routing": ["building-a-357-role-catalog", "scenario-sales-layer-crm-handoff"],
+  "guides/memvid-bridge": ["portable-agent-memory-with-memvid"],
+  "guides/replay-fork": ["durable-checkpoints-resume-cancel-replay"],
+  "guides/streaming-events": ["fastapi-swarm-api-sse-auth"],
+  "resources/comparison": [
+    "langgraph-vs-role-catalog-runtimes",
+    "crewai-autogen-vs-role-ontology",
+  ],
+  "resources/roadmap": ["swarm-357-mid-year-status"],
+  "resources/status": ["swarm-357-mid-year-status"],
+  "roster/overview": ["building-a-357-role-catalog"],
+  "roster/sales": ["scenario-sales-layer-crm-handoff"],
+  "roster/support": ["scenario-support-bash-denied-until-hitl"],
+  "sdk/approval-gate": ["human-in-the-loop-approvals-for-agents"],
+  "sdk/bash-security-gate": ["why-your-agent-needs-a-bash-policy-gate"],
+  "sdk/cost-controller": ["cost-control-for-llm-agent-fleets"],
+  "sdk/memory-manager": ["portable-agent-memory-with-memvid"],
+  "security/bash-policy": ["why-your-agent-needs-a-bash-policy-gate"],
+  "security/security-model": [
+    "why-your-agent-needs-a-bash-policy-gate",
+    "human-in-the-loop-approvals-for-agents",
+  ],
+};
+
+/** Reads the live post title so link text cannot drift from the post. */
+function blog_title(slug: string): string | null {
+  const file_path = path.join(BLOG, `${slug}.mdx`);
+  if (!fs.existsSync(file_path)) return null;
+  const match = /^title:\s*"(.+?)"\s*$/m.exec(fs.readFileSync(file_path, "utf8"));
+  return match?.[1] ?? null;
+}
+
+function related_reading(relative_slug: string): string {
+  const links = (DOC_RELATED_POSTS[relative_slug] ?? []).flatMap((slug) => {
+    const title = blog_title(slug);
+    return title ? [`- [${title}](/blog/${slug})`] : [];
+  });
+
+  return links.length > 0 ? `\n\n## Related reading\n\n${links.join("\n")}` : "";
+}
+
 function write_mdx(relative_slug: string, frontmatter: Record<string, string | number>, body: string) {
   const file_path = path.join(DOCS, `${relative_slug}.mdx`);
   ensure_dir(path.dirname(file_path));
   const yaml = Object.entries(frontmatter)
     .map(([key, value]) => `${key}: "${String(value).replace(/"/g, '\\"')}"`)
     .join("\n");
-  fs.writeFileSync(file_path, `---\n${yaml}\n---\n\n${body.trim()}\n`, "utf8");
+  const body_with_links = `${body.trim()}${related_reading(relative_slug)}`;
+  fs.writeFileSync(file_path, `---\n${yaml}\n---\n\n${body_with_links}\n`, "utf8");
 }
 
 function write_blog(slug: string, frontmatter: Record<string, string>, body: string) {
