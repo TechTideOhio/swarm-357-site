@@ -99,16 +99,27 @@ function MenuCard({ card }: { card: (typeof header_menu_cards)[number] }): React
           >
             Contributing
           </Link>
-          <div className="mt-auto flex items-center gap-4 pt-8">
-            <a
-              href={github_social.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`${chrome_icon_circle} bg-background/10 text-background hover:bg-background/20`}
-              aria-label={github_social.ariaLabel}
-            >
-              <GitHubIcon className="h-5 w-5" />
-            </a>
+          <div className="mt-auto flex flex-col gap-4 pt-8">
+            <div className="flex items-center gap-4">
+              <a
+                href={github_social.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`${chrome_icon_circle} bg-background/10 text-background hover:bg-background/20`}
+                aria-label={github_social.ariaLabel}
+              >
+                <GitHubIcon className="h-5 w-5" />
+              </a>
+            </div>
+            <div className="flex flex-col gap-2 text-sm text-background/70">
+              <span className="font-semibold text-background/50 uppercase tracking-widest text-xs">Contributors</span>
+              <a href="https://github.com/Alexi5000" target="_blank" rel="noopener noreferrer" className="hover:text-background hover:underline transition-colors">
+                @Alexi5000 Alex Cinovoj
+              </a>
+              <a href="https://github.com/sakshar2303" target="_blank" rel="noopener noreferrer" className="hover:text-background hover:underline transition-colors">
+                @sakshar2303 Sakshar Dhawan
+              </a>
+            </div>
           </div>
         </div>
       )}
