@@ -98,7 +98,11 @@ export function Footer(): ReactNode {
             >
               <div>
                 <h4 className="mb-1 font-semibold">{footerConfig.contact.location}</h4>
-                <p className="text-black/70">TechTide AI · open source Apache-2.0</p>
+                <p className="text-black/70">
+                  <a href="https://techtideai.io" target="_blank" rel="noopener noreferrer" className="hover:text-black hover:underline">TechTide AI</a> · open source Apache-2.0
+                  <br />
+                  Created by <a href="https://alexcinovoj.com" target="_blank" rel="noopener noreferrer" className="hover:text-black hover:underline">Alex Cinovoj</a>
+                </p>
               </div>
               <Link
                 href="/docs/resources/contributing"

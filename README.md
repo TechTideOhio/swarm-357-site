@@ -212,3 +212,5 @@ docker image inspect <image> --format '{{json .Config.Env}}'
 ## License
 
 Apache-2.0. See [LICENSE](LICENSE).
+
+Created by [Alex Cinovoj](https://alexcinovoj.com) at [TechTide AI](https://techtideai.io).
