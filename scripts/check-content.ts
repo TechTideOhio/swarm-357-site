@@ -6,11 +6,25 @@
 import fs from "node:fs";
 import path from "node:path";
 import { get_flat_nav_items } from "../lib/content/nav";
-import { GITHUB_SITE_URL, GITHUB_URL } from "../lib/site-url";
+import {
+  AUTHOR_URL,
+  CONTRIBUTOR_PROFILE_URLS,
+  GITHUB_SITE_URL,
+  GITHUB_URL,
+  LINKEDIN_URL,
+  TECHTIDE_URL,
+} from "../lib/site-url";
 
 const ROOT = path.join(process.cwd());
 const ALLOWED_GITHUB = GITHUB_URL;
 const ALLOWED_GITHUB_URLS = new Set([GITHUB_URL, GITHUB_SITE_URL]);
+const ALLOWED_NAV_EXTERNAL_URLS = new Set<string>([
+  GITHUB_URL,
+  LINKEDIN_URL,
+  TECHTIDE_URL,
+  AUTHOR_URL,
+  ...CONTRIBUTOR_PROFILE_URLS,
+]);
 
 const SCAN_DIRS = ["app", "components", "lib", "content/docs", "content/blog"];
 const SCAN_EXTENSIONS = [".ts", ".tsx", ".mdx"];
@@ -168,8 +182,12 @@ function check_nav_external_links() {
     const https_matches = content.match(/https:\/\/[^\s"'`)]+/g) ?? [];
 
     for (const url of https_matches) {
-      if (url === ALLOWED_GITHUB) {
-        if (rel !== "lib/navigation.ts" && rel !== "lib/site-url.ts") {
+      if (ALLOWED_NAV_EXTERNAL_URLS.has(url)) {
+        if (
+          url === ALLOWED_GITHUB &&
+          rel !== "lib/navigation.ts" &&
+          rel !== "lib/site-url.ts"
+        ) {
           errors.push(
             `${rel}: GITHUB_URL must only appear in lib/navigation.ts github_social, not in ${rel}`
           );
@@ -187,8 +205,14 @@ function check_nav_external_links() {
     if (!nav_content.includes("export const github_social")) {
       errors.push("lib/navigation.ts must export github_social");
     }
+    if (!nav_content.includes("export const linkedin_social")) {
+      errors.push("lib/navigation.ts must export linkedin_social");
+    }
     if (!nav_content.includes("href: GITHUB_URL")) {
       errors.push("lib/navigation.ts github_social must use href: GITHUB_URL");
+    }
+    if (!nav_content.includes("href: LINKEDIN_URL")) {
+      errors.push("lib/navigation.ts linkedin_social must use href: LINKEDIN_URL");
     }
     const literal_github = nav_content.match(/https:\/\/github\.com\/TechTideOhio\/swarm-357/g) ?? [];
     if (literal_github.length > 0) {
@@ -282,7 +306,7 @@ function check_ui_consistency() {
 
         const is_interactive =
           line.includes("<button") ||
-          line.includes("<Link") ||
+          /<Link[\s>]/.test(line) ||
           (line.includes("<a ") && line.includes("href"));
 
         if (!is_interactive || !line.includes("className=")) return;

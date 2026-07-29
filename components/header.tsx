@@ -5,7 +5,7 @@
 "use client";
 
 import { siteConfig } from "@/lib/config";
-import { github_social, header_menu_cards } from "@/lib/navigation";
+import { contributor_links, github_social, header_menu_cards } from "@/lib/navigation";
 import { easeInOut, easeOut, overlayFade, overlayFadeTransition, spring, useReducedMotion } from "@/lib/motion";
 import {
   chrome_icon_circle,
@@ -113,12 +113,17 @@ function MenuCard({ card }: { card: (typeof header_menu_cards)[number] }): React
             </div>
             <div className="flex flex-col gap-2 text-sm text-background/70">
               <span className="font-semibold text-background/50 uppercase tracking-widest text-xs">Contributors</span>
-              <a href="https://github.com/Alexi5000" target="_blank" rel="noopener noreferrer" className="hover:text-background hover:underline transition-colors">
-                @Alexi5000 Alex Cinovoj
-              </a>
-              <a href="https://github.com/sakshar2303" target="_blank" rel="noopener noreferrer" className="hover:text-background hover:underline transition-colors">
-                @sakshar2303 Sakshar Dhawan
-              </a>
+              {contributor_links.map((contributor) => (
+                <a
+                  key={contributor.href}
+                  href={contributor.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="focus-ring hover:text-background hover:underline transition-colors"
+                >
+                  {contributor.label}
+                </a>
+              ))}
             </div>
           </div>
         </div>
