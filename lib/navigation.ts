@@ -2,7 +2,13 @@
 // description: Canonical internal navigation links and the single external GitHub social target
 // reference: lib/site-url.ts, components/header.tsx, components/footer.tsx
 
-import { GITHUB_URL } from "@/lib/site-url";
+import {
+  AUTHOR_URL,
+  CONTRIBUTOR_PROFILE_URLS,
+  GITHUB_URL,
+  LINKEDIN_URL,
+  TECHTIDE_URL,
+} from "@/lib/site-url";
 
 export interface NavLink {
   label: string;
@@ -16,12 +22,28 @@ export interface MenuCard {
   links: NavLink[];
 }
 
-/** Only external URL permitted in site navigation chrome. */
+/** External social targets permitted in site chrome. URLs live in lib/site-url.ts. */
 export const github_social = {
   label: "GitHub",
   href: GITHUB_URL,
   ariaLabel: "Swarm 357 on GitHub",
 } as const;
+
+export const linkedin_social = {
+  label: "LinkedIn",
+  href: LINKEDIN_URL,
+  ariaLabel: "TechTide AI on LinkedIn",
+} as const;
+
+export const publisher_links = {
+  studio: { label: "TechTide AI", href: TECHTIDE_URL },
+  author: { label: "Alex Cinovoj", href: AUTHOR_URL },
+} as const;
+
+export const contributor_links = [
+  { label: "@Alexi5000 Alex Cinovoj", href: CONTRIBUTOR_PROFILE_URLS[0] },
+  { label: "@sakshar2303 Sakshar Dhawan", href: CONTRIBUTOR_PROFILE_URLS[1] },
+] as const;
 
 export const header_menu_cards: MenuCard[] = [
   {

@@ -18,6 +18,7 @@ Marketing site, documentation library, and engineering blog for [TechTide Swarm 
 | Changelog | https://swarm357.techtideai.io/changelog |
 | Evals | https://swarm357.techtideai.io/evals |
 | Machine-readable index | https://swarm357.techtideai.io/llms.txt |
+| TechTide AI (LinkedIn) | https://www.linkedin.com/company/techtide-ai/ |
 | Backend API | https://swarm357be.up.railway.app |
 
 ## Contents
