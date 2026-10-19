@@ -5,6 +5,7 @@
 
 import fs from "node:fs";
 import path from "node:path";
+import { serializeFrontmatter } from "./frontmatter";
 
 const SITE_ROOT = process.cwd();
 const CORE_ROOT = path.resolve(SITE_ROOT, "../swarm357-sync");
@@ -95,18 +96,14 @@ function related_reading(relative_slug: string): string {
 function write_mdx(relative_slug: string, frontmatter: Record<string, string | number>, body: string) {
   const file_path = path.join(DOCS, `${relative_slug}.mdx`);
   ensure_dir(path.dirname(file_path));
-  const yaml = Object.entries(frontmatter)
-    .map(([key, value]) => `${key}: "${String(value).replace(/"/g, '\\"')}"`)
-    .join("\n");
+  const yaml = serializeFrontmatter(frontmatter);
   const body_with_links = `${body.trim()}${related_reading(relative_slug)}`;
   fs.writeFileSync(file_path, `---\n${yaml}\n---\n\n${body_with_links}\n`, "utf8");
 }
 
 function write_blog(slug: string, frontmatter: Record<string, string>, body: string) {
   ensure_dir(BLOG);
-  const yaml = Object.entries(frontmatter)
-    .map(([key, value]) => `${key}: "${String(value).replace(/"/g, '\\"')}"`)
-    .join("\n");
+  const yaml = serializeFrontmatter(frontmatter);
   fs.writeFileSync(path.join(BLOG, `${slug}.mdx`), `---\n${yaml}\n---\n\n${body.trim()}\n`, "utf8");
 }
 
