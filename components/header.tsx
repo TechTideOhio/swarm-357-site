@@ -250,20 +250,23 @@ export function Header(): ReactNode {
 
   React.useEffect(() => {
     const wrapper = document.querySelector(".h-screen.overflow-y-auto") as HTMLElement;
-    if (wrapper) {
-      setScrollbarWidth(wrapper.offsetWidth - wrapper.clientWidth);
-    }
+    const measureScrollbar = () => {
+      if (wrapper) setScrollbarWidth(wrapper.offsetWidth - wrapper.clientWidth);
+    };
+    const frame = requestAnimationFrame(measureScrollbar);
 
     const handleScroll = () => {
       const scrollY = wrapper ? wrapper.scrollTop : window.scrollY;
       setHasScrolled(scrollY > 50);
     };
 
-    handleScroll();
+    const scrollFrame = requestAnimationFrame(handleScroll);
     window.addEventListener("scroll", handleScroll, { passive: true });
     wrapper?.addEventListener("scroll", handleScroll, { passive: true });
 
     return () => {
+      cancelAnimationFrame(frame);
+      cancelAnimationFrame(scrollFrame);
       window.removeEventListener("scroll", handleScroll);
       wrapper?.removeEventListener("scroll", handleScroll);
     };

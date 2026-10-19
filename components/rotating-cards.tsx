@@ -2,6 +2,7 @@
 
 import React, {
   useState,
+  useSyncExternalStore,
   useMemo,
   useEffect,
   useRef,
@@ -39,6 +40,8 @@ export interface RotatingCardsProps {
   trackLineOffset?: number;
 }
 
+const subscribeToMount = () => () => {};
+
 const RotatingCards: React.FC<RotatingCardsProps> = ({
   cards,
   radius = 360,
@@ -59,8 +62,8 @@ const RotatingCards: React.FC<RotatingCardsProps> = ({
 }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
-  const [loaded, setLoaded] = useState(false);
-  const [isMounted, setIsMounted] = useState(false);
+  const [loadedCards, setLoadedCards] = useState<Card[] | null>(null);
+  const isMounted = useSyncExternalStore(subscribeToMount, () => true, () => false);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const rotationRef = useRef(initialRotation);
@@ -92,32 +95,11 @@ const RotatingCards: React.FC<RotatingCardsProps> = ({
     });
   }, [cards, radius, initialRotation]);
 
-  // Track cards reference for preloading
-  const cardsRef = useRef(cards);
   const hasImages = cards.some((card) => card.image);
-  
-  // Reset loaded when cards change
-  if (cardsRef.current !== cards) {
-    cardsRef.current = cards;
-    if (!loaded) {
-      // Already not loaded, no action needed
-    } else if (hasImages) {
-      // Will be set to false and then loaded after preload
-    }
-  }
-
-  // Handle client-side mounting to prevent hydration mismatches
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
+  const loaded = !hasImages || loadedCards === cards;
 
   useEffect(() => {
-    if (!hasImages) {
-      setLoaded(true);
-      return;
-    }
-
-    setLoaded(false);
+    if (!hasImages) return;
     let cancelled = false;
 
     const preloadImages = async () => {
@@ -137,7 +119,7 @@ const RotatingCards: React.FC<RotatingCardsProps> = ({
       } catch (error) {
         console.error("Failed to load images", error);
       } finally {
-        if (!cancelled) setLoaded(true);
+        if (!cancelled) setLoadedCards(cards);
       }
     };
 
