@@ -7,7 +7,7 @@
 import { CORE_PACKAGE_VERSION, heroConfig, siteConfig } from "@/lib/config";
 import { easeOut } from "@/lib/motion";
 import { chrome_primary_cta, chrome_secondary_cta } from "@/lib/ui-classes";
-import { motion } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 import Link from "next/link";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import DitherCursor from "./dither-cursor";
@@ -52,24 +52,33 @@ function AnimatedLine({
   delayBase: number;
   className?: string;
 }): ReactNode {
+  const reducedMotion = useReducedMotion();
+  if (reducedMotion) return <span className={`block ${className ?? ""}`}>{text}</span>;
   return (
     <span className={`block ${className ?? ""}`}>
-      {text.split("").map((char, index) => (
-        <motion.span
-          key={`${text}-${index}`}
-          initial={{ opacity: 0, filter: "blur(10px)" }}
-          animate={{ opacity: 1, filter: "blur(0px)" }}
-          transition={{
-            duration: 0.35,
-            delay: delayBase + index * 0.02,
-            ease: easeOut,
-          }}
-          className="inline-block"
-          style={{ whiteSpace: char === " " ? "pre" : "normal" }}
-        >
-          {char}
-        </motion.span>
-      ))}
+      {text.split(/(\s+)/).map((word, wordIndex, words) => {
+        const offset = words.slice(0, wordIndex).join("").length;
+        if (!word.trim()) return word;
+        return (
+          <span key={`${text}-${wordIndex}`} className="inline-block whitespace-nowrap">
+            {word.split("").map((char, index) => (
+              <motion.span
+                key={`${word}-${index}`}
+                initial={{ opacity: 0, filter: "blur(10px)" }}
+                animate={{ opacity: 1, filter: "blur(0px)" }}
+                transition={{
+                  duration: 0.35,
+                  delay: delayBase + (offset + index) * 0.02,
+                  ease: easeOut,
+                }}
+                className="inline-block motion-reduce:!opacity-100 motion-reduce:!blur-none"
+              >
+                {char}
+              </motion.span>
+            ))}
+          </span>
+        );
+      })}
     </span>
   );
 }
