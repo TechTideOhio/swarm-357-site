@@ -19,10 +19,26 @@ Marketing site, documentation library, and engineering blog for [TechTide Swarm 
 | Evals | https://swarm357.techtideai.io/evals |
 | Machine-readable index | https://swarm357.techtideai.io/llms.txt |
 | TechTide AI (LinkedIn) | https://www.linkedin.com/company/techtide-ai/ |
-| Backend API | https://swarm357be.up.railway.app |
+| Backend API (OpenAPI docs) | https://swarm357be.up.railway.app/docs |
+
+## Why this exists
+
+**What it does.** Serves the Swarm 357 marketing page, a 124-page documentation library generated from the core repository's Markdown into `content/docs/`, a hand-authored MDX engineering blog with an RSS feed, sitemap, JSON-LD, and `llms.txt`, and a server-only BFF route under `app/api/` that proxies demo runs to the backend so the write key never reaches the browser. Built with Next.js 16, React 19, Tailwind CSS v4, and Bun, and deployed to Railway from the checked-in `Dockerfile`.
+
+**Who it serves.** Readers evaluating Swarm 357 before running `pip install techtide-swarm`, operators looking up the CLI, HTTP API, eval methodology, and feature maturity, and maintainers who need to publish documentation from the core repository without copying it by hand.
+
+**Why Alex built it.** The site was split out of the core repository on 2026-07-25 (first commit `11c2474`: "feat(site): split Swarm 357 landing into standalone public repo") so the runtime and the product surface release on independent trains, which the core README and the published [About page](https://swarm357.techtideai.io/about) both state. The first week of pull requests set the posture the repository still enforces: an "honesty pass" with a same-origin run BFF (`6b71fda`, PR #1, 2026-07-26), a demo proxy pinned server side with baseline response headers (`f257eda`, PR #7), and a Dockerfile build "so the write key never enters the build" (`8c3aa14`, PR #8). Created by [Alex Cinovoj](https://alexcinovoj.com), Founder & CTO of [TechTide AI](https://techtideai.io).
+
+**Real-world use case (2025-2026 evidence).** **Verified in this repository.** Publishing a documentation library and blog for an open-source Python package as a static-first Next.js 16 site, with continuous integration that fails on broken internal links, duplicate blog keywords, missing frontmatter, or em dashes (`scripts/check-content.ts`, `scripts/verify-links.ts`, `tests/seo-surfaces.test.ts`, `tests/swarm-run-route.test.ts`, and [`.github/workflows/ci.yml`](.github/workflows/ci.yml)). Next.js 16 made Turbopack the default bundler and rewrote prefetching with layout deduplication and incremental prefetching, which the documentation navigation picks up through the `next/link` components in `components/header.tsx` and `components/page-shell.tsx`[^1]; the 16.0.0 release was published on 2025-10-22 and this repository tracks the 16.x line (`next` 16.4.2 in `package.json`)[^2]; Next.js 16.1 added an experimental bundle analyzer for Turbopack that the release notes describe as a way to optimize bundle sizes and improve Core Web Vitals[^3]; and LCP and INP became Baseline Newly available across all major browsers in December 2025, which is why the site keeps heavy client JavaScript optional (the hero does not render its WebGL cursor on mobile in `components/hero.tsx`, and `MotionDiv` and `MotionSection` in `lib/motion.tsx` switch to `reducedMotionVariants` when `useReducedMotion()` is true)[^4].
+
+[^1]: Vercel, "Next.js 16", <https://nextjs.org/blog/next-16>, published 2025-10-21.
+[^2]: vercel/next.js, release v16.0.0, <https://github.com/vercel/next.js/releases/tag/v16.0.0>, published 2025-10-22.
+[^3]: Vercel, "Next.js 16.1", <https://nextjs.org/blog/next-16-1>, published 2025-12-18.
+[^4]: web.dev, "LCP and INP are now Baseline Newly available", <https://web.dev/blog/lcp-and-inp-are-now-baseline-newly-available>, published 2025-12-17.
 
 ## Contents
 
+- [Why this exists](#why-this-exists)
 - [Quick start](#quick-start)
 - [Tech stack](#tech-stack)
 - [Repository map](#repository-map)
@@ -63,11 +79,11 @@ swarm demo
 | Content | [MDX](https://mdxjs.com/) with [remark-gfm](https://github.com/remarkjs/remark-gfm), [rehype-slug](https://github.com/rehypejs/rehype-slug), [rehype-pretty-code](https://rehype-pretty.pages.dev/) | Documentation library and blog |
 | Syntax highlighting | [Shiki](https://shiki.style/) | Build-time code themes |
 | Animation | [Motion](https://motion.dev/docs) | Presets in `lib/motion.tsx` with reduced-motion fallbacks |
-| 3D | [React Three Fiber](https://r3f.docs.pmnd.rs/) and [drei](https://drei.docs.pmnd.rs/) | Optional WebGL dither cursor, disabled on mobile |
+| 3D | [React Three Fiber](https://r3f.docs.pmnd.rs/) and [drei](https://drei.docs.pmnd.rs/) | Optional WebGL dither cursor; the hero skips it on mobile |
 | Theming | [next-themes](https://github.com/pacocoursey/next-themes) | Class-based dark mode |
 | Frontmatter | [gray-matter](https://github.com/jonschlinkert/gray-matter) | MDX metadata parsing |
 | Toolchain | [Bun](https://bun.sh/docs) | Install, scripts, and content generation |
-| Hosting | [Railway](https://docs.railway.com/) | Nixpacks build defined in `nixpacks.toml` |
+| Hosting | [Railway](https://docs.railway.com/) | Dockerfile build selected in `railway.toml` |
 
 There is no component library dependency. Components are hand written against the class tiers in `lib/ui-classes.ts`.
 
@@ -94,6 +110,7 @@ There is no component library dependency. Components are hand written against th
 | `bun run start` | Serve the production build |
 | `bun run lint` | ESLint across the repository |
 | `bun run typecheck` | TypeScript with `--noEmit` |
+| `bun test` | Bun test runner over `tests/` and `scripts/*.test.ts` |
 | `bun run check:content` | Dash policy, URL policy, frontmatter, and UI interaction guards |
 | `bun run verify:links` | Resolve every internal documentation link |
 | `bun run generate:content` | Sync documentation from the core repository |
@@ -106,6 +123,7 @@ bun run check:content
 bun run verify:links
 bun run typecheck
 bun run lint
+bun test
 bun run build
 ```
 
