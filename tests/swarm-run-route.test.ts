@@ -29,10 +29,13 @@ function stubUpstream(): void {
       body: JSON.parse(String(init?.body)) as UpstreamCall["body"],
       headers: (init?.headers ?? {}) as Record<string, string>,
     });
-    return new Response(JSON.stringify({ pipeline_id: "test", status: "complete" }), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
+    return new Response(
+      JSON.stringify({ pipeline_id: "test", status: "complete" }),
+      {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
   }) as typeof fetch;
 }
 
@@ -58,7 +61,9 @@ afterEach(() => {
 
 describe("POST /api/swarm/run", () => {
   test("forces simulate mode even when the client asks for a live run", async () => {
-    const res = await POST(makeRequest({ task: "audit pricing", simulate: false }));
+    const res = await POST(
+      makeRequest({ task: "audit pricing", simulate: false })
+    );
 
     expect(res.status).toBe(200);
     expect(calls).toHaveLength(1);

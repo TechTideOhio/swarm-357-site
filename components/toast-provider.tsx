@@ -19,7 +19,9 @@ import type { ReactNode } from "react";
 function ToastViewport(): ReactNode {
   const { toasts, dismissToast } = useToast();
   const prefers_reduced_motion = useReducedMotion();
-  const toast_motion = prefers_reduced_motion ? toastSpringReduced : toastSpring;
+  const toast_motion = prefers_reduced_motion
+    ? toastSpringReduced
+    : toastSpring;
 
   return (
     <div
@@ -36,7 +38,9 @@ function ToastViewport(): ReactNode {
             animate={toast_motion.animate}
             exit={toast_motion.exit}
             transition={
-              prefers_reduced_motion ? { duration: 0.01 } : toastSpringTransition
+              prefers_reduced_motion
+                ? { duration: 0.01 }
+                : toastSpringTransition
             }
             className={`bg-background border-border text-foreground pointer-events-auto flex w-full max-w-sm items-start gap-3 rounded-xl border p-4 shadow-2xl/20 ${
               toast.variant === "error" ? "border-foreground/20" : ""
@@ -58,7 +62,11 @@ function ToastViewport(): ReactNode {
   );
 }
 
-export function AppToastProvider({ children }: { children: ReactNode }): ReactNode {
+export function AppToastProvider({
+  children,
+}: {
+  children: ReactNode;
+}): ReactNode {
   return (
     <ToastContextProvider>
       {children}

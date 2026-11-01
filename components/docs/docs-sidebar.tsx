@@ -32,7 +32,9 @@ export function DocsSidebar(): ReactNode {
                   <Link
                     href={item.href}
                     className={`${content_nav_link} ${
-                      active ? content_nav_link_active : content_nav_link_inactive
+                      active
+                        ? content_nav_link_active
+                        : content_nav_link_inactive
                     }`}
                   >
                     {item.title}

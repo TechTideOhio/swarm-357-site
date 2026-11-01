@@ -9,7 +9,8 @@ const FOCUSABLE =
 
 function get_focusable(container: HTMLElement): HTMLElement[] {
   return Array.from(container.querySelectorAll<HTMLElement>(FOCUSABLE)).filter(
-    (el) => !el.hasAttribute("disabled") && el.getAttribute("aria-hidden") !== "true"
+    (el) =>
+      !el.hasAttribute("disabled") && el.getAttribute("aria-hidden") !== "true"
   );
 }
 
@@ -26,7 +27,8 @@ export function useFocusTrap(
 
     const container: HTMLElement = trap_root;
     const previously_focused = document.activeElement as HTMLElement | null;
-    const return_target_on_close = return_focus_ref?.current ?? previously_focused;
+    const return_target_on_close =
+      return_focus_ref?.current ?? previously_focused;
 
     const focus_first = (): void => {
       const focusable = get_focusable(container);

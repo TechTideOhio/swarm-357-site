@@ -40,7 +40,9 @@ function AgentRow({ agent }: { agent: Agent }): ReactNode {
       <span className="text-foreground truncate text-sm font-medium tracking-tight">
         {agent.name}
       </span>
-      <span className="text-muted-foreground truncate text-xs">{agent.role}</span>
+      <span className="text-muted-foreground truncate text-xs">
+        {agent.role}
+      </span>
       <span className="bg-accent shrink-0 rounded-[3.5px] px-2 py-0.5 text-[10px] font-medium tracking-tight text-black uppercase">
         {agent.model}
       </span>
@@ -81,9 +83,10 @@ export function AgentRoster(): ReactNode {
   }, []);
 
   const counts = useMemo(() => {
-    const map = Object.fromEntries(
-      LAYER_ORDER.map((id) => [id, 0])
-    ) as Record<LayerId, number>;
+    const map = Object.fromEntries(LAYER_ORDER.map((id) => [id, 0])) as Record<
+      LayerId,
+      number
+    >;
     for (const agent of agents) {
       if (agent.layer in map) {
         map[agent.layer as LayerId] += 1;
@@ -106,10 +109,7 @@ export function AgentRoster(): ReactNode {
   return (
     <section className="bg-background px-6 py-16 md:py-24">
       <div className="mx-auto max-w-3xl">
-        <motion.div
-          className="mb-8 text-center"
-          {...fadeInUpView}
-        >
+        <motion.div className="mb-8 text-center" {...fadeInUpView}>
           <h2 className="mb-3 text-3xl font-medium tracking-tight md:text-4xl lg:text-5xl">
             {loading
               ? "Agent roster"
@@ -208,9 +208,7 @@ export function AgentRoster(): ReactNode {
                       <span>
                         {LAYER_LABELS[layer]} · {visible.length} shown
                       </span>
-                      <span className="hidden sm:inline">
-                        Model
-                      </span>
+                      <span className="hidden sm:inline">Model</span>
                     </div>
                     <ul className="scrollbar-fluid max-h-80 overflow-x-auto overflow-y-auto overscroll-contain">
                       {visible.map((agent) => (

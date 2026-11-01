@@ -10,6 +10,10 @@ test("frontmatter preserves escapes and cannot inject fields or close the header
     count: 7,
   };
   const parsed = matter(`---\n${serializeFrontmatter(values)}\n---\nBody`);
-  expect(parsed.data).toEqual(Object.fromEntries(Object.entries(values).map(([key, value]) => [key, String(value)])));
+  expect(parsed.data).toEqual(
+    Object.fromEntries(
+      Object.entries(values).map(([key, value]) => [key, String(value)])
+    )
+  );
   expect(parsed.content.trim()).toBe("Body");
 });

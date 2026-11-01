@@ -10,7 +10,8 @@ export function useBodyScrollLock(locked: boolean): void {
 
     const previous_overflow = document.body.style.overflow;
     const previous_padding_right = document.body.style.paddingRight;
-    const scrollbar_width = window.innerWidth - document.documentElement.clientWidth;
+    const scrollbar_width =
+      window.innerWidth - document.documentElement.clientWidth;
 
     document.body.style.overflow = "hidden";
     if (scrollbar_width > 0) {

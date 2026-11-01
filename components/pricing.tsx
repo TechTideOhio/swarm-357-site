@@ -61,7 +61,7 @@ function PlanCard({ plan }: { plan: Plan }): ReactNode {
       className={`rounded-2xl border p-6 shadow-2xl/20 md:p-8 ${
         plan.highlighted
           ? "glow-accent-subtle border-accent bg-background hover:bg-background/80"
-          : "border-neutral-200/10 bg-background hover:border-accent/30 hover:bg-background/80"
+          : "bg-background hover:border-accent/30 hover:bg-background/80 border-neutral-200/10"
       } ${interactive_card}`}
       {...fadeInUpView}
     >
@@ -105,8 +105,8 @@ export function Pricing(): ReactNode {
             Open-Core Pricing
           </h2>
           <p className="text-muted-foreground text-lg">
-            Open-source agent harness and memory bridge. Bring your own Anthropic
-            keys and hosting.
+            Open-source agent harness and memory bridge. Bring your own
+            Anthropic keys and hosting.
           </p>
         </motion.div>
 
@@ -134,7 +134,10 @@ export function Pricing(): ReactNode {
               <ChevronRightIcon className="relative left-px h-4 w-4" />
             </span>
           </a>
-          <a href={pricingConfig.cta.secondary.href} className={chrome_quiet_link}>
+          <a
+            href={pricingConfig.cta.secondary.href}
+            className={chrome_quiet_link}
+          >
             {pricingConfig.cta.secondary.text}
           </a>
         </motion.div>

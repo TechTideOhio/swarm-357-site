@@ -23,9 +23,9 @@ export function ThemeSwitch(): ReactNode {
 
   if (!mounted) {
     return (
-      <div className="fixed bottom-6 right-6 z-50">
+      <div className="fixed right-6 bottom-6 z-50">
         <button
-          className={`${chrome_icon_circle} cursor-not-allowed bg-foreground/10 opacity-30`}
+          className={`${chrome_icon_circle} bg-foreground/10 cursor-not-allowed opacity-30`}
           aria-label="Toggle theme"
           disabled
         />
@@ -36,7 +36,7 @@ export function ThemeSwitch(): ReactNode {
   const isDark = resolvedTheme === "dark";
 
   return (
-    <div className="fixed bottom-6 right-6 z-50">
+    <div className="fixed right-6 bottom-6 z-50">
       <button
         onClick={toggleTheme}
         className={`${chrome_icon_circle} bg-muted text-foreground opacity-30 shadow-lg shadow-black/10 hover:opacity-100 hover:shadow-xl hover:shadow-black/20`}

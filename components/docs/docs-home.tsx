@@ -15,10 +15,13 @@ import type { ReactNode } from "react";
 export function DocsHome(): ReactNode {
   return (
     <main id="main-content" className="mx-auto max-w-3xl">
-      <h1 className="mb-4 text-4xl font-medium tracking-tight md:text-5xl">Documentation</h1>
+      <h1 className="mb-4 text-4xl font-medium tracking-tight md:text-5xl">
+        Documentation
+      </h1>
       <p className="text-muted-foreground mb-12 text-lg leading-relaxed">
-        Everything you need to install, configure, run, and operate Swarm 357. Layered agents,
-        portable memory, honest cost controls, and production security defaults.
+        Everything you need to install, configure, run, and operate Swarm 357.
+        Layered agents, portable memory, honest cost controls, and production
+        security defaults.
       </p>
 
       <div className="grid gap-6 sm:grid-cols-2">

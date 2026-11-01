@@ -23,7 +23,10 @@ interface DocsSearchProps {
   variant?: "default" | "icon";
 }
 
-export function DocsSearch({ entries, variant = "default" }: DocsSearchProps): ReactNode {
+export function DocsSearch({
+  entries,
+  variant = "default",
+}: DocsSearchProps): ReactNode {
   const [open, set_open] = useState(false);
   const [query, set_query] = useState("");
   const trigger_ref = useRef<HTMLButtonElement>(null);
@@ -94,13 +97,18 @@ export function DocsSearch({ entries, variant = "default" }: DocsSearchProps): R
             className="focus-ring w-full bg-transparent text-base outline-none"
             aria-label="Search query"
             onFocus={(event) => {
-              event.currentTarget.scrollIntoView({ block: "nearest", behavior: "smooth" });
+              event.currentTarget.scrollIntoView({
+                block: "nearest",
+                behavior: "smooth",
+              });
             }}
           />
         </div>
         <ul className="scrollbar-fluid min-h-0 flex-1 overflow-y-auto p-2 sm:max-h-80">
           {results.length === 0 ? (
-            <li className="text-muted-foreground px-3 py-4 text-sm">No results found.</li>
+            <li className="text-muted-foreground px-3 py-4 text-sm">
+              No results found.
+            </li>
           ) : (
             results.map((entry) => (
               <li key={entry.href}>
@@ -111,10 +119,12 @@ export function DocsSearch({ entries, variant = "default" }: DocsSearchProps): R
                 >
                   <span className="flex items-center gap-2">
                     <span className="font-medium">{entry.title}</span>
-                    <span className="text-muted-foreground text-xs uppercase">{entry.type}</span>
+                    <span className="text-muted-foreground text-xs uppercase">
+                      {entry.type}
+                    </span>
                   </span>
                   {entry.description ? (
-                    <span className="text-muted-foreground mt-1 block text-sm line-clamp-2">
+                    <span className="text-muted-foreground mt-1 line-clamp-2 block text-sm">
                       {entry.description}
                     </span>
                   ) : null}

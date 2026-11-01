@@ -179,7 +179,9 @@ export function MotionDiv({
 }: MotionDivProps): ReactNode {
   const prefersReducedMotion = useReducedMotion();
 
-  const activeVariants = prefersReducedMotion ? reducedMotionVariants : variants;
+  const activeVariants = prefersReducedMotion
+    ? reducedMotionVariants
+    : variants;
   const activeTransition = prefersReducedMotion
     ? { duration: 0.01 }
     : defaultTransition;
@@ -206,7 +208,9 @@ export function MotionSection({
 }: MotionDivProps): ReactNode {
   const prefersReducedMotion = useReducedMotion();
 
-  const activeVariants = prefersReducedMotion ? reducedMotionVariants : variants;
+  const activeVariants = prefersReducedMotion
+    ? reducedMotionVariants
+    : variants;
   const activeTransition = prefersReducedMotion
     ? { duration: 0.01 }
     : defaultTransition;

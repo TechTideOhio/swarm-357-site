@@ -48,7 +48,10 @@ export function get_all_blog_tags(): BlogTag[] {
       posts: group.posts,
       indexable: group.posts.length >= MIN_POSTS_FOR_INDEXED_HUB,
     }))
-    .sort((a, b) => b.posts.length - a.posts.length || a.label.localeCompare(b.label));
+    .sort(
+      (a, b) =>
+        b.posts.length - a.posts.length || a.label.localeCompare(b.label)
+    );
 }
 
 /**

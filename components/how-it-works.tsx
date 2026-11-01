@@ -2,7 +2,11 @@
 
 import { howItWorksConfig } from "@/lib/config";
 import { fadeInUpView } from "@/lib/motion";
-import { chrome_card_shell, chrome_quiet_link, interactive_card } from "@/lib/ui-classes";
+import {
+  chrome_card_shell,
+  chrome_quiet_link,
+  interactive_card,
+} from "@/lib/ui-classes";
 import { Download, Layers, Terminal } from "lucide-react";
 import { motion } from "motion/react";
 import Link from "next/link";
@@ -40,14 +44,14 @@ function StepCard({
 
   return (
     <motion.div
-      className={`${chrome_card_shell} ${interactive_card} flex min-h-70 flex-col p-6 hover:border-accent/30 md:p-8`}
+      className={`${chrome_card_shell} ${interactive_card} hover:border-accent/30 flex min-h-70 flex-col p-6 md:p-8`}
       {...fadeInUpView}
       transition={{ ...fadeInUpView.transition, delay: index * 0.1 }}
     >
       <div className="text-foreground mb-6">
         <Icon className="h-12 w-12" strokeWidth={1} />
       </div>
-      <h3 className="mb-3 text-xl font-medium tracking-tight md:text-2xl mt-auto">
+      <h3 className="mt-auto mb-3 text-xl font-medium tracking-tight md:text-2xl">
         {step.title}
       </h3>
       <p className="text-muted-foreground text-base leading-relaxed">
@@ -68,7 +72,10 @@ export function HowItWorks(): ReactNode {
           <p className="text-muted-foreground mx-auto mt-4 max-w-2xl text-base md:text-lg">
             {howItWorksConfig.description}
           </p>
-          <Link href={howItWorksConfig.cta.href} className={`${chrome_quiet_link} mt-6 inline-block`}>
+          <Link
+            href={howItWorksConfig.cta.href}
+            className={`${chrome_quiet_link} mt-6 inline-block`}
+          >
             {howItWorksConfig.cta.text}
           </Link>
         </motion.div>

@@ -33,9 +33,15 @@ export function BlogCover({
 
   return (
     <motion.div
-      initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 1.02 }}
+      initial={
+        prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 1.02 }
+      }
       animate={{ opacity: 1, scale: 1 }}
-      transition={prefersReducedMotion ? { duration: 0.01 } : { duration: 0.7, ease: easeOut }}
+      transition={
+        prefersReducedMotion
+          ? { duration: 0.01 }
+          : { duration: 0.7, ease: easeOut }
+      }
       className={`border-border relative w-full overflow-hidden border bg-black ${FRAME[size]}`}
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}

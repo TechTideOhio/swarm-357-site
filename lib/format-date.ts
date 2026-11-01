@@ -22,10 +22,16 @@ const MONTHS = [
   "December",
 ] as const;
 
-function parts(date: string): { year: number; month: number; day: number } | null {
+function parts(
+  date: string
+): { year: number; month: number; day: number } | null {
   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date.trim());
   if (!match) return null;
-  return { year: Number(match[1]), month: Number(match[2]), day: Number(match[3]) };
+  return {
+    year: Number(match[1]),
+    month: Number(match[2]),
+    day: Number(match[3]),
+  };
 }
 
 /** "13 January 2026". Returns the raw string when the date is not ISO shaped. */

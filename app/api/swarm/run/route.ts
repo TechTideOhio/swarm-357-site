@@ -37,14 +37,23 @@ export async function POST(request: Request): Promise<Response> {
   );
   if (!rate.allowed) {
     return NextResponse.json(
-      { detail: "Too many demo runs. Try again shortly.", status: "rate_limited" },
-      { status: 429, headers: { "Retry-After": String(rate.retryAfterSeconds) } }
+      {
+        detail: "Too many demo runs. Try again shortly.",
+        status: "rate_limited",
+      },
+      {
+        status: 429,
+        headers: { "Retry-After": String(rate.retryAfterSeconds) },
+      }
     );
   }
 
   const raw = await request.text();
   if (raw.length > MAX_BODY_BYTES) {
-    return NextResponse.json({ detail: "Request body too large" }, { status: 413 });
+    return NextResponse.json(
+      { detail: "Request body too large" },
+      { status: 413 }
+    );
   }
 
   let body: RunBody;
@@ -121,7 +130,11 @@ export async function POST(request: Request): Promise<Response> {
 
     return NextResponse.json(payload, { status: upstream.status });
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : "Upstream request failed";
-    return NextResponse.json({ detail: message, status: "error" }, { status: 502 });
+    const message =
+      err instanceof Error ? err.message : "Upstream request failed";
+    return NextResponse.json(
+      { detail: message, status: "error" },
+      { status: 502 }
+    );
   }
 }

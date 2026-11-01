@@ -11,7 +11,10 @@ import type { ReactNode } from "react";
 
 export function PostCard({ post }: { post: BlogPost }): ReactNode {
   return (
-    <Link href={post.href} className={`${content_card} block h-full no-underline`}>
+    <Link
+      href={post.href}
+      className={`${content_card} block h-full no-underline`}
+    >
       {post.frontmatter.cover ? (
         <BlogCover
           src={post.frontmatter.cover}
@@ -23,8 +26,12 @@ export function PostCard({ post }: { post: BlogPost }): ReactNode {
       <p className="text-muted-foreground mt-4 text-sm">
         {format_post_date(post.frontmatter.date)}
       </p>
-      <h3 className="mt-1 text-xl font-medium tracking-tight">{post.frontmatter.title}</h3>
-      <p className="text-muted-foreground mt-2 text-sm">{post.frontmatter.description}</p>
+      <h3 className="mt-1 text-xl font-medium tracking-tight">
+        {post.frontmatter.title}
+      </h3>
+      <p className="text-muted-foreground mt-2 text-sm">
+        {post.frontmatter.description}
+      </p>
     </Link>
   );
 }

@@ -24,7 +24,7 @@ export function DocsPager({
           href={prev.href}
           className={`${content_card} group active:opacity-90`}
         >
-          <span className="text-muted-foreground flex items-center gap-1 text-xs uppercase tracking-wider">
+          <span className="text-muted-foreground flex items-center gap-1 text-xs tracking-wider uppercase">
             <ChevronLeft className="h-3 w-3" /> Previous
           </span>
           <span className="mt-2 block font-medium">{prev.title}</span>
@@ -37,7 +37,7 @@ export function DocsPager({
           href={next.href}
           className={`${content_card} group text-right active:opacity-90`}
         >
-          <span className="text-muted-foreground flex items-center justify-end gap-1 text-xs uppercase tracking-wider">
+          <span className="text-muted-foreground flex items-center justify-end gap-1 text-xs tracking-wider uppercase">
             Next <ChevronRight className="h-3 w-3" />
           </span>
           <span className="mt-2 block font-medium">{next.title}</span>

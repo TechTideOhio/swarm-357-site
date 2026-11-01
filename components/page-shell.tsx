@@ -46,7 +46,10 @@ export function PageShell({
 }: PageShellProps): ReactNode {
   const content = (
     <>
-      <nav aria-label="Breadcrumb" className="text-muted-foreground mb-8 text-sm">
+      <nav
+        aria-label="Breadcrumb"
+        className="text-muted-foreground mb-8 text-sm"
+      >
         <ol className="flex flex-wrap items-center gap-2">
           <li>
             <Link href="/" className={content_breadcrumb_link}>
@@ -77,7 +80,9 @@ export function PageShell({
       ) : null}
 
       {description ? (
-        <p className={`text-muted-foreground text-lg ${showHeading || !title ? "mb-12" : "mb-8"}`}>
+        <p
+          className={`text-muted-foreground text-lg ${showHeading || !title ? "mb-12" : "mb-8"}`}
+        >
           {description}
         </p>
       ) : null}

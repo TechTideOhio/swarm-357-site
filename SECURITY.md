@@ -14,13 +14,13 @@ We aim to acknowledge a report within 72 hours and to share a remediation timeli
 
 ## Trust boundaries
 
-| Surface | Posture |
-|---------|---------|
+| Surface               | Posture                                                                                                                                                                                          |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `POST /api/swarm/run` | Anonymous same-origin proxy. The server pins `simulate: true`, clamps `budget_usd` to a demo ceiling, caps task length and body size, and rate limits per IP. Client-supplied flags are ignored. |
-| Write key | `SWARM_API_KEY` is read server side on each request. It is never prefixed with `NEXT_PUBLIC_`, so it cannot be inlined into the client bundle. |
-| Read fetches | The browser calls the core API directly for health, roster, status, and cost. Those responses are redacted for unauthenticated callers by the API. |
-| Response headers | Content Security Policy, `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`, and HSTS in production. |
-| Raw docs export | `/docs/raw/...` serves committed content only. Role slugs are allowlisted and resolved paths are confined to the SOUL template directory. |
+| Write key             | `SWARM_API_KEY` is read server side on each request. It is never prefixed with `NEXT_PUBLIC_`, so it cannot be inlined into the client bundle.                                                   |
+| Read fetches          | The browser calls the core API directly for health, roster, status, and cost. Those responses are redacted for unauthenticated callers by the API.                                               |
+| Response headers      | Content Security Policy, `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`, and HSTS in production.                                                           |
+| Raw docs export       | `/docs/raw/...` serves committed content only. Role slugs are allowlisted and resolved paths are confined to the SOUL template directory.                                                        |
 
 ## Automated checks
 

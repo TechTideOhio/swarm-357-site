@@ -6,7 +6,11 @@ import Link from "next/link";
 import { BlogCover } from "@/components/blog/blog-cover";
 import { load_all_blog_posts } from "@/lib/content/loader";
 import { format_post_date } from "@/lib/format-date";
-import { chrome_card_shell, chrome_quiet_link, interactive_card } from "@/lib/ui-classes";
+import {
+  chrome_card_shell,
+  chrome_quiet_link,
+  interactive_card,
+} from "@/lib/ui-classes";
 import type { ReactNode } from "react";
 
 const POST_COUNT = 3;
@@ -25,7 +29,10 @@ export function LatestPosts(): ReactNode {
           <p className="text-muted-foreground mx-auto mt-4 max-w-2xl text-base md:text-lg">
             What broke, what we changed, and what we would not build again.
           </p>
-          <Link href="/blog" className={`${chrome_quiet_link} mt-6 inline-block`}>
+          <Link
+            href="/blog"
+            className={`${chrome_quiet_link} mt-6 inline-block`}
+          >
             Read the blog
           </Link>
         </div>

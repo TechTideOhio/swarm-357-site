@@ -51,7 +51,12 @@ export function InteractiveArtPanel({
       onMouseLeave={handle_mouse_leave}
     >
       {!is_mobile && is_hovered ? (
-        <DitherCursor position="absolute" opacity={0.45} intensity={0.65} radius={0.09} />
+        <DitherCursor
+          position="absolute"
+          opacity={0.45}
+          intensity={0.65}
+          radius={0.09}
+        />
       ) : null}
 
       <motion.div
@@ -67,7 +72,7 @@ export function InteractiveArtPanel({
         aria-label={label}
       />
 
-      <div className="absolute inset-0 bg-gradient-to-t from-muted via-muted/30 to-transparent" />
+      <div className="from-muted via-muted/30 absolute inset-0 bg-gradient-to-t to-transparent" />
       <div className="absolute inset-0 bg-gradient-to-br from-black/25 via-transparent to-transparent opacity-80" />
 
       <div className="relative z-10 flex h-full min-h-56 items-end p-5 md:min-h-0 md:p-6">

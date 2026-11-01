@@ -34,7 +34,8 @@ interface ModalSheetProps {
 
 function useVisualViewportHeight(active: boolean): void {
   useEffect(() => {
-    if (!active || typeof window === "undefined" || !window.visualViewport) return;
+    if (!active || typeof window === "undefined" || !window.visualViewport)
+      return;
 
     const set_height = (): void => {
       document.documentElement.style.setProperty(
@@ -80,8 +81,12 @@ export function ModalSheet({
     return () => window.removeEventListener("keydown", on_key);
   }, [open, onClose]);
 
-  const overlay_motion = prefers_reduced_motion ? overlayFadeReduced : overlayFade;
-  const panel_motion = prefers_reduced_motion ? dialogSpringReduced : dialogSpring;
+  const overlay_motion = prefers_reduced_motion
+    ? overlayFadeReduced
+    : overlayFade;
+  const panel_motion = prefers_reduced_motion
+    ? dialogSpringReduced
+    : dialogSpring;
 
   return (
     <AnimatePresence>
@@ -106,12 +111,14 @@ export function ModalSheet({
             animate={panel_motion.animate}
             exit={panel_motion.exit}
             transition={
-              prefers_reduced_motion ? { duration: 0.01 } : dialogSpringTransition
+              prefers_reduced_motion
+                ? { duration: 0.01 }
+                : dialogSpringTransition
             }
             onClick={(event) => event.stopPropagation()}
             data-lenis-prevent
           >
-            <div className="border-border relative flex shrink-0 items-center justify-center border-b px-4 py-3 sm:justify-end sm:border-0 sm:py-0 sm:pr-3 sm:pt-3">
+            <div className="border-border relative flex shrink-0 items-center justify-center border-b px-4 py-3 sm:justify-end sm:border-0 sm:py-0 sm:pt-3 sm:pr-3">
               <div
                 className="bg-muted absolute top-3 left-1/2 h-1 w-12 -translate-x-1/2 rounded-full sm:hidden"
                 aria-hidden="true"
@@ -125,7 +132,9 @@ export function ModalSheet({
                 <X className="h-5 w-5" aria-hidden="true" />
               </button>
             </div>
-            <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">{children}</div>
+            <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+              {children}
+            </div>
           </motion.div>
         </motion.div>
       ) : null}

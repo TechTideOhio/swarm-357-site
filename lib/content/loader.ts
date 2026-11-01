@@ -19,7 +19,10 @@ const CONTENT_ROOT = path.join(process.cwd(), "content");
 const DOCS_DIR = path.join(CONTENT_ROOT, "docs");
 const BLOG_DIR = path.join(CONTENT_ROOT, "blog");
 
-function read_mdx_file(file_path: string): { content: string; data: Record<string, unknown> } {
+function read_mdx_file(file_path: string): {
+  content: string;
+  data: Record<string, unknown>;
+} {
   const raw = fs.readFileSync(file_path, "utf8");
   const { content, data } = matter(raw);
   return { content, data: data as Record<string, unknown> };
@@ -71,7 +74,10 @@ export function load_doc_by_slug(slug: string): DocPage | null {
 export function load_all_docs(): DocPage[] {
   const nav_slugs = get_flat_nav_items().map((item) => item.slug);
   const disk_files = list_mdx_files(DOCS_DIR).map((file) =>
-    path.relative(DOCS_DIR, file).replace(/\\/g, "/").replace(/\.mdx$/, "")
+    path
+      .relative(DOCS_DIR, file)
+      .replace(/\\/g, "/")
+      .replace(/\.mdx$/, "")
   );
 
   const all_slugs = [...new Set([...nav_slugs, ...disk_files])];
@@ -83,7 +89,9 @@ export function load_all_docs(): DocPage[] {
   }
 
   const order_map = new Map(nav_slugs.map((slug, index) => [slug, index]));
-  pages.sort((a, b) => (order_map.get(a.slug) ?? 999) - (order_map.get(b.slug) ?? 999));
+  pages.sort(
+    (a, b) => (order_map.get(a.slug) ?? 999) - (order_map.get(b.slug) ?? 999)
+  );
   return pages;
 }
 
@@ -158,7 +166,9 @@ export function load_all_blog_posts(): BlogPost[] {
     .readdirSync(BLOG_DIR)
     .filter((name) => name.endsWith(".mdx"))
     .map((name) => load_blog_by_slug(name.replace(/\.mdx$/, "")))
-    .filter((post): post is BlogPost => post !== null && !post.frontmatter.draft)
+    .filter(
+      (post): post is BlogPost => post !== null && !post.frontmatter.draft
+    )
     .sort((a, b) => b.frontmatter.date.localeCompare(a.frontmatter.date));
 }
 

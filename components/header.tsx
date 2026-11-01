@@ -5,8 +5,19 @@
 "use client";
 
 import { siteConfig } from "@/lib/config";
-import { contributor_links, github_social, header_menu_cards } from "@/lib/navigation";
-import { easeInOut, easeOut, overlayFade, overlayFadeTransition, spring, useReducedMotion } from "@/lib/motion";
+import {
+  contributor_links,
+  github_social,
+  header_menu_cards,
+} from "@/lib/navigation";
+import {
+  easeInOut,
+  easeOut,
+  overlayFade,
+  overlayFadeTransition,
+  spring,
+  useReducedMotion,
+} from "@/lib/motion";
 import {
   chrome_icon_circle,
   chrome_overlay,
@@ -68,13 +79,22 @@ function HamburgerIcon({ isOpen }: { isOpen: boolean }): ReactNode {
 
 function GitHubIcon({ className }: { className?: string }): ReactNode {
   return (
-    <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      aria-hidden="true"
+    >
       <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
     </svg>
   );
 }
 
-function MenuCard({ card }: { card: (typeof header_menu_cards)[number] }): ReactNode {
+function MenuCard({
+  card,
+}: {
+  card: (typeof header_menu_cards)[number];
+}): ReactNode {
   return (
     <motion.div
       className="bg-menu-card min-h-50 rounded-2xl p-6 min-[1080px]:min-h-80"
@@ -111,15 +131,17 @@ function MenuCard({ card }: { card: (typeof header_menu_cards)[number] }): React
                 <GitHubIcon className="h-5 w-5" />
               </a>
             </div>
-            <div className="flex flex-col gap-2 text-sm text-background/70">
-              <span className="font-semibold text-background/50 uppercase tracking-widest text-xs">Contributors</span>
+            <div className="text-background/70 flex flex-col gap-2 text-sm">
+              <span className="text-background/50 text-xs font-semibold tracking-widest uppercase">
+                Contributors
+              </span>
               {contributor_links.map((contributor) => (
                 <a
                   key={contributor.href}
                   href={contributor.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="focus-ring hover:text-background hover:underline transition-colors"
+                  className="focus-ring hover:text-background transition-colors hover:underline"
                 >
                   {contributor.label}
                 </a>
@@ -147,7 +169,9 @@ function MenuCard({ card }: { card: (typeof header_menu_cards)[number] }): React
                 </span>
                 <ArrowUpRight className="h-5 w-5 opacity-50 transition-all duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:opacity-100 group-active:opacity-100" />
               </Link>
-              {index < card.links.length - 1 && <div className="bg-background/10 h-px" />}
+              {index < card.links.length - 1 && (
+                <div className="bg-background/10 h-px" />
+              )}
             </li>
           ))}
         </ul>
@@ -189,9 +213,15 @@ function MobileSignUpButton(): ReactNode {
           }}
         >
           <span className="flex flex-col duration-0 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-2/3 group-hover:transition-transform group-hover:duration-300">
-            <span className="block leading-[1.25em]">{siteConfig.nav.cta.text}</span>
-            <span className="block leading-[1.25em]">{siteConfig.nav.cta.text}</span>
-            <span className="block leading-[1.25em]">{siteConfig.nav.cta.text}</span>
+            <span className="block leading-[1.25em]">
+              {siteConfig.nav.cta.text}
+            </span>
+            <span className="block leading-[1.25em]">
+              {siteConfig.nav.cta.text}
+            </span>
+            <span className="block leading-[1.25em]">
+              {siteConfig.nav.cta.text}
+            </span>
           </span>
         </span>
       </Link>
@@ -199,11 +229,7 @@ function MobileSignUpButton(): ReactNode {
   );
 }
 
-function MegaMenuContent({
-  cardsDelay,
-}: {
-  cardsDelay: number;
-}): ReactNode {
+function MegaMenuContent({ cardsDelay }: { cardsDelay: number }): ReactNode {
   return (
     <motion.div
       className="grid grid-cols-1 gap-6 p-6 min-[1080px]:grid-cols-3"
@@ -249,7 +275,9 @@ export function Header(): ReactNode {
   useFocusTrap(isMenuOpen, menu_panel_ref, menu_button_ref);
 
   React.useEffect(() => {
-    const wrapper = document.querySelector(".h-screen.overflow-y-auto") as HTMLElement;
+    const wrapper = document.querySelector(
+      ".h-screen.overflow-y-auto"
+    ) as HTMLElement;
     const measureScrollbar = () => {
       if (wrapper) setScrollbarWidth(wrapper.offsetWidth - wrapper.clientWidth);
     };
@@ -284,11 +312,7 @@ export function Header(): ReactNode {
   }, [isMenuOpen]);
 
   const nav_width =
-    isMenuOpen || isMobileSheet
-      ? "100%"
-      : hasScrolled
-        ? "56rem"
-        : "42rem";
+    isMenuOpen || isMobileSheet ? "100%" : hasScrolled ? "56rem" : "42rem";
 
   return (
     <>
@@ -300,7 +324,9 @@ export function Header(): ReactNode {
             animate={overlayFade.animate}
             exit={overlayFade.exit}
             transition={
-              prefers_reduced_motion ? { duration: 0.01 } : overlayFadeTransition
+              prefers_reduced_motion
+                ? { duration: 0.01 }
+                : overlayFadeTransition
             }
             onClick={() => setIsMenuOpen(false)}
             aria-hidden="true"
@@ -322,7 +348,7 @@ export function Header(): ReactNode {
         }}
       >
         <motion.nav
-          className={`bg-foreground shadow-2xl/20 border border-neutral-200/10 flex max-w-full flex-col overflow-hidden rounded-md ${
+          className={`bg-foreground flex max-w-full flex-col overflow-hidden rounded-md border border-neutral-200/10 shadow-2xl/20 ${
             isMenuOpen && isMobileSheet ? "w-full" : ""
           }`}
           initial={false}

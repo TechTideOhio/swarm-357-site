@@ -42,7 +42,8 @@ html {
   overflow-x: hidden;
 }
 
-html.lenis, html.lenis body {
+html.lenis,
+html.lenis body {
   height: auto;
 }
 
@@ -129,7 +130,8 @@ body {
   }
 
   .interactive-base {
-    transition-property: color, background-color, border-color, opacity, transform, box-shadow;
+    transition-property:
+      color, background-color, border-color, opacity, transform, box-shadow;
     transition-duration: 200ms;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   }
@@ -149,7 +151,8 @@ body {
   /* Pill CTAs: the radius morph is deliberately slower than the colour and
      press response, so each property carries its own duration. */
   .cta-morph {
-    transition-property: border-radius, background-color, border-color, color, filter, opacity,
+    transition-property:
+      border-radius, background-color, border-color, color, filter, opacity,
       box-shadow, transform;
     transition-duration: 500ms, 200ms, 200ms, 200ms, 200ms, 200ms, 300ms, 200ms;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
@@ -207,7 +210,8 @@ body {
 
 .scrollbar-fluid {
   scrollbar-width: thin;
-  scrollbar-color: color-mix(in srgb, var(--accent) 55%, transparent) transparent;
+  scrollbar-color: color-mix(in srgb, var(--accent) 55%, transparent)
+    transparent;
 }
 
 .scrollbar-fluid::-webkit-scrollbar {

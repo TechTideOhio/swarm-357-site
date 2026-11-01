@@ -63,7 +63,11 @@ function StatCard({
       transition={{ ...fadeInUpView.transition, delay: index * 0.1 }}
     >
       <div className="text-foreground text-5xl font-medium tracking-tight md:text-6xl lg:text-7xl">
-        <AnimatedNumber value={stat.value} suffix={stat.suffix} decimals={stat.decimals} />
+        <AnimatedNumber
+          value={stat.value}
+          suffix={stat.suffix}
+          decimals={stat.decimals}
+        />
       </div>
       <p className="text-muted-foreground mt-3 text-base md:text-lg">
         {stat.label}

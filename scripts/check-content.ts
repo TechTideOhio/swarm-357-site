@@ -54,7 +54,9 @@ function check_dashes(file: string, content: string) {
 }
 
 function check_github_links(file: string, content: string) {
-  const matches = content.match(/https:\/\/github\.com\/TechTideOhio\/swarm-357[^\s)"']*/g);
+  const matches = content.match(
+    /https:\/\/github\.com\/TechTideOhio\/swarm-357[^\s)"']*/g
+  );
   if (!matches) return;
 
   for (const match of matches) {
@@ -70,7 +72,9 @@ function check_malformed_urls(file: string, content: string) {
   const lines = content.split("\n");
   lines.forEach((line, index) => {
     if (/https?:\/\/\//.test(line)) {
-      errors.push(`${file}:${index + 1} contains a malformed URL with an empty host`);
+      errors.push(
+        `${file}:${index + 1} contains a malformed URL with an empty host`
+      );
     }
   });
 }
@@ -142,7 +146,9 @@ for (const dir of SCAN_DIRS) {
 const site_url_file = path.join(ROOT, "lib/site-url.ts");
 if (fs.existsSync(site_url_file)) {
   const content = fs.readFileSync(site_url_file, "utf8");
-  const matches = content.match(/https:\/\/github\.com\/TechTideOhio\/swarm-357[^\s)"']*/g) ?? [];
+  const matches =
+    content.match(/https:\/\/github\.com\/TechTideOhio\/swarm-357[^\s)"']*/g) ??
+    [];
   for (const allowed of ALLOWED_GITHUB_URLS) {
     if (matches.filter((match) => match === allowed).length !== 1) {
       errors.push(`lib/site-url.ts must define ${allowed} exactly once`);
@@ -212,11 +218,17 @@ function check_nav_external_links() {
       errors.push("lib/navigation.ts github_social must use href: GITHUB_URL");
     }
     if (!nav_content.includes("href: LINKEDIN_URL")) {
-      errors.push("lib/navigation.ts linkedin_social must use href: LINKEDIN_URL");
+      errors.push(
+        "lib/navigation.ts linkedin_social must use href: LINKEDIN_URL"
+      );
     }
-    const literal_github = nav_content.match(/https:\/\/github\.com\/TechTideOhio\/swarm-357/g) ?? [];
+    const literal_github =
+      nav_content.match(/https:\/\/github\.com\/TechTideOhio\/swarm-357/g) ??
+      [];
     if (literal_github.length > 0) {
-      errors.push("lib/navigation.ts must import GITHUB_URL instead of hardcoding the repo URL");
+      errors.push(
+        "lib/navigation.ts must import GITHUB_URL instead of hardcoding the repo URL"
+      );
     }
   }
 }
@@ -242,7 +254,8 @@ function check_ui_consistency() {
 
       const content = fs.readFileSync(file, "utf8");
       const uses_ui_classes =
-        content.includes("@/lib/ui-classes") || content.includes("lib/ui-classes");
+        content.includes("@/lib/ui-classes") ||
+        content.includes("lib/ui-classes");
 
       const lines = content.split("\n");
       lines.forEach((line, index) => {
@@ -253,14 +266,22 @@ function check_ui_consistency() {
           !line.includes("focus-ring") &&
           !line.includes("focus-visible:")
         ) {
-          errors.push(`${rel}:${line_no} uses focus:outline-none without focus-ring`);
+          errors.push(
+            `${rel}:${line_no} uses focus:outline-none without focus-ring`
+          );
         }
 
         if (
-          (line.includes("rounded-md") && line.includes("px-5") && line.includes("py-3")) ||
-          (line.includes("rounded-md") && line.includes("bg-accent") && line.includes("py-3"))
+          (line.includes("rounded-md") &&
+            line.includes("px-5") &&
+            line.includes("py-3")) ||
+          (line.includes("rounded-md") &&
+            line.includes("bg-accent") &&
+            line.includes("py-3"))
         ) {
-          errors.push(`${rel}:${line_no} uses legacy rounded-md CTA base (use rounded-[3.5px])`);
+          errors.push(
+            `${rel}:${line_no} uses legacy rounded-md CTA base (use rounded-[3.5px])`
+          );
         }
 
         if (
@@ -275,7 +296,9 @@ function check_ui_consistency() {
           line.includes("h-10 w-10") &&
           !line.includes("min-h-11")
         ) {
-          errors.push(`${rel}:${line_no} button uses h-10 w-10 without min-h-11 touch target`);
+          errors.push(
+            `${rel}:${line_no} button uses h-10 w-10 without min-h-11 touch target`
+          );
         }
 
         if (
@@ -290,7 +313,9 @@ function check_ui_consistency() {
         ) {
           const string_match = line.match(/className="([^"]+)"/);
           if (string_match && !string_match[1].includes("focus-ring")) {
-            errors.push(`${rel}:${line_no} button missing focus-ring or ui-classes interaction`);
+            errors.push(
+              `${rel}:${line_no} button missing focus-ring or ui-classes interaction`
+            );
           }
         }
 
@@ -301,7 +326,9 @@ function check_ui_consistency() {
           !line.includes("chrome_form_control") &&
           !line.includes("content_form_control")
         ) {
-          errors.push(`${rel}:${line_no} input uses text-sm without mobile text-base override`);
+          errors.push(
+            `${rel}:${line_no} input uses text-sm without mobile text-base override`
+          );
         }
 
         const is_interactive =
@@ -326,7 +353,9 @@ function check_ui_consistency() {
 
         const string_match = line.match(/className="([^"]+)"/);
         if (string_match && !string_match[1].includes("focus-ring")) {
-          errors.push(`${rel}:${line_no} interactive element missing focus-ring in class string`);
+          errors.push(
+            `${rel}:${line_no} interactive element missing focus-ring in class string`
+          );
         }
       });
     }
@@ -358,7 +387,9 @@ function check_blog_frontmatter() {
   }
 
   const owners = (
-    JSON.parse(fs.readFileSync(owners_path, "utf8")) as { owners: Record<string, string> }
+    JSON.parse(fs.readFileSync(owners_path, "utf8")) as {
+      owners: Record<string, string>;
+    }
   ).owners;
   const claimed = new Map<string, string>();
 
@@ -368,7 +399,9 @@ function check_blog_frontmatter() {
     const slug = entry.replace(/\.mdx$/, "");
     const rel = `content/blog/${entry}`;
     // Normalised so a Windows checkout does not report a missing frontmatter block.
-    const raw = fs.readFileSync(path.join(blog_dir, entry), "utf8").replace(/\r\n/g, "\n");
+    const raw = fs
+      .readFileSync(path.join(blog_dir, entry), "utf8")
+      .replace(/\r\n/g, "\n");
     const front_matter = /^---\n([\s\S]*?)\n---/.exec(raw)?.[1];
 
     if (!front_matter) {
@@ -383,13 +416,17 @@ function check_blog_frontmatter() {
     }
 
     const read_field = (field: string): string | null => {
-      const value = new RegExp(`^${field}:\\s*"?([^"\\n]*)"?\\s*$`, "m").exec(front_matter)?.[1];
+      const value = new RegExp(`^${field}:\\s*"?([^"\\n]*)"?\\s*$`, "m").exec(
+        front_matter
+      )?.[1];
       return value ? value.trim() : null;
     };
 
     const declared_slug = read_field("slug");
     if (declared_slug && declared_slug !== slug) {
-      errors.push(`${rel}: slug "${declared_slug}" does not match the filename`);
+      errors.push(
+        `${rel}: slug "${declared_slug}" does not match the filename`
+      );
     }
 
     const description = read_field("description");
@@ -417,7 +454,9 @@ function check_blog_frontmatter() {
         errors.push(
           `${rel}: cover "${cover}" must match /art/blog/<lowercase-slug>.<jpg|jpeg|png|webp>`
         );
-      } else if (!fs.existsSync(path.join(ROOT, "public", cover.replace(/^\//, "")))) {
+      } else if (
+        !fs.existsSync(path.join(ROOT, "public", cover.replace(/^\//, "")))
+      ) {
         errors.push(`${rel}: cover "${cover}" does not exist in public/`);
       }
     }
@@ -426,14 +465,18 @@ function check_blog_frontmatter() {
     if (keyword) {
       const owner = owners[keyword];
       if (!owner) {
-        errors.push(`${rel}: keyword "${keyword}" is not registered in blog-keyword-owners.json`);
+        errors.push(
+          `${rel}: keyword "${keyword}" is not registered in blog-keyword-owners.json`
+        );
       } else if (owner !== slug) {
         errors.push(`${rel}: keyword "${keyword}" belongs to ${owner}`);
       }
 
       const previous = claimed.get(keyword);
       if (previous) {
-        errors.push(`${rel}: keyword "${keyword}" already claimed by ${previous}`);
+        errors.push(
+          `${rel}: keyword "${keyword}" already claimed by ${previous}`
+        );
       }
       claimed.set(keyword, slug);
     }

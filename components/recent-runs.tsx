@@ -107,13 +107,19 @@ export function RecentRuns(): ReactNode {
         {loading && (
           <div className="space-y-3">
             {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="skeleton h-14 rounded-2xl border border-neutral-200/10" />
+              <div
+                key={i}
+                className="skeleton h-14 rounded-2xl border border-neutral-200/10"
+              />
             ))}
           </div>
         )}
 
         {!loading && fetchError && (
-          <p className="text-muted-foreground py-12 text-center text-sm" role="alert">
+          <p
+            className="text-muted-foreground py-12 text-center text-sm"
+            role="alert"
+          >
             Could not load run history. Check that the backend is reachable.
           </p>
         )}

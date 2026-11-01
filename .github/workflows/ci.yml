@@ -29,6 +29,8 @@ jobs:
         run: bun run verify:links
       - name: Lint
         run: bun run lint
+      - name: Format check
+        run: bun run format:check
       - name: Test
         run: bun test
       - name: Build

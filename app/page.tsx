@@ -32,7 +32,11 @@ const software_json_ld = {
   description: siteConfig.description,
   url: SITE_URL,
   sameAs: [GITHUB_URL, PYPI_URL],
-  publisher: { "@type": "Organization", name: "TechTide AI", url: TECHTIDE_URL },
+  publisher: {
+    "@type": "Organization",
+    name: "TechTide AI",
+    url: TECHTIDE_URL,
+  },
   offers: {
     "@type": "Offer",
     price: "0",

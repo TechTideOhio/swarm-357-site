@@ -18,7 +18,11 @@ export default function Error({
   return (
     <PageShell title="Something went wrong" centered>
       <p className="text-muted-foreground mb-8 text-sm">{error.message}</p>
-      <button type="button" onClick={reset} className={`${chrome_primary_cta} glow-accent`}>
+      <button
+        type="button"
+        onClick={reset}
+        className={`${chrome_primary_cta} glow-accent`}
+      >
         Try again
       </button>
     </PageShell>

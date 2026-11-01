@@ -29,7 +29,9 @@ export async function generateStaticParams() {
   ];
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
   const { slug: slug_parts } = await params;
   const slug = slug_parts?.join("/") ?? "";
 
@@ -98,7 +100,9 @@ function DocJsonLd({
   );
 }
 
-export default async function DocPage({ params }: PageProps): Promise<ReactNode> {
+export default async function DocPage({
+  params,
+}: PageProps): Promise<ReactNode> {
   const { slug: slug_parts } = await params;
   const slug = slug_parts?.join("/") ?? "";
 
@@ -121,7 +125,7 @@ export default async function DocPage({ params }: PageProps): Promise<ReactNode>
         path={doc.href}
         breadcrumbs={crumbs}
       />
-      <article className="min-w-0 flex-1 max-w-3xl">
+      <article className="max-w-3xl min-w-0 flex-1">
         <DocsBreadcrumbs crumbs={crumbs} />
         <header className="mb-8">
           <h1 className="mb-3 text-3xl font-medium tracking-tight md:text-4xl">
