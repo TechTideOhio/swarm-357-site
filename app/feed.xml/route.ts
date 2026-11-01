@@ -27,12 +27,16 @@ function mime_for(url: string): string {
 
 export function GET(): Response {
   const posts = load_all_blog_posts();
-  const latest = posts[0] ? post_date_to_utc(posts[0].frontmatter.date) : new Date();
+  const latest = posts[0]
+    ? post_date_to_utc(posts[0].frontmatter.date)
+    : new Date();
 
   const items = posts
     .map((post) => {
       const url = `${SITE_URL}${post.href}`;
-      const cover = post.frontmatter.cover ? `${SITE_URL}${post.frontmatter.cover}` : null;
+      const cover = post.frontmatter.cover
+        ? `${SITE_URL}${post.frontmatter.cover}`
+        : null;
       const categories = (post.frontmatter.tags ?? [])
         .map((tag) => `      <category>${escape_xml(tag)}</category>`)
         .join("\n");
@@ -44,7 +48,9 @@ export function GET(): Response {
         `      <guid isPermaLink="true">${escape_xml(url)}</guid>`,
         `      <pubDate>${to_rfc_822(post_date_to_utc(post.frontmatter.date))}</pubDate>`,
         `      <description>${escape_xml(post.frontmatter.description)}</description>`,
-        cover ? `      <enclosure url="${escape_xml(cover)}" type="${mime_for(cover)}" />` : "",
+        cover
+          ? `      <enclosure url="${escape_xml(cover)}" type="${mime_for(cover)}" />`
+          : "",
         categories,
         "    </item>",
       ]

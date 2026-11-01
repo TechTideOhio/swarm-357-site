@@ -38,7 +38,7 @@ function FAQItem({
         aria-controls={`faq-panel-${index}`}
         className="group focus-ring hover:bg-foreground/5 active:bg-foreground/10 flex w-full items-center justify-between py-6 text-left transition-colors duration-200"
       >
-        <span className="text-foreground text-lg font-medium pr-8 md:text-xl">
+        <span className="text-foreground pr-8 text-lg font-medium md:text-xl">
           {faq.question}
         </span>
         <motion.div
@@ -77,7 +77,7 @@ export function FAQ(): ReactNode {
   };
 
   return (
-    <section className="bg-foreground px-6 py-16 md:py-32 rounded-4xl">
+    <section className="bg-foreground rounded-4xl px-6 py-16 md:py-32">
       <div className="mx-auto max-w-3xl">
         <motion.div className="mb-12 text-center md:mb-16" {...fadeInUpView}>
           <h2 className="text-background text-3xl font-medium tracking-tight md:text-4xl lg:text-5xl">

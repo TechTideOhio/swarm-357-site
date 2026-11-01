@@ -30,7 +30,9 @@ export const siteConfig = {
 
 /** Feed autodiscovery. Repeated on every page so readers can subscribe anywhere. */
 function rss_alternate(): Record<string, AlternateLinkDescriptor[]> {
-  return { "application/rss+xml": [{ url: "/feed.xml", title: "Swarm 357 blog" }] };
+  return {
+    "application/rss+xml": [{ url: "/feed.xml", title: "Swarm 357 blog" }],
+  };
 }
 
 function og_image_url(title: string, subtitle?: string): string {

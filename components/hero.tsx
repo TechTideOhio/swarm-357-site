@@ -34,7 +34,7 @@ const carouselCards: Card[] = heroConfig.carousel.map((label, index) => ({
   content: (
     <div className="relative flex h-full flex-col justify-end">
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent" />
-      <div className="relative z-10 px-4 pb-5 pt-3">
+      <div className="relative z-10 px-4 pt-3 pb-5">
         <span className="inline-block rounded-[3.5px] bg-black/55 px-3 py-1.5 text-sm font-medium tracking-tight text-white backdrop-blur-sm">
           {label}
         </span>
@@ -53,14 +53,18 @@ function AnimatedLine({
   className?: string;
 }): ReactNode {
   const reducedMotion = useReducedMotion();
-  if (reducedMotion) return <span className={`block ${className ?? ""}`}>{text}</span>;
+  if (reducedMotion)
+    return <span className={`block ${className ?? ""}`}>{text}</span>;
   return (
     <span className={`block ${className ?? ""}`}>
       {text.split(/(\s+)/).map((word, wordIndex, words) => {
         const offset = words.slice(0, wordIndex).join("").length;
         if (!word.trim()) return word;
         return (
-          <span key={`${text}-${wordIndex}`} className="inline-block whitespace-nowrap">
+          <span
+            key={`${text}-${wordIndex}`}
+            className="inline-block whitespace-nowrap"
+          >
             {word.split("").map((char, index) => (
               <motion.span
                 key={`${word}-${index}`}
@@ -156,7 +160,7 @@ export function Hero(): ReactNode {
         <p className="text-muted-foreground mb-5 text-xs font-medium tracking-[0.2em] uppercase md:text-sm">
           {siteConfig.name}
         </p>
-        <h1 className="mb-6 text-4xl font-medium leading-[1.05] tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl">
+        <h1 className="mb-6 text-4xl leading-[1.05] font-medium tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl">
           <AnimatedLine text={lineOne} delayBase={0} />
           <AnimatedLine text={lineTwo} delayBase={0.35} className="mt-1" />
         </h1>
@@ -174,10 +178,16 @@ export function Hero(): ReactNode {
           transition={{ duration: 0.6, delay: 0.95, ease: easeOut }}
           className="mt-8 flex flex-wrap items-center justify-center gap-3"
         >
-          <Link href={heroConfig.cta.primary.href} className={`${chrome_primary_cta} glow-accent`}>
+          <Link
+            href={heroConfig.cta.primary.href}
+            className={`${chrome_primary_cta} glow-accent`}
+          >
             {heroConfig.cta.primary.text}
           </Link>
-          <Link href={heroConfig.cta.secondary.href} className={chrome_secondary_cta}>
+          <Link
+            href={heroConfig.cta.secondary.href}
+            className={chrome_secondary_cta}
+          >
             {heroConfig.cta.secondary.text}
           </Link>
         </motion.div>
@@ -187,7 +197,8 @@ export function Hero(): ReactNode {
           transition={{ duration: 0.5, delay: 1.1, ease: easeOut }}
           className="text-muted-foreground mt-4 text-xs tracking-tight"
         >
-          Landing {siteConfig.siteVersion} · techtide-swarm {CORE_PACKAGE_VERSION}
+          Landing {siteConfig.siteVersion} · techtide-swarm{" "}
+          {CORE_PACKAGE_VERSION}
         </motion.p>
       </div>
 
@@ -200,7 +211,7 @@ export function Hero(): ReactNode {
             "linear-gradient(to bottom, black 0%, black 62%, transparent 100%)",
         }}
       >
-        <div className="absolute left-1/2 top-0 -translate-x-1/2">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2">
           <div className="origin-top scale-[0.55] sm:scale-[0.65] lg:scale-[0.8] xl:scale-100">
             <RotatingCards
               cards={carouselCards}

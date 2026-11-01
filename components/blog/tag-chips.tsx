@@ -20,7 +20,10 @@ export function TagChips({
     <ul className="flex flex-wrap gap-2" aria-label={label}>
       {tags.map((tag) => (
         <li key={tag}>
-          <Link href={`/blog/tag/${tag_to_slug(tag)}`} className={content_tag_chip}>
+          <Link
+            href={`/blog/tag/${tag_to_slug(tag)}`}
+            className={content_tag_chip}
+          >
             {tag}
           </Link>
         </li>

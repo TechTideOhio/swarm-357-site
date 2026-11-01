@@ -50,7 +50,11 @@ export const header_menu_cards: MenuCard[] = [
     id: "products",
     title: "PRODUCT",
     links: [
-      { label: "Installation", href: "/docs/getting-started/installation", badge: null },
+      {
+        label: "Installation",
+        href: "/docs/getting-started/installation",
+        badge: null,
+      },
       { label: "Try it live", href: "#try-it-live", badge: "LIVE" },
       { label: "HTTP API docs", href: "/docs/api/overview", badge: null },
     ],
@@ -62,7 +66,11 @@ export const header_menu_cards: MenuCard[] = [
       { label: "About", href: "/about", badge: null },
       { label: "Documentation", href: "/docs", badge: null },
       { label: "Status", href: "/docs/resources/status", badge: null },
-      { label: "Verification", href: "/docs/resources/verification", badge: null },
+      {
+        label: "Verification",
+        href: "/docs/resources/verification",
+        badge: null,
+      },
       { label: "Security", href: "/docs/security/security-model", badge: null },
       { label: "Evals", href: "/evals", badge: null },
       { label: "Changelog", href: "/changelog", badge: null },
@@ -82,7 +90,10 @@ export const footer_links = {
     { label: "Memvid bridge", href: "/docs/guides/memvid-bridge" },
     { label: "Status", href: "/docs/resources/status" },
     { label: "Verification", href: "/docs/resources/verification" },
-    { label: "Enterprise controls", href: "/docs/security/enterprise-controls" },
+    {
+      label: "Enterprise controls",
+      href: "/docs/security/enterprise-controls",
+    },
   ],
   company: [
     { label: "About", href: "/about" },

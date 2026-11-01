@@ -14,7 +14,7 @@ export function DocsToc({ headings }: { headings: TocHeading[] }): ReactNode {
       <p className="text-muted-foreground mb-4 text-xs font-semibold tracking-widest uppercase">
         On this page
       </p>
-      <ul className="space-y-2 border-l border-border pl-4">
+      <ul className="border-border space-y-2 border-l pl-4">
         {headings.map((heading) => (
           <li key={heading.id}>
             <a

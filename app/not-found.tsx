@@ -17,7 +17,10 @@ export default function NotFound(): ReactNode {
         <Link href="/" className={`${chrome_primary_cta} glow-accent`}>
           Home
         </Link>
-        <Link href="/docs" className={`${chrome_secondary_cta} border-border border`}>
+        <Link
+          href="/docs"
+          className={`${chrome_secondary_cta} border-border border`}
+        >
           Documentation
         </Link>
       </div>

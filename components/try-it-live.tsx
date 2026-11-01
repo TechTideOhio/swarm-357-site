@@ -30,9 +30,7 @@ function StatusDot({ status }: { status: AgentResult["status"] }): ReactNode {
     skipped: "bg-muted-foreground",
   };
   return (
-    <span
-      className={`inline-block h-2 w-2 rounded-full ${colors[status]}`}
-    />
+    <span className={`inline-block h-2 w-2 rounded-full ${colors[status]}`} />
   );
 }
 
@@ -150,11 +148,14 @@ export function TryItLive(): ReactNode {
       </h2>
       <p className="text-muted-foreground mb-6 text-center text-base">
         Type a business task and watch a simulated route through the swarm. Demo
-        writes go through a same-origin BFF. The write key stays server-side, never
-        in the browser bundle.
+        writes go through a same-origin BFF. The write key stays server-side,
+        never in the browser bundle.
       </p>
 
-      <form onSubmit={handleSubmit} className="mb-6 flex flex-col gap-3 sm:flex-row">
+      <form
+        onSubmit={handleSubmit}
+        className="mb-6 flex flex-col gap-3 sm:flex-row"
+      >
         <label htmlFor="try-it-live-task" className="sr-only">
           Business task
         </label>
@@ -168,7 +169,10 @@ export function TryItLive(): ReactNode {
           disabled={state === "running"}
           className={`${chrome_form_control} placeholder:text-muted-foreground min-w-0 flex-1`}
           onFocus={(event) => {
-            event.currentTarget.scrollIntoView({ block: "nearest", behavior: "smooth" });
+            event.currentTarget.scrollIntoView({
+              block: "nearest",
+              behavior: "smooth",
+            });
           }}
         />
         <button
@@ -227,7 +231,9 @@ export function TryItLive(): ReactNode {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: easeOut }}
         >
-          <p className="text-foreground mb-1 text-sm font-medium">Auth required</p>
+          <p className="text-foreground mb-1 text-sm font-medium">
+            Auth required
+          </p>
           <p className="text-muted-foreground text-sm">
             {errorMsg ||
               "Set server-only SWARM_API_KEY on the site deploy (Railway). This is not a successful run."}

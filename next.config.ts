@@ -70,8 +70,16 @@ const nextConfig: NextConfig = {
   // into the canonical doc page instead of indexing two addresses.
   async redirects() {
     return [
-      { source: "/status", destination: "/docs/resources/status", permanent: true },
-      { source: "/security", destination: "/docs/security/security-model", permanent: true },
+      {
+        source: "/status",
+        destination: "/docs/resources/status",
+        permanent: true,
+      },
+      {
+        source: "/security",
+        destination: "/docs/security/security-model",
+        permanent: true,
+      },
     ];
   },
 };

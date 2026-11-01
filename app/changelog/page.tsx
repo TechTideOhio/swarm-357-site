@@ -26,7 +26,10 @@ function render_changelog(md: string): ReactNode {
   for (const line of lines) {
     if (line.startsWith("## ")) {
       elements.push(
-        <h2 key={key++} className="mt-12 mb-4 text-2xl font-medium tracking-tight">
+        <h2
+          key={key++}
+          className="mt-12 mb-4 text-2xl font-medium tracking-tight"
+        >
           {line.replace(/^## /, "").replace(/\u2014/g, "-")}
         </h2>
       );
@@ -38,7 +41,10 @@ function render_changelog(md: string): ReactNode {
       );
     } else if (line.startsWith("- ")) {
       elements.push(
-        <li key={key++} className="text-muted-foreground ml-6 list-disc leading-relaxed">
+        <li
+          key={key++}
+          className="text-muted-foreground ml-6 list-disc leading-relaxed"
+        >
           {line.replace(/^- /, "").replace(/\u2014/g, "-")}
         </li>
       );
@@ -56,7 +62,9 @@ function render_changelog(md: string): ReactNode {
 
 export default function ChangelogPage(): ReactNode {
   const file_path = path.join(process.cwd(), "content/data/changelog.md");
-  const md = fs.existsSync(file_path) ? fs.readFileSync(file_path, "utf8") : "# Changelog\n\nNo data synced yet.";
+  const md = fs.existsSync(file_path)
+    ? fs.readFileSync(file_path, "utf8")
+    : "# Changelog\n\nNo data synced yet.";
 
   return (
     <PageShell

@@ -13,7 +13,8 @@ import type { ReactNode } from "react";
 
 export const metadata: Metadata = createMetadata({
   title: "Evals",
-  description: "Latest evaluation baseline metrics for Swarm 357 single-agent and swarm tasks.",
+  description:
+    "Latest evaluation baseline metrics for Swarm 357 single-agent and swarm tasks.",
   path: "/evals",
 });
 
@@ -26,7 +27,7 @@ export default function EvalsPage(): ReactNode {
       title="Evals"
       description="Budgeted evaluation suite with keyword, length, and LLM judge gates. Numbers from the latest committed baseline."
     >
-      <div className="bg-muted mb-8 overflow-hidden rounded-2xl border border-border p-4">
+      <div className="bg-muted border-border mb-8 overflow-hidden rounded-2xl border p-4">
         <Image
           src="/assets/eval-results.svg"
           alt="Eval results chart"
@@ -51,12 +52,15 @@ export default function EvalsPage(): ReactNode {
               </tr>
               <tr className="border-border border-b">
                 <td className="px-4 py-3 font-medium">Avg combined score</td>
-                <td className="px-4 py-3">{baseline.avg_combined_score.toFixed(3)}</td>
+                <td className="px-4 py-3">
+                  {baseline.avg_combined_score.toFixed(3)}
+                </td>
               </tr>
               <tr className="border-border border-b">
                 <td className="px-4 py-3 font-medium">Spend</td>
                 <td className="px-4 py-3">
-                  ${baseline.spent_usd.toFixed(2)} / ${baseline.budget_usd.toFixed(2)}
+                  ${baseline.spent_usd.toFixed(2)} / $
+                  {baseline.budget_usd.toFixed(2)}
                 </td>
               </tr>
               <tr className="border-border border-b">
@@ -78,7 +82,10 @@ export default function EvalsPage(): ReactNode {
         </div>
       ) : null}
 
-      <Link href="/docs/evals/methodology" className={`${content_inline_link} font-medium`}>
+      <Link
+        href="/docs/evals/methodology"
+        className={`${content_inline_link} font-medium`}
+      >
         Read full eval methodology
       </Link>
     </PageShell>

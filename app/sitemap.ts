@@ -12,13 +12,48 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
 
   const static_pages: MetadataRoute.Sitemap = [
-    { url: SITE_URL, lastModified: now, changeFrequency: "weekly", priority: 1 },
-    { url: `${SITE_URL}/about`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
-    { url: `${SITE_URL}/docs`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
-    { url: `${SITE_URL}/changelog`, lastModified: now, changeFrequency: "weekly", priority: 0.7 },
-    { url: `${SITE_URL}/evals`, lastModified: now, changeFrequency: "weekly", priority: 0.7 },
-    { url: `${SITE_URL}/blog`, lastModified: now, changeFrequency: "weekly", priority: 0.8 },
-    { url: `${SITE_URL}/blog/tags`, lastModified: now, changeFrequency: "monthly", priority: 0.5 },
+    {
+      url: SITE_URL,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 1,
+    },
+    {
+      url: `${SITE_URL}/about`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
+      url: `${SITE_URL}/docs`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+    {
+      url: `${SITE_URL}/changelog`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.7,
+    },
+    {
+      url: `${SITE_URL}/evals`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.7,
+    },
+    {
+      url: `${SITE_URL}/blog`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.8,
+    },
+    {
+      url: `${SITE_URL}/blog/tags`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.5,
+    },
   ];
 
   const doc_pages = load_all_docs().map((doc) => ({
@@ -38,10 +73,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   const blog_pages = load_all_blog_posts().map((post) => ({
     url: `${SITE_URL}${post.href}`,
-    lastModified: post_date_to_utc(post.frontmatter.updated ?? post.frontmatter.date),
+    lastModified: post_date_to_utc(
+      post.frontmatter.updated ?? post.frontmatter.date
+    ),
     changeFrequency: "monthly" as const,
     priority: 0.6,
-    ...(post.frontmatter.cover && { images: [`${SITE_URL}${post.frontmatter.cover}`] }),
+    ...(post.frontmatter.cover && {
+      images: [`${SITE_URL}${post.frontmatter.cover}`],
+    }),
   }));
 
   return [...static_pages, ...doc_pages, ...tag_pages, ...blog_pages];

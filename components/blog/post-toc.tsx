@@ -25,7 +25,10 @@ export function PostToc({ headings }: { headings: TocHeading[] }): ReactNode {
       <ol className="space-y-2">
         {sections.map((heading) => (
           <li key={heading.id}>
-            <a href={`#${heading.id}`} className={`${content_inline_link} text-sm`}>
+            <a
+              href={`#${heading.id}`}
+              className={`${content_inline_link} text-sm`}
+            >
               {heading.text}
             </a>
           </li>

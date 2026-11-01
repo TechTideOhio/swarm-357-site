@@ -1,7 +1,13 @@
 import type { MetadataRoute } from "next";
 import { SITE_URL } from "@/lib/site-url";
 
-const AI_CRAWLERS = ["GPTBot", "ClaudeBot", "PerplexityBot", "Google-Extended", "anthropic-ai"];
+const AI_CRAWLERS = [
+  "GPTBot",
+  "ClaudeBot",
+  "PerplexityBot",
+  "Google-Extended",
+  "anthropic-ai",
+];
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -14,7 +20,14 @@ export default function robots(): MetadataRoute.Robots {
       },
       ...AI_CRAWLERS.map((userAgent) => ({
         userAgent,
-        allow: ["/", "/docs/", "/blog/", "/llms.txt", "/llms-full.txt", "/feed.xml"],
+        allow: [
+          "/",
+          "/docs/",
+          "/blog/",
+          "/llms.txt",
+          "/llms-full.txt",
+          "/feed.xml",
+        ],
         disallow: ["/api/"],
       })),
     ],

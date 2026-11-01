@@ -111,14 +111,14 @@ export function Testimonials() {
   };
 
   return (
-    <section className="bg-background overflow-hidden py-16 text-foreground md:py-32">
+    <section className="bg-background text-foreground overflow-hidden py-16 md:py-32">
       <div className="mx-auto max-w-6xl px-6">
         <motion.div
           className="mb-8 flex flex-col items-start justify-between gap-4 md:mb-16 md:flex-row md:items-center"
           {...fadeInUpView}
         >
           <div>
-            <h2 className="text-3xl font-medium tracking-tight text-foreground md:text-4xl lg:text-5xl">
+            <h2 className="text-foreground text-3xl font-medium tracking-tight md:text-4xl lg:text-5xl">
               Use-case scenarios
             </h2>
             <p className="text-muted-foreground mt-2 text-sm md:text-base">
@@ -131,7 +131,7 @@ export function Testimonials() {
             <button
               onClick={() => scroll("left")}
               disabled={!canScrollLeft}
-              className={`${chrome_icon_circle} bg-accent text-black hover:bg-accent/80 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100`}
+              className={`${chrome_icon_circle} bg-accent hover:bg-accent/80 text-black disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100`}
               aria-label="Scroll left"
             >
               <ArrowLeft className="h-5 w-5" />
@@ -139,7 +139,7 @@ export function Testimonials() {
             <button
               onClick={() => scroll("right")}
               disabled={!canScrollRight}
-              className={`${chrome_icon_circle} bg-accent text-black hover:bg-accent/80 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100`}
+              className={`${chrome_icon_circle} bg-accent hover:bg-accent/80 text-black disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100`}
               aria-label="Scroll right"
             >
               <ArrowRight className="h-5 w-5" />
@@ -164,10 +164,10 @@ export function Testimonials() {
                   role="img"
                   aria-label={`${item.title} scenario illustration`}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-t from-muted via-transparent to-transparent" />
+                  <div className="from-muted absolute inset-0 bg-gradient-to-t via-transparent to-transparent" />
                 </div>
                 <div className="flex flex-1 flex-col justify-between p-8 md:p-10">
-                  <h3 className="mb-4 text-2xl font-medium leading-[1.1] tracking-tight md:text-3xl">
+                  <h3 className="mb-4 text-2xl leading-[1.1] font-medium tracking-tight md:text-3xl">
                     {item.title}
                   </h3>
                   <div>

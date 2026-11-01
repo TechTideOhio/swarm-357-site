@@ -47,7 +47,9 @@ function og_card_url(post: BlogPost): string {
   return `/api/og?${params.toString()}`;
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const post = load_blog_by_slug(slug);
   if (!post) return {};
@@ -69,7 +71,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   });
 }
 
-export default async function BlogPostPage({ params }: PageProps): Promise<ReactNode> {
+export default async function BlogPostPage({
+  params,
+}: PageProps): Promise<ReactNode> {
   const { slug } = await params;
   const post = load_blog_by_slug(slug);
   if (!post) notFound();
@@ -94,13 +98,21 @@ export default async function BlogPostPage({ params }: PageProps): Promise<React
     articleSection: post.frontmatter.tags?.[0],
     wordCount: count_words(post.content),
     inLanguage: "en-US",
-    isPartOf: { "@type": "Blog", name: "Swarm 357 blog", url: `${SITE_URL}/blog` },
+    isPartOf: {
+      "@type": "Blog",
+      name: "Swarm 357 blog",
+      url: `${SITE_URL}/blog`,
+    },
     author: {
       "@type": "Person",
       name: author,
       // AUTHOR_URL is Alex's canonical site; other authors get no url rather than a wrong one.
       ...(author === DEFAULT_AUTHOR && { url: AUTHOR_URL }),
-      worksFor: { "@type": "Organization", name: "TechTide AI", url: TECHTIDE_URL },
+      worksFor: {
+        "@type": "Organization",
+        name: "TechTide AI",
+        url: TECHTIDE_URL,
+      },
     },
     publisher: {
       "@type": "Organization",
@@ -115,8 +127,18 @@ export default async function BlogPostPage({ params }: PageProps): Promise<React
     "@type": "BreadcrumbList",
     itemListElement: [
       { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
-      { "@type": "ListItem", position: 2, name: "Blog", item: `${SITE_URL}/blog` },
-      { "@type": "ListItem", position: 3, name: post.frontmatter.title, item: url },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Blog",
+        item: `${SITE_URL}/blog`,
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: post.frontmatter.title,
+        item: url,
+      },
     ],
   };
 
@@ -154,13 +176,18 @@ export default async function BlogPostPage({ params }: PageProps): Promise<React
         />
       ) : null}
 
-      <h1 className="mb-4 text-4xl font-medium tracking-tight">{post.frontmatter.title}</h1>
+      <h1 className="mb-4 text-4xl font-medium tracking-tight">
+        {post.frontmatter.title}
+      </h1>
 
       <p className="text-muted-foreground mb-6 text-sm">
         <span>{author}</span>
         <span aria-hidden="true"> · </span>
-        <time dateTime={post.frontmatter.date}>{format_post_date(post.frontmatter.date)}</time>
-        {post.frontmatter.updated && post.frontmatter.updated !== post.frontmatter.date ? (
+        <time dateTime={post.frontmatter.date}>
+          {format_post_date(post.frontmatter.date)}
+        </time>
+        {post.frontmatter.updated &&
+        post.frontmatter.updated !== post.frontmatter.date ? (
           <>
             <span aria-hidden="true"> · </span>
             <span>updated {format_post_date(post.frontmatter.updated)}</span>
@@ -187,7 +214,9 @@ export default async function BlogPostPage({ params }: PageProps): Promise<React
 
       {faq ? (
         <section className="border-border mt-16 border-t pt-10">
-          <h2 className="mb-6 text-2xl font-medium tracking-tight">Frequently asked questions</h2>
+          <h2 className="mb-6 text-2xl font-medium tracking-tight">
+            Frequently asked questions
+          </h2>
           <dl className="space-y-6">
             {faq.map((entry) => (
               <div key={entry.question}>
@@ -206,19 +235,29 @@ export default async function BlogPostPage({ params }: PageProps): Promise<React
       ) : null}
 
       {newer || older ? (
-        <nav aria-label="More posts" className="mt-12 grid gap-4 sm:grid-cols-2">
+        <nav
+          aria-label="More posts"
+          className="mt-12 grid gap-4 sm:grid-cols-2"
+        >
           {older ? (
             <Link href={older.href} className={`${content_card} no-underline`}>
               <span className="text-muted-foreground text-sm">Previous</span>
-              <span className="mt-1 block font-medium">{older.frontmatter.title}</span>
+              <span className="mt-1 block font-medium">
+                {older.frontmatter.title}
+              </span>
             </Link>
           ) : (
             <span />
           )}
           {newer ? (
-            <Link href={newer.href} className={`${content_card} text-right no-underline`}>
+            <Link
+              href={newer.href}
+              className={`${content_card} text-right no-underline`}
+            >
               <span className="text-muted-foreground text-sm">Next</span>
-              <span className="mt-1 block font-medium">{newer.frontmatter.title}</span>
+              <span className="mt-1 block font-medium">
+                {newer.frontmatter.title}
+              </span>
             </Link>
           ) : null}
         </nav>

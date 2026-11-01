@@ -2,10 +2,7 @@
 
 import { finalCtaConfig } from "@/lib/config";
 import { easeOut, fadeInUpView } from "@/lib/motion";
-import {
-  chrome_arrow_cta,
-  chrome_arrow_cta_badge,
-} from "@/lib/ui-classes";
+import { chrome_arrow_cta, chrome_arrow_cta_badge } from "@/lib/ui-classes";
 import { ChevronRightIcon } from "lucide-react";
 import { motion } from "motion/react";
 import { useEffect, useState, type ReactNode } from "react";

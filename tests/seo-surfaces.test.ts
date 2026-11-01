@@ -26,7 +26,8 @@ describe("blog corpus", () => {
 
   test("every post carries the fields schema and social cards need", () => {
     for (const post of posts) {
-      const { title, description, date, cover, coverAlt, author, keyword } = post.frontmatter;
+      const { title, description, date, cover, coverAlt, author, keyword } =
+        post.frontmatter;
       expect(title.length).toBeGreaterThan(0);
       expect(description.length).toBeGreaterThan(0);
       expect(date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
@@ -55,7 +56,13 @@ describe("blog corpus", () => {
 
 describe("loader input validation", () => {
   test("rejects a slug that is not a plain lowercase filename", () => {
-    for (const slug of ["../secrets", "Upper", "has space", "javascript:alert(1)", ""]) {
+    for (const slug of [
+      "../secrets",
+      "Upper",
+      "has space",
+      "javascript:alert(1)",
+      "",
+    ]) {
       expect(load_blog_by_slug(slug)).toBeNull();
     }
   });
@@ -70,7 +77,9 @@ describe("loader input validation", () => {
 describe("feed.xml", () => {
   test("is well-formed RSS listing every post", async () => {
     const body = await feed_get().text();
-    expect(body.startsWith('<?xml version="1.0" encoding="UTF-8"?>')).toBe(true);
+    expect(body.startsWith('<?xml version="1.0" encoding="UTF-8"?>')).toBe(
+      true
+    );
     expect(body).toContain('<rss version="2.0"');
     expect(body).toContain(`<atom:link href="${SITE_URL}/feed.xml"`);
     for (const post of posts) {
@@ -128,7 +137,9 @@ describe("sitemap", () => {
 
   test("blog entries carry their cover image for image search", () => {
     for (const post of posts) {
-      const entry = entries.find((candidate) => candidate.url === `${SITE_URL}${post.href}`);
+      const entry = entries.find(
+        (candidate) => candidate.url === `${SITE_URL}${post.href}`
+      );
       expect(entry?.images).toEqual([`${SITE_URL}${post.frontmatter.cover}`]);
     }
   });
@@ -150,7 +161,8 @@ describe("blog tag hubs", () => {
   test("slugs are url safe and unique", () => {
     const slugs = tags.map((tag) => tag.slug);
     expect(new Set(slugs).size).toBe(slugs.length);
-    for (const slug of slugs) expect(slug).toMatch(/^[a-z0-9]+(?:-[a-z0-9]+)*$/);
+    for (const slug of slugs)
+      expect(slug).toMatch(/^[a-z0-9]+(?:-[a-z0-9]+)*$/);
   });
 
   test("an unknown slug resolves to nothing rather than an empty hub", () => {

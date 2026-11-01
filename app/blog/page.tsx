@@ -68,7 +68,12 @@ export default function BlogIndexPage(): ReactNode {
     "@type": "BreadcrumbList",
     itemListElement: [
       { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
-      { "@type": "ListItem", position: 2, name: "Blog", item: `${SITE_URL}/blog` },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Blog",
+        item: `${SITE_URL}/blog`,
+      },
     ],
   };
 
@@ -91,7 +96,10 @@ export default function BlogIndexPage(): ReactNode {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb_schema) }}
       />
 
-      <nav aria-label="Blog topics" className="border-border mb-12 border-b pb-8">
+      <nav
+        aria-label="Blog topics"
+        className="border-border mb-12 border-b pb-8"
+      >
         <p className="text-muted-foreground mb-3 text-xs font-semibold tracking-widest uppercase">
           Browse by topic
         </p>
@@ -100,7 +108,10 @@ export default function BlogIndexPage(): ReactNode {
             <li key={tag.slug}>
               <Link href={`/blog/tag/${tag.slug}`} className={content_tag_chip}>
                 {tag.label}
-                <span className="text-muted-foreground/60"> {tag.posts.length}</span>
+                <span className="text-muted-foreground/60">
+                  {" "}
+                  {tag.posts.length}
+                </span>
               </Link>
             </li>
           ))}
@@ -115,7 +126,10 @@ export default function BlogIndexPage(): ReactNode {
       {lead ? (
         <article className="border-border mb-12 border-b pb-12">
           {lead.frontmatter.cover ? (
-            <Link href={lead.href} className="focus-ring mb-6 block rounded-2xl">
+            <Link
+              href={lead.href}
+              className="focus-ring mb-6 block rounded-2xl"
+            >
               <BlogCover
                 src={lead.frontmatter.cover}
                 alt={lead.frontmatter.coverAlt ?? lead.frontmatter.title}
@@ -129,11 +143,16 @@ export default function BlogIndexPage(): ReactNode {
             {lead.frontmatter.author ? ` by ${lead.frontmatter.author}` : ""}
           </p>
           <h2 className="mb-3 text-3xl font-medium tracking-tight">
-            <Link href={lead.href} className={`${content_inline_link} no-underline`}>
+            <Link
+              href={lead.href}
+              className={`${content_inline_link} no-underline`}
+            >
               {lead.frontmatter.title}
             </Link>
           </h2>
-          <p className="text-muted-foreground text-lg">{lead.frontmatter.description}</p>
+          <p className="text-muted-foreground text-lg">
+            {lead.frontmatter.description}
+          </p>
         </article>
       ) : null}
 

@@ -78,7 +78,9 @@ export function DocsMobileToolbar({
               animate={overlayFade.animate}
               exit={overlayFade.exit}
               transition={
-                prefers_reduced_motion ? { duration: 0.01 } : overlayFadeTransition
+                prefers_reduced_motion
+                  ? { duration: 0.01 }
+                  : overlayFadeTransition
               }
               onClick={() => set_drawer_open(false)}
               aria-hidden="true"
@@ -90,9 +92,15 @@ export function DocsMobileToolbar({
               role="dialog"
               aria-modal="true"
               aria-label="Documentation sections"
-              initial={{ x: prefers_reduced_motion ? 0 : "-100%", opacity: prefers_reduced_motion ? 0 : 1 }}
+              initial={{
+                x: prefers_reduced_motion ? 0 : "-100%",
+                opacity: prefers_reduced_motion ? 0 : 1,
+              }}
               animate={{ x: 0, opacity: 1 }}
-              exit={{ x: prefers_reduced_motion ? 0 : "-100%", opacity: prefers_reduced_motion ? 0 : 1 }}
+              exit={{
+                x: prefers_reduced_motion ? 0 : "-100%",
+                opacity: prefers_reduced_motion ? 0 : 1,
+              }}
               transition={
                 prefers_reduced_motion
                   ? { duration: 0.01 }
@@ -100,7 +108,9 @@ export function DocsMobileToolbar({
               }
             >
               <div className="border-border flex items-center justify-between border-b px-4 py-3">
-                <span className="text-sm font-semibold tracking-tight">Documentation</span>
+                <span className="text-sm font-semibold tracking-tight">
+                  Documentation
+                </span>
                 <button
                   type="button"
                   onClick={() => set_drawer_open(false)}

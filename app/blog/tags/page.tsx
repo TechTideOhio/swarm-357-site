@@ -30,7 +30,11 @@ export default function BlogTagsPage(): ReactNode {
     name: "Blog topics",
     description: "Topic index for the Swarm 357 engineering blog.",
     url: `${SITE_URL}/blog/tags`,
-    isPartOf: { "@type": "Blog", name: "Swarm 357 blog", url: `${SITE_URL}/blog` },
+    isPartOf: {
+      "@type": "Blog",
+      name: "Swarm 357 blog",
+      url: `${SITE_URL}/blog`,
+    },
     mainEntity: {
       "@type": "ItemList",
       numberOfItems: hubs.length,
@@ -57,8 +61,13 @@ export default function BlogTagsPage(): ReactNode {
       <ul className="grid gap-4 sm:grid-cols-2">
         {hubs.map((tag) => (
           <li key={tag.slug}>
-            <Link href={`/blog/tag/${tag.slug}`} className={`${content_card} block no-underline`}>
-              <span className="text-xl font-medium tracking-tight">{tag.label}</span>
+            <Link
+              href={`/blog/tag/${tag.slug}`}
+              className={`${content_card} block no-underline`}
+            >
+              <span className="text-xl font-medium tracking-tight">
+                {tag.label}
+              </span>
               <span className="text-muted-foreground mt-1 block text-sm">
                 {tag.posts.length} articles
               </span>
@@ -69,11 +78,16 @@ export default function BlogTagsPage(): ReactNode {
 
       {singles.length > 0 ? (
         <section className="border-border mt-12 border-t pt-10">
-          <h2 className="mb-4 text-lg font-medium tracking-tight">One-off topics</h2>
+          <h2 className="mb-4 text-lg font-medium tracking-tight">
+            One-off topics
+          </h2>
           <p className="text-muted-foreground mb-6 text-sm">
             Single articles that have not grown into a series yet.
           </p>
-          <TagChips tags={singles.map((tag) => tag.label)} label="One-off topics" />
+          <TagChips
+            tags={singles.map((tag) => tag.label)}
+            label="One-off topics"
+          />
         </section>
       ) : null}
 

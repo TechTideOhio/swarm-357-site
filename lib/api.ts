@@ -175,7 +175,9 @@ export async function postRun(task: string): Promise<SwarmRunResult> {
     throw err;
   }
   if (!res.ok) {
-    throw new Error(payload.detail ?? `API /api/swarm/run returned ${res.status}`);
+    throw new Error(
+      payload.detail ?? `API /api/swarm/run returned ${res.status}`
+    );
   }
   return payload;
 }

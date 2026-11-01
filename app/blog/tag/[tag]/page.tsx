@@ -26,7 +26,9 @@ function hub_description(label: string, count: number): string {
   return `${count} engineering ${noun} on ${label.toLowerCase()} from building and running Swarm 357 in production.`;
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
   const { tag: slug } = await params;
   const tag = get_blog_tag(slug);
   if (!tag) return {};
@@ -39,7 +41,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   });
 }
 
-export default async function BlogTagPage({ params }: PageProps): Promise<ReactNode> {
+export default async function BlogTagPage({
+  params,
+}: PageProps): Promise<ReactNode> {
   const { tag: slug } = await params;
   const tag = get_blog_tag(slug);
   if (!tag) notFound();
@@ -52,7 +56,11 @@ export default async function BlogTagPage({ params }: PageProps): Promise<ReactN
     name: `${tag.label} articles`,
     description: hub_description(tag.label, tag.posts.length),
     url,
-    isPartOf: { "@type": "Blog", name: "Swarm 357 blog", url: `${SITE_URL}/blog` },
+    isPartOf: {
+      "@type": "Blog",
+      name: "Swarm 357 blog",
+      url: `${SITE_URL}/blog`,
+    },
     mainEntity: {
       "@type": "ItemList",
       numberOfItems: tag.posts.length,
@@ -70,8 +78,18 @@ export default async function BlogTagPage({ params }: PageProps): Promise<ReactN
     "@type": "BreadcrumbList",
     itemListElement: [
       { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
-      { "@type": "ListItem", position: 2, name: "Blog", item: `${SITE_URL}/blog` },
-      { "@type": "ListItem", position: 3, name: "Topics", item: `${SITE_URL}/blog/tags` },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Blog",
+        item: `${SITE_URL}/blog`,
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: "Topics",
+        item: `${SITE_URL}/blog/tags`,
+      },
       { "@type": "ListItem", position: 4, name: tag.label, item: url },
     ],
   };

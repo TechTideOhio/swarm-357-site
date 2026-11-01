@@ -52,7 +52,11 @@ const website_json_ld = {
   url: SITE_URL,
   // No SearchAction: search is a client-side dialog with no query URL, and
   // declaring an action the site cannot serve is a claim we would have to walk back.
-  publisher: { "@type": "Organization", name: "TechTide AI", url: TECHTIDE_URL },
+  publisher: {
+    "@type": "Organization",
+    name: "TechTide AI",
+    url: TECHTIDE_URL,
+  },
 };
 
 export default function RootLayout({
@@ -65,7 +69,9 @@ export default function RootLayout({
       <head>
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(organization_json_ld) }}
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(organization_json_ld),
+          }}
         />
         <script
           type="application/ld+json"

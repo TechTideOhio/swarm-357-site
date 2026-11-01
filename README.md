@@ -8,18 +8,18 @@ Marketing site, documentation library, and engineering blog for [TechTide Swarm 
 
 **Landing 0.2.2**, compatible with [`techtide-swarm` 0.2.2](https://pypi.org/project/techtide-swarm/0.2.2/).
 
-| Surface | URL |
-|---------|-----|
-| Marketing and docs | https://swarm357.techtideai.io |
-| Documentation home | https://swarm357.techtideai.io/docs |
-| Blog | https://swarm357.techtideai.io/blog |
-| Blog feed (RSS 2.0) | https://swarm357.techtideai.io/feed.xml |
-| About | https://swarm357.techtideai.io/about |
-| Changelog | https://swarm357.techtideai.io/changelog |
-| Evals | https://swarm357.techtideai.io/evals |
-| Machine-readable index | https://swarm357.techtideai.io/llms.txt |
-| TechTide AI (LinkedIn) | https://www.linkedin.com/company/techtide-ai/ |
-| Backend API (OpenAPI docs) | https://swarm357be.up.railway.app/docs |
+| Surface                    | URL                                           |
+| -------------------------- | --------------------------------------------- |
+| Marketing and docs         | https://swarm357.techtideai.io                |
+| Documentation home         | https://swarm357.techtideai.io/docs           |
+| Blog                       | https://swarm357.techtideai.io/blog           |
+| Blog feed (RSS 2.0)        | https://swarm357.techtideai.io/feed.xml       |
+| About                      | https://swarm357.techtideai.io/about          |
+| Changelog                  | https://swarm357.techtideai.io/changelog      |
+| Evals                      | https://swarm357.techtideai.io/evals          |
+| Machine-readable index     | https://swarm357.techtideai.io/llms.txt       |
+| TechTide AI (LinkedIn)     | https://www.linkedin.com/company/techtide-ai/ |
+| Backend API (OpenAPI docs) | https://swarm357be.up.railway.app/docs        |
 
 ## Why this exists
 
@@ -32,8 +32,11 @@ Marketing site, documentation library, and engineering blog for [TechTide Swarm 
 **Real-world use case (2025-2026 evidence).** **Verified in this repository.** Publishing a documentation library and blog for an open-source Python package as a static-first Next.js 16 site, with continuous integration that fails on broken internal links, duplicate blog keywords, missing frontmatter, or em dashes (`scripts/check-content.ts`, `scripts/verify-links.ts`, `tests/seo-surfaces.test.ts`, `tests/swarm-run-route.test.ts`, and [`.github/workflows/ci.yml`](.github/workflows/ci.yml)). Next.js 16 made Turbopack the default bundler and rewrote prefetching with layout deduplication and incremental prefetching, which the documentation navigation picks up through the `next/link` components in `components/header.tsx` and `components/page-shell.tsx`[^1]; the 16.0.0 release was published on 2025-10-22 and this repository tracks the 16.x line (`next` 16.4.2 in `package.json`)[^2]; Next.js 16.1 added an experimental bundle analyzer for Turbopack that the release notes describe as a way to optimize bundle sizes and improve Core Web Vitals[^3]; and LCP and INP became Baseline Newly available across all major browsers in December 2025, which is why the site keeps heavy client JavaScript optional (the hero does not render its WebGL cursor on mobile in `components/hero.tsx`, and `MotionDiv` and `MotionSection` in `lib/motion.tsx` switch to `reducedMotionVariants` when `useReducedMotion()` is true)[^4].
 
 [^1]: Vercel, "Next.js 16", <https://nextjs.org/blog/next-16>, published 2025-10-21.
+
 [^2]: vercel/next.js, release v16.0.0, <https://github.com/vercel/next.js/releases/tag/v16.0.0>, published 2025-10-22.
+
 [^3]: Vercel, "Next.js 16.1", <https://nextjs.org/blog/next-16-1>, published 2025-12-18.
+
 [^4]: web.dev, "LCP and INP are now Baseline Newly available", <https://web.dev/blog/lcp-and-inp-are-now-baseline-newly-available>, published 2025-12-17.
 
 ## Contents
@@ -70,51 +73,51 @@ swarm demo
 
 ## Tech stack
 
-| Layer | Technology | Role |
-|-------|-----------|------|
-| Framework | [Next.js 16](https://nextjs.org/docs) | App Router, server components, static documentation |
-| UI runtime | [React 19](https://react.dev/) | Component model |
-| Language | [TypeScript](https://www.typescriptlang.org/docs/) | Strict mode across the codebase |
-| Styling | [Tailwind CSS v4](https://tailwindcss.com/docs) | CSS-first tokens declared with `@theme inline` in `app/globals.css` |
-| Content | [MDX](https://mdxjs.com/) with [remark-gfm](https://github.com/remarkjs/remark-gfm), [rehype-slug](https://github.com/rehypejs/rehype-slug), [rehype-pretty-code](https://rehype-pretty.pages.dev/) | Documentation library and blog |
-| Syntax highlighting | [Shiki](https://shiki.style/) | Build-time code themes |
-| Animation | [Motion](https://motion.dev/docs) | Presets in `lib/motion.tsx` with reduced-motion fallbacks |
-| 3D | [React Three Fiber](https://r3f.docs.pmnd.rs/) and [drei](https://drei.docs.pmnd.rs/) | Optional WebGL dither cursor; the hero skips it on mobile |
-| Theming | [next-themes](https://github.com/pacocoursey/next-themes) | Class-based dark mode |
-| Frontmatter | [gray-matter](https://github.com/jonschlinkert/gray-matter) | MDX metadata parsing |
-| Toolchain | [Bun](https://bun.sh/docs) | Install, scripts, and content generation |
-| Hosting | [Railway](https://docs.railway.com/) | Dockerfile build selected in `railway.toml` |
+| Layer               | Technology                                                                                                                                                                                          | Role                                                                |
+| ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| Framework           | [Next.js 16](https://nextjs.org/docs)                                                                                                                                                               | App Router, server components, static documentation                 |
+| UI runtime          | [React 19](https://react.dev/)                                                                                                                                                                      | Component model                                                     |
+| Language            | [TypeScript](https://www.typescriptlang.org/docs/)                                                                                                                                                  | Strict mode across the codebase                                     |
+| Styling             | [Tailwind CSS v4](https://tailwindcss.com/docs)                                                                                                                                                     | CSS-first tokens declared with `@theme inline` in `app/globals.css` |
+| Content             | [MDX](https://mdxjs.com/) with [remark-gfm](https://github.com/remarkjs/remark-gfm), [rehype-slug](https://github.com/rehypejs/rehype-slug), [rehype-pretty-code](https://rehype-pretty.pages.dev/) | Documentation library and blog                                      |
+| Syntax highlighting | [Shiki](https://shiki.style/)                                                                                                                                                                       | Build-time code themes                                              |
+| Animation           | [Motion](https://motion.dev/docs)                                                                                                                                                                   | Presets in `lib/motion.tsx` with reduced-motion fallbacks           |
+| 3D                  | [React Three Fiber](https://r3f.docs.pmnd.rs/) and [drei](https://drei.docs.pmnd.rs/)                                                                                                               | Optional WebGL dither cursor; the hero skips it on mobile           |
+| Theming             | [next-themes](https://github.com/pacocoursey/next-themes)                                                                                                                                           | Class-based dark mode                                               |
+| Frontmatter         | [gray-matter](https://github.com/jonschlinkert/gray-matter)                                                                                                                                         | MDX metadata parsing                                                |
+| Toolchain           | [Bun](https://bun.sh/docs)                                                                                                                                                                          | Install, scripts, and content generation                            |
+| Hosting             | [Railway](https://docs.railway.com/)                                                                                                                                                                | Dockerfile build selected in `railway.toml`                         |
 
 There is no component library dependency. Components are hand written against the class tiers in `lib/ui-classes.ts`.
 
 ## Repository map
 
-| Path | Contents |
-|------|----------|
-| `app/` | Routes. Marketing at `page.tsx`, plus `about/`, `docs/`, `blog/`, `changelog/`, `evals/`, `status/`, `security/`, and the server-only BFF under `api/` |
-| `components/` | Landing sections, site chrome, and documentation shell components |
-| `lib/` | Shared modules: `ui-classes.ts` (class tiers), `motion.tsx` (animation presets), `navigation.ts` (nav model), `site-url.ts` (canonical URLs), `eval-baseline.ts` (baseline metrics), `content/` (MDX loader, nav tree, table of contents) |
-| `content/docs/` | Generated MDX documentation library |
-| `content/blog/` | Generated blog posts |
-| `content/data/` | Generated snapshots: `eval-baseline.json`, `status.md`, `changelog.md` |
-| `public/` | Static assets, diagrams, and the Open Graph image |
-| `scripts/` | `generate-content.ts` (sync), `check-content.ts` (CI guard), `verify-links.ts` (link resolution) |
-| `DESIGN.md` | Canonical design system reference |
+| Path            | Contents                                                                                                                                                                                                                                  |
+| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `app/`          | Routes. Marketing at `page.tsx`, plus `about/`, `docs/`, `blog/`, `changelog/`, `evals/`, `status/`, `security/`, and the server-only BFF under `api/`                                                                                    |
+| `components/`   | Landing sections, site chrome, and documentation shell components                                                                                                                                                                         |
+| `lib/`          | Shared modules: `ui-classes.ts` (class tiers), `motion.tsx` (animation presets), `navigation.ts` (nav model), `site-url.ts` (canonical URLs), `eval-baseline.ts` (baseline metrics), `content/` (MDX loader, nav tree, table of contents) |
+| `content/docs/` | Generated MDX documentation library                                                                                                                                                                                                       |
+| `content/blog/` | Generated blog posts                                                                                                                                                                                                                      |
+| `content/data/` | Generated snapshots: `eval-baseline.json`, `status.md`, `changelog.md`                                                                                                                                                                    |
+| `public/`       | Static assets, diagrams, and the Open Graph image                                                                                                                                                                                         |
+| `scripts/`      | `generate-content.ts` (sync), `check-content.ts` (CI guard), `verify-links.ts` (link resolution)                                                                                                                                          |
+| `DESIGN.md`     | Canonical design system reference                                                                                                                                                                                                         |
 
 ## Commands
 
-| Command | Purpose |
-|---------|---------|
-| `bun run dev` | Local development server |
-| `bun run build` | Production build |
-| `bun run start` | Serve the production build |
-| `bun run lint` | ESLint across the repository |
-| `bun run typecheck` | TypeScript with `--noEmit` |
-| `bun test` | Bun test runner over `tests/` and `scripts/*.test.ts` |
-| `bun run check:content` | Dash policy, URL policy, frontmatter, and UI interaction guards |
-| `bun run verify:links` | Resolve every internal documentation link |
-| `bun run generate:content` | Sync documentation from the core repository |
-| `bun run format` | Prettier with the Tailwind class sorter |
+| Command                    | Purpose                                                         |
+| -------------------------- | --------------------------------------------------------------- |
+| `bun run dev`              | Local development server                                        |
+| `bun run build`            | Production build                                                |
+| `bun run start`            | Serve the production build                                      |
+| `bun run lint`             | ESLint across the repository                                    |
+| `bun run typecheck`        | TypeScript with `--noEmit`                                      |
+| `bun test`                 | Bun test runner over `tests/` and `scripts/*.test.ts`           |
+| `bun run check:content`    | Dash policy, URL policy, frontmatter, and UI interaction guards |
+| `bun run verify:links`     | Resolve every internal documentation link                       |
+| `bun run generate:content` | Sync documentation from the core repository                     |
+| `bun run format`           | Prettier with the Tailwind class sorter                         |
 
 Run this sequence before opening a pull request:
 
@@ -173,13 +176,13 @@ Posts live in `content/blog/*.mdx` and are hand authored. `generate:content` onl
 
 Required frontmatter, enforced by `bun run check:content`:
 
-| Field | Purpose |
-|-------|---------|
-| `title`, `description`, `date`, `slug` | Listing, feed, and `BlogPosting` schema |
-| `cover`, `coverAlt` | 1200x630 JPEG under `public/art/blog/`, also the `og:image` |
-| `author` | Rendered as a schema.org `Person` with `worksFor` TechTide AI |
-| `keyword` | Primary search phrase, registered in `content/data/blog-keyword-owners.json` |
-| `tags`, `faq`, `updated` | Tag chips, `FAQPage` schema, and `dateModified` |
+| Field                                  | Purpose                                                                      |
+| -------------------------------------- | ---------------------------------------------------------------------------- |
+| `title`, `description`, `date`, `slug` | Listing, feed, and `BlogPosting` schema                                      |
+| `cover`, `coverAlt`                    | 1200x630 JPEG under `public/art/blog/`, also the `og:image`                  |
+| `author`                               | Rendered as a schema.org `Person` with `worksFor` TechTide AI                |
+| `keyword`                              | Primary search phrase, registered in `content/data/blog-keyword-owners.json` |
+| `tags`, `faq`, `updated`               | Tag chips, `FAQPage` schema, and `dateModified`                              |
 
 One post owns one keyword. `check:content` fails the build if two posts claim the same phrase or a post claims an unregistered one, which is what keeps the cluster from cannibalizing itself. Each post emits `BlogPosting`, `BreadcrumbList`, and, when `faq` is present, `FAQPage` JSON-LD. The index, RSS feed at `/feed.xml`, sitemap, `llms.txt`, and the landing page strip all read from the same loader, so publishing a post updates every surface.
 
@@ -200,11 +203,11 @@ Railway builds this repository from its root with the `Dockerfile`, per `railway
 
 The Dockerfile is deliberate, not a preference. Nixpacks injects every service variable into the build environment, which put `SWARM_API_KEY` into build arguments and into the image configuration. A Dockerfile build only receives the arguments it declares, so the build stage sees `NEXT_PUBLIC_API_URL` and `NEXT_PUBLIC_SITE_URL` and nothing else.
 
-| Variable | Availability | Reason |
-|----------|--------------|--------|
-| `NEXT_PUBLIC_API_URL` | Build and runtime | Inlined into the client bundle. Public value. |
-| `NEXT_PUBLIC_SITE_URL` | Build and runtime | Inlined into the client bundle. Public value. |
-| `SWARM_API_KEY` | Runtime only | Read per request by the server route. Never declared as a build `ARG`. |
+| Variable               | Availability      | Reason                                                                 |
+| ---------------------- | ----------------- | ---------------------------------------------------------------------- |
+| `NEXT_PUBLIC_API_URL`  | Build and runtime | Inlined into the client bundle. Public value.                          |
+| `NEXT_PUBLIC_SITE_URL` | Build and runtime | Inlined into the client bundle. Public value.                          |
+| `SWARM_API_KEY`        | Runtime only      | Read per request by the server route. Never declared as a build `ARG`. |
 
 Verify after a deploy that the write key is absent from the image configuration:
 
@@ -223,10 +226,10 @@ docker image inspect <image> --format '{{json .Config.Env}}'
 
 ## Related repositories
 
-| Repository | Role |
-|------------|------|
+| Repository                                                          | Role                                                      |
+| ------------------------------------------------------------------- | --------------------------------------------------------- |
 | [TechTideOhio/swarm-357](https://github.com/TechTideOhio/swarm-357) | Core runtime, roster, Memvid bridge, documentation source |
-| [techtide-swarm on PyPI](https://pypi.org/project/techtide-swarm/) | Published package |
+| [techtide-swarm on PyPI](https://pypi.org/project/techtide-swarm/)  | Published package                                         |
 
 ## License
 

@@ -4,13 +4,13 @@ Canonical design reference for the Swarm 357 product surface. This document desc
 
 The code is the source of truth. This document explains it. When they disagree, fix the document.
 
-| Concern | File |
-|---------|------|
-| Color, typography, and utility tokens | [`app/globals.css`](app/globals.css) |
-| Canonical class strings | [`lib/ui-classes.ts`](lib/ui-classes.ts) |
-| Motion presets and reduced-motion handling | [`lib/motion.tsx`](lib/motion.tsx) |
-| Navigation and the external link policy | [`lib/navigation.ts`](lib/navigation.ts), [`lib/site-url.ts`](lib/site-url.ts) |
-| Automated enforcement | [`scripts/check-content.ts`](scripts/check-content.ts) |
+| Concern                                    | File                                                                           |
+| ------------------------------------------ | ------------------------------------------------------------------------------ |
+| Color, typography, and utility tokens      | [`app/globals.css`](app/globals.css)                                           |
+| Canonical class strings                    | [`lib/ui-classes.ts`](lib/ui-classes.ts)                                       |
+| Motion presets and reduced-motion handling | [`lib/motion.tsx`](lib/motion.tsx)                                             |
+| Navigation and the external link policy    | [`lib/navigation.ts`](lib/navigation.ts), [`lib/site-url.ts`](lib/site-url.ts) |
+| Automated enforcement                      | [`scripts/check-content.ts`](scripts/check-content.ts)                         |
 
 ## Contents
 
@@ -49,16 +49,16 @@ The code is the source of truth. This document explains it. When they disagree, 
 
 Tokens are declared once in [`app/globals.css`](app/globals.css) and exposed to Tailwind through `@theme inline`. Components reference the semantic name, never the hex value.
 
-| Token | Light | Dark | Use |
-|-------|-------|------|-----|
-| `--background` | `#ffffff` | `#0a0a0a` | Page and panel base |
-| `--foreground` | `#0a0a0a` | `#fafafa` | Body text |
-| `--muted` | `#f5f5f5` | `#171717` | Secondary surfaces, cards, code blocks |
-| `--muted-foreground` | `#737373` | `#a3a3a3` | Supporting text and captions |
-| `--border` | `#e5e5e5` | `#262626` | Hairlines and dividers |
-| `--accent` | `#ffd900` | `#ffd900` | Primary calls to action, active nav, selection |
-| `--ring` | `#0066ff` | `#3b82f6` | Focus outlines and link underlines |
-| `--menu-card` | `#1a1a1a` | `#f0f0f0` | Mega-menu cards, inverted against the page |
+| Token                | Light     | Dark      | Use                                            |
+| -------------------- | --------- | --------- | ---------------------------------------------- |
+| `--background`       | `#ffffff` | `#0a0a0a` | Page and panel base                            |
+| `--foreground`       | `#0a0a0a` | `#fafafa` | Body text                                      |
+| `--muted`            | `#f5f5f5` | `#171717` | Secondary surfaces, cards, code blocks         |
+| `--muted-foreground` | `#737373` | `#a3a3a3` | Supporting text and captions                   |
+| `--border`           | `#e5e5e5` | `#262626` | Hairlines and dividers                         |
+| `--accent`           | `#ffd900` | `#ffd900` | Primary calls to action, active nav, selection |
+| `--ring`             | `#0066ff` | `#3b82f6` | Focus outlines and link underlines             |
+| `--menu-card`        | `#1a1a1a` | `#f0f0f0` | Mega-menu cards, inverted against the page     |
 
 Rules:
 
@@ -68,35 +68,35 @@ Rules:
 
 ## Typography
 
-| Role | Family | Variable |
-|------|--------|----------|
+| Role               | Family     | Variable      |
+| ------------------ | ---------- | ------------- |
 | Interface and body | Geist Sans | `--font-sans` |
-| Code and metrics | Geist Mono | `--font-mono` |
+| Code and metrics   | Geist Mono | `--font-mono` |
 
 Both are loaded in [`app/layout.tsx`](app/layout.tsx) through `next/font/google` with `display: swap`, so there is no external stylesheet request and no layout shift.
 
 Scale, expressed as the Tailwind classes actually in use:
 
-| Level | Classes |
-|-------|---------|
-| Page hero | `text-4xl md:text-5xl lg:text-6xl font-medium tracking-tight` |
-| Section heading | `text-3xl md:text-4xl lg:text-5xl font-medium tracking-tight` (`chrome_section_heading`) |
-| Subsection heading | `text-2xl md:text-3xl font-medium tracking-tight` |
-| Lead paragraph | `text-lg md:text-xl leading-relaxed text-muted-foreground` |
-| Body | `text-base leading-relaxed` |
-| Caption and eyebrow | `text-sm tracking-widest uppercase text-muted-foreground` |
+| Level               | Classes                                                                                  |
+| ------------------- | ---------------------------------------------------------------------------------------- |
+| Page hero           | `text-4xl md:text-5xl lg:text-6xl font-medium tracking-tight`                            |
+| Section heading     | `text-3xl md:text-4xl lg:text-5xl font-medium tracking-tight` (`chrome_section_heading`) |
+| Subsection heading  | `text-2xl md:text-3xl font-medium tracking-tight`                                        |
+| Lead paragraph      | `text-lg md:text-xl leading-relaxed text-muted-foreground`                               |
+| Body                | `text-base leading-relaxed`                                                              |
+| Caption and eyebrow | `text-sm tracking-widest uppercase text-muted-foreground`                                |
 
 Headings use `font-medium` with tight tracking rather than bold weights. Emphasis comes from size and spacing.
 
 ## Shape and elevation
 
-| Element | Radius |
-|---------|--------|
-| Buttons and inputs at rest | `rounded-[3.5px]` |
-| Buttons on hover | `rounded-[50px]` (the pill morph) |
-| Cards and panels | `rounded-2xl` |
-| Documentation cards and dialogs | `rounded-xl` |
-| Icon buttons and badges | `rounded-full` |
+| Element                         | Radius                            |
+| ------------------------------- | --------------------------------- |
+| Buttons and inputs at rest      | `rounded-[3.5px]`                 |
+| Buttons on hover                | `rounded-[50px]` (the pill morph) |
+| Cards and panels                | `rounded-2xl`                     |
+| Documentation cards and dialogs | `rounded-xl`                      |
+| Icon buttons and badges         | `rounded-full`                    |
 
 Elevation is deliberately shallow. Landing panels use `shadow-2xl/20` over a `bg-muted` surface with a `border-neutral-200/10` hairline. Documentation surfaces use a `border-border` hairline and no shadow at rest. Form controls never carry a shadow.
 
@@ -108,63 +108,63 @@ Elevation is deliberately shallow. Landing panels use `shadow-2xl/20` over a `bg
 
 Marketing surfaces: the header, the landing sections, and the footer.
 
-| Export | Purpose |
-|--------|---------|
-| `chrome_primary_cta` | Accent call to action with pill morph |
-| `chrome_secondary_cta` | Muted call to action with pill morph |
-| `chrome_arrow_cta`, `chrome_arrow_cta_badge` | Arrow call to action and its chevron badge |
-| `chrome_quiet_link` | Low emphasis text link with a hover surface |
-| `chrome_icon_circle` | Circular icon button, 44px minimum |
-| `chrome_card_shell` | Landing card and panel shell |
-| `chrome_section`, `chrome_section_heading`, `chrome_section_sub` | Section rhythm and headings |
-| `chrome_form_control` | Landing input and select |
-| `chrome_overlay` | Modal and mega-menu backdrop |
+| Export                                                           | Purpose                                     |
+| ---------------------------------------------------------------- | ------------------------------------------- |
+| `chrome_primary_cta`                                             | Accent call to action with pill morph       |
+| `chrome_secondary_cta`                                           | Muted call to action with pill morph        |
+| `chrome_arrow_cta`, `chrome_arrow_cta_badge`                     | Arrow call to action and its chevron badge  |
+| `chrome_quiet_link`                                              | Low emphasis text link with a hover surface |
+| `chrome_icon_circle`                                             | Circular icon button, 44px minimum          |
+| `chrome_card_shell`                                              | Landing card and panel shell                |
+| `chrome_section`, `chrome_section_heading`, `chrome_section_sub` | Section rhythm and headings                 |
+| `chrome_form_control`                                            | Landing input and select                    |
+| `chrome_overlay`                                                 | Modal and mega-menu backdrop                |
 
 ### Tier B, content
 
 Documentation and long-form reading surfaces.
 
-| Export | Purpose |
-|--------|---------|
-| `content_nav_link`, `content_nav_link_active`, `content_nav_link_inactive` | Sidebar and drawer navigation |
-| `content_inline_link` | Prose link with an underline |
-| `content_card` | Documentation home and pager cards |
-| `content_form_control` | Search trigger and documentation inputs |
-| `content_dialog_panel`, `content_dialog_sheet_sm` | Search dialog and mobile sheet |
-| `content_breadcrumb_link` | Breadcrumb trail |
+| Export                                                                     | Purpose                                 |
+| -------------------------------------------------------------------------- | --------------------------------------- |
+| `content_nav_link`, `content_nav_link_active`, `content_nav_link_inactive` | Sidebar and drawer navigation           |
+| `content_inline_link`                                                      | Prose link with an underline            |
+| `content_card`                                                             | Documentation home and pager cards      |
+| `content_form_control`                                                     | Search trigger and documentation inputs |
+| `content_dialog_panel`, `content_dialog_sheet_sm`                          | Search dialog and mobile sheet          |
+| `content_breadcrumb_link`                                                  | Breadcrumb trail                        |
 
 ### Shared
 
-| Export | Purpose |
-|--------|---------|
-| `interactive_press` | Press feedback, `active:scale-[0.96]` |
-| `interactive_card` | Hover lift and shadow for cards |
-| `touch_target` | 44px minimum hit area for compact controls |
+| Export              | Purpose                                    |
+| ------------------- | ------------------------------------------ |
+| `interactive_press` | Press feedback, `active:scale-[0.96]`      |
+| `interactive_card`  | Hover lift and shadow for cards            |
+| `touch_target`      | 44px minimum hit area for compact controls |
 
 ## Interaction
 
 Every interactive element answers four states the same way.
 
-| State | Behavior |
-|-------|----------|
-| Rest | Token colors, `rounded-[3.5px]` for controls |
-| Hover | Color or brightness shift, cards lift by `-translate-y-1`, buttons morph toward a pill |
-| Press | `active:scale-[0.96]` on every button and icon control, `active:opacity-80` on links. Presses always move inward |
-| Focus | `.focus-ring` renders a 2px `--ring` outline at 2px offset on `:focus-visible` only |
-| Disabled | `disabled:opacity-50`, pointer events off, press and morph suppressed |
+| State    | Behavior                                                                                                         |
+| -------- | ---------------------------------------------------------------------------------------------------------------- |
+| Rest     | Token colors, `rounded-[3.5px]` for controls                                                                     |
+| Hover    | Color or brightness shift, cards lift by `-translate-y-1`, buttons morph toward a pill                           |
+| Press    | `active:scale-[0.96]` on every button and icon control, `active:opacity-80` on links. Presses always move inward |
+| Focus    | `.focus-ring` renders a 2px `--ring` outline at 2px offset on `:focus-visible` only                              |
+| Disabled | `disabled:opacity-50`, pointer events off, press and morph suppressed                                            |
 
 Named utilities in [`app/globals.css`](app/globals.css):
 
-| Utility | Behavior |
-|---------|----------|
-| `.interactive-base` | 200ms transition across color, background, border, opacity, transform, and shadow |
-| `.interactive-press` | 200ms transform-only transition |
-| `.interactive-card` | 300ms transition across transform, shadow, border, and background |
-| `.cta-morph` | Pill call to action. Radius at 500ms, color, brightness, opacity and press at 200ms, shadow at 300ms |
-| `.glow-accent` | Accent halo for the single most important call to action on a page. Carries box-shadow values only |
+| Utility               | Behavior                                                                                              |
+| --------------------- | ----------------------------------------------------------------------------------------------------- |
+| `.interactive-base`   | 200ms transition across color, background, border, opacity, transform, and shadow                     |
+| `.interactive-press`  | 200ms transform-only transition                                                                       |
+| `.interactive-card`   | 300ms transition across transform, shadow, border, and background                                     |
+| `.cta-morph`          | Pill call to action. Radius at 500ms, color, brightness, opacity and press at 200ms, shadow at 300ms  |
+| `.glow-accent`        | Accent halo for the single most important call to action on a page. Carries box-shadow values only    |
 | `.glow-accent-subtle` | Accent ring for a highlighted card, such as the featured pricing tier. Carries box-shadow values only |
-| `.nav-link-underline` | Ring-colored underline that scales in from the center on hover and focus |
-| `.focus-ring` | The only sanctioned focus treatment |
+| `.nav-link-underline` | Ring-colored underline that scales in from the center on hover and focus                              |
+| `.focus-ring`         | The only sanctioned focus treatment                                                                   |
 
 Three rules that are easy to get wrong:
 
@@ -176,13 +176,13 @@ Three rules that are easy to get wrong:
 
 Presets live in [`lib/motion.tsx`](lib/motion.tsx). Components import a preset rather than writing transition objects inline.
 
-| Preset | Use |
-|--------|-----|
-| `fadeInUp`, `fadeInUpView` | Section entrance, 30px rise over 0.8s |
-| `staggerContainer`, `StaggerItem` | Lists and card grids, 0.1s between children |
-| `overlayFade` with `overlayFadeTransition` | Modal and drawer backdrops, 0.3s |
+| Preset                                       | Use                                                   |
+| -------------------------------------------- | ----------------------------------------------------- |
+| `fadeInUp`, `fadeInUpView`                   | Section entrance, 30px rise over 0.8s                 |
+| `staggerContainer`, `StaggerItem`            | Lists and card grids, 0.1s between children           |
+| `overlayFade` with `overlayFadeTransition`   | Modal and drawer backdrops, 0.3s                      |
 | `dialogSpring` with `dialogSpringTransition` | Dialog panels, spring at stiffness 400 and damping 25 |
-| `toastSpring` with `toastSpringTransition` | Toasts, spring at stiffness 400 and damping 30 |
+| `toastSpring` with `toastSpringTransition`   | Toasts, spring at stiffness 400 and damping 30        |
 
 Canonical easings are `easeOut` at `[0.16, 1, 0.3, 1]` and `easeInOut` at `[0.65, 0, 0.35, 1]`.
 
@@ -200,22 +200,22 @@ Reduced motion is handled in two layers. A global media query in `app/globals.cs
 
 ## Responsive rules
 
-| Breakpoint | Behavior |
-|------------|----------|
-| Below `sm` (640px) | Dialogs become full-screen sheets at `100dvh` through `content_dialog_sheet_sm`. Tables become stacked cards. Inputs use `text-base`. |
-| Below `lg` (1024px) | The documentation sidebar collapses into a toolbar with a drawer and a search trigger. |
-| `lg` and above | The header expands to the mega-menu. The documentation layout shows the sidebar and the table of contents. |
+| Breakpoint          | Behavior                                                                                                                              |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| Below `sm` (640px)  | Dialogs become full-screen sheets at `100dvh` through `content_dialog_sheet_sm`. Tables become stacked cards. Inputs use `text-base`. |
+| Below `lg` (1024px) | The documentation sidebar collapses into a toolbar with a drawer and a search trigger.                                                |
+| `lg` and above      | The header expands to the mega-menu. The documentation layout shows the sidebar and the table of contents.                            |
 
 The mobile navigation is a full-screen sheet opened from the header, not a bottom bar. Section padding scales through `chrome_section` (`px-6 py-16 md:py-32`).
 
 ## Assets
 
-| Path | Contents |
-|------|----------|
-| `public/assets/` | Architecture and eval diagrams shared with the core repo |
-| `public/art/hero/`, `public/art/testimonials/` | Landing artwork |
-| `public/art/blog/` | Blog covers, one per post |
-| `public/og-image.png` | Open Graph and social card image |
+| Path                                           | Contents                                                 |
+| ---------------------------------------------- | -------------------------------------------------------- |
+| `public/assets/`                               | Architecture and eval diagrams shared with the core repo |
+| `public/art/hero/`, `public/art/testimonials/` | Landing artwork                                          |
+| `public/art/blog/`                             | Blog covers, one per post                                |
+| `public/og-image.png`                          | Open Graph and social card image                         |
 
 Diagrams are authored as SVG in the core repo under `docs/assets/` and mirrored here. Regenerate them in the core repo rather than editing the copies in `public/`.
 
@@ -225,11 +225,11 @@ Blog covers are exactly 1200x630 progressive JPEG, quality 82, and stay under ro
 
 The site keeps exactly two canonical GitHub URLs, defined once in [`lib/site-url.ts`](lib/site-url.ts):
 
-| Constant | Target |
-|----------|--------|
-| `GITHUB_URL` | The core repository |
-| `GITHUB_SITE_URL` | This landing repository |
-| `PYPI_URL` | The published `techtide-swarm` package |
+| Constant          | Target                                 |
+| ----------------- | -------------------------------------- |
+| `GITHUB_URL`      | The core repository                    |
+| `GITHUB_SITE_URL` | This landing repository                |
+| `PYPI_URL`        | The published `techtide-swarm` package |
 
 Rules:
 

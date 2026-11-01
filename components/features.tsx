@@ -62,12 +62,12 @@ function FeatureCard({
 }): ReactNode {
   return (
     <motion.div
-      className={`${chrome_card_shell} ${interactive_card} group grid grid-cols-1 gap-2 overflow-hidden p-2 hover:border-accent/30 md:grid-cols-2`}
+      className={`${chrome_card_shell} ${interactive_card} group hover:border-accent/30 grid grid-cols-1 gap-2 overflow-hidden p-2 md:grid-cols-2`}
       {...fadeInUpView}
       transition={{ ...fadeInUpView.transition, delay: index * 0.1 }}
     >
       <div className="px-4 py-16 md:py-28">
-        <span className="text-muted-foreground bg-foreground/5 mb-4 block w-fit rounded-[3.5px] px-2 py-1 text-sm font-medium tracking-tight transition-colors duration-300 ease-out group-hover:bg-foreground/10">
+        <span className="text-muted-foreground bg-foreground/5 group-hover:bg-foreground/10 mb-4 block w-fit rounded-[3.5px] px-2 py-1 text-sm font-medium tracking-tight transition-colors duration-300 ease-out">
           {feature.number}
         </span>
         <h3 className="mb-4 text-2xl font-medium tracking-tight md:text-3xl">
@@ -91,7 +91,10 @@ export function Features(): ReactNode {
   return (
     <section className="bg-background px-6 py-16 md:py-32">
       <div className="mx-auto flex max-w-6xl flex-col gap-12 lg:flex-row lg:items-start lg:gap-16">
-        <motion.div className="lg:sticky lg:top-60 lg:w-96 lg:shrink-0" {...fadeInUpView}>
+        <motion.div
+          className="lg:sticky lg:top-60 lg:w-96 lg:shrink-0"
+          {...fadeInUpView}
+        >
           <h2 className="mb-4 text-2xl font-medium tracking-tight md:mb-6 md:text-3xl lg:text-4xl">
             {featuresConfig.title}
           </h2>

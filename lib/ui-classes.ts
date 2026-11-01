@@ -53,8 +53,7 @@ export const chrome_section_heading =
 export const chrome_section_sub = "text-muted-foreground text-lg";
 
 /** Tier A - modal / mega-menu backdrop overlay. */
-export const chrome_overlay =
-  "fixed inset-0 bg-black/60 backdrop-blur-sm";
+export const chrome_overlay = "fixed inset-0 bg-black/60 backdrop-blur-sm";
 
 /** Tier A - chrome form control (select, input on landing). */
 export const chrome_form_control =

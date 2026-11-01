@@ -26,8 +26,12 @@ export function Callout({
       className={`my-6 rounded-xl border p-4 ${styles[variant]}`}
       role="note"
     >
-      {title ? <p className="mb-2 font-semibold text-foreground">{title}</p> : null}
-      <div className="text-muted-foreground text-sm leading-relaxed">{children}</div>
+      {title ? (
+        <p className="text-foreground mb-2 font-semibold">{title}</p>
+      ) : null}
+      <div className="text-muted-foreground text-sm leading-relaxed">
+        {children}
+      </div>
     </aside>
   );
 }
