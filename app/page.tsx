@@ -14,7 +14,7 @@ import { features } from "@/lib/config";
 import { landing_faqs } from "@/lib/faq-data";
 import type { Metadata } from "next";
 import { createMetadata, siteConfig } from "@/lib/metadata";
-import { SITE_URL } from "@/lib/site-url";
+import { GITHUB_URL, PYPI_URL, SITE_URL, TECHTIDE_URL } from "@/lib/site-url";
 import type { ReactNode } from "react";
 
 export const metadata: Metadata = createMetadata({
@@ -31,6 +31,8 @@ const software_json_ld = {
   operatingSystem: "Cross-platform",
   description: siteConfig.description,
   url: SITE_URL,
+  sameAs: [GITHUB_URL, PYPI_URL],
+  publisher: { "@type": "Organization", name: "TechTide AI", url: TECHTIDE_URL },
   offers: {
     "@type": "Offer",
     price: "0",

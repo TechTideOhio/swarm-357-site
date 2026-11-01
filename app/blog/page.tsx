@@ -10,7 +10,7 @@ import { load_all_blog_posts } from "@/lib/content/loader";
 import { get_indexable_blog_tags } from "@/lib/content/tags";
 import { format_post_date } from "@/lib/format-date";
 import { createMetadata } from "@/lib/metadata";
-import { SITE_URL } from "@/lib/site-url";
+import { SITE_URL, TECHTIDE_URL } from "@/lib/site-url";
 import { content_inline_link, content_tag_chip } from "@/lib/ui-classes";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
@@ -38,7 +38,7 @@ export default function BlogIndexPage(): ReactNode {
     publisher: {
       "@type": "Organization",
       name: "TechTide AI",
-      url: SITE_URL,
+      url: TECHTIDE_URL,
     },
     blogPost: posts.map((post) => ({
       "@type": "BlogPosting",

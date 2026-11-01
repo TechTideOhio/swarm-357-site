@@ -17,7 +17,7 @@ import {
 import { format_post_date } from "@/lib/format-date";
 import { compile_mdx } from "@/lib/content/mdx";
 import { createMetadata } from "@/lib/metadata";
-import { SITE_URL } from "@/lib/site-url";
+import { AUTHOR_URL, SITE_URL, TECHTIDE_URL } from "@/lib/site-url";
 import { content_card } from "@/lib/ui-classes";
 import type { BlogPost } from "@/lib/content/types";
 import type { Metadata } from "next";
@@ -58,7 +58,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     title: post.frontmatter.title,
     description: post.frontmatter.description,
     path: post.href,
-    image: og_card_url(post),
+    // Hand-authored covers are 1200x630 share images; the dynamic card is the fallback.
+    image: post.frontmatter.cover ?? og_card_url(post),
     article: {
       publishedTime: post.frontmatter.date,
       modifiedTime: post.frontmatter.updated ?? post.frontmatter.date,
@@ -97,13 +98,14 @@ export default async function BlogPostPage({ params }: PageProps): Promise<React
     author: {
       "@type": "Person",
       name: author,
-      url: `${SITE_URL}/about`,
-      worksFor: { "@type": "Organization", name: "TechTide AI" },
+      // AUTHOR_URL is Alex's canonical site; other authors get no url rather than a wrong one.
+      ...(author === DEFAULT_AUTHOR && { url: AUTHOR_URL }),
+      worksFor: { "@type": "Organization", name: "TechTide AI", url: TECHTIDE_URL },
     },
     publisher: {
       "@type": "Organization",
       name: "TechTide AI",
-      url: SITE_URL,
+      url: TECHTIDE_URL,
       logo: { "@type": "ImageObject", url: `${SITE_URL}/icon-512.png` },
     },
   };
